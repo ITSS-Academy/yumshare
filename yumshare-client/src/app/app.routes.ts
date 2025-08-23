@@ -1,0 +1,69 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/home/home.component').then((m) => m.HomeComponent),
+  },
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./pages/home/home.component').then((m) => m.HomeComponent),
+  },
+  {
+    path: 'add-recipe',
+    loadComponent: () =>
+      import('./pages/add-recipe/add-recipe.component').then(
+        (m) => m.AddRecipeComponent
+      ),
+  },
+  {
+    path: 'edit-recipe',
+    loadComponent: () =>
+      import('./pages/edit-recipe/edit-recipe.component').then(
+        (m) => m.EditRecipeComponent
+      ),
+  },
+  {
+    path: 'my-favourite-recipe',
+    loadComponent: () =>
+      import('./pages/my-favourite-recipe/my-favourite-recipe.component').then(
+        (m) => m.MyFavouriteRecipeComponent
+      ),
+  },
+  {
+    path: 'my-recipe',
+    loadComponent: () =>
+      import('./pages/my-recipe/my-recipe.component').then(
+        (m) => m.MyRecipeComponent
+      ),
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./pages/profile/profile.component').then(
+        (m) => m.ProfileComponent
+      ),
+  },
+  {
+    path: 'recipe-detail',
+    loadComponent: () =>
+      import('./pages/recipe-detail/recipe-detail.component').then(
+        (m) => m.RecipeDetailComponent
+      ),
+  },
+  {
+    path:'search',
+    loadComponent: () =>
+      import('./pages/search/search.component').then(
+        (m) => m.SearchComponent
+      ),
+  },
+  {
+    path: 'message',
+    loadComponent: () =>
+      import('./pages/message/message.component').then((m) => m.MessageComponent),
+  },
+  { path: '**', redirectTo: 'home' },
+];

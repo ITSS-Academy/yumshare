@@ -1,0 +1,218 @@
+.sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  overflow: hidden;
+  // border-radius: 0 16px 16px 0;
+}
+
+.logo-section {
+  padding: 24px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.logo {
+  max-width: 140px;
+  max-height: 60px;
+  width: auto;
+  height: auto;
+}
+
+mat-nav-list {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  a[mat-list-item] {
+    height: 56px;
+    border-radius: 0;
+    margin: 0;
+    padding: 0 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 12px;
+    
+    
+    // hover effect like screenshot: light elevation and bg
+    &:hover {
+      background: #f6fbf0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transform: scale(0.985);
+    }
+    
+    mat-icon {
+      margin-right: 16px;
+      color: #666;
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    span {
+      color: #333;
+      font-weight: 400;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    &.active {
+      background: linear-gradient(90deg, #8DC63F 0%, #7FC520 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(141,198,63,0.28);
+      transform: scale(0.98);
+      
+      mat-icon { color: #fff !important; }
+      span { color: #fff !important; font-weight: 600; }
+    }
+  }
+}
+
+.logout-section {
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 44px;
+}
+
+
+.sidebar-container {
+	height: 100vh;
+	width: 100%;
+}
+
+.sidebar {
+	width: 100%;
+	max-width: 280px;
+	background: #fff;
+	box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+}
+.logo-section {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 80px;
+	.logo {
+		height:100px;
+	}
+}
+mat-nav-list {
+	flex: 1 1 auto;
+	padding-top: 8px;
+		a[mat-list-item] {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			font-size: 16px;
+			color: #333;
+			font-weight: 600;
+			height: 48px;
+			line-height: 48px;
+			transition: transform 0.2s, color 0.2s;
+		}
+		a[mat-list-item] mat-icon {
+			color: #88C533;
+			font-size: 22px;
+			min-width: 24px;
+			margin-right: 8px;
+			vertical-align: middle;
+			display: inline-block;
+			transition: font-size 0.2s, color 0.2s;
+		}
+		a[mat-list-item] span {
+			font-weight: 600;
+			letter-spacing: 0.2px;
+			vertical-align: middle;
+			display: inline-block;
+			transition: font-size 0.2s, color 0.2s;
+		}
+}
+.logout-section {
+	padding: 16px;
+	.logout-btn {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		mat-icon {
+			margin-right: 8px;
+		}
+	}
+}
+
+
+// Mini sidebar: chỉ hiện icon, ẩn text
+:host-context(.sidebar-mini) .sidebar {
+  position: fixed !important;
+  left: 0;
+  top: 0;
+  height: 100vh !important;
+  width: 4rem !important;
+  min-width: 4rem !important;
+  z-index: 1200;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+  background: #fff;
+  padding: 0 16px;
+}
+
+:host-context(.sidebar-mini) + .main-content {
+  width: 100vw !important;
+  margin-left: 0 !important;
+}
+
+// Mini sidebar: chỉ hiện icon, ẩn text
+:host-context(.sidebar-mini) .sidebar {
+  .logo-section {
+    padding: 12px 0;
+    height: 64px;
+    .logo {
+      max-width: 32px;
+      height: 32px;
+      width: auto;
+    }
+  }
+  mat-nav-list {
+    padding: 8px 0;
+  }
+  mat-nav-list a[mat-list-item] {
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+    text-align: center;
+    mat-icon {
+      margin: 0;
+      display: block;
+      font-size: 24px;
+    }
+    span {
+      display: none;
+    }
+  }
+  .logout-section {
+    padding: 8px 0;
+    .logout-btn {
+      min-width: 0;
+      padding: 0;
+      font-size: 0;
+      mat-icon {
+        margin: 0;
+      }
+      span {
+        display: none;
+      }
+    }
+  }
+}

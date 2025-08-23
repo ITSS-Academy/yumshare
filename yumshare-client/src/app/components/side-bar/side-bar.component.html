@@ -1,0 +1,34 @@
+<div class="sidebar">
+	<div class="logo-section">
+		<img src="assets/logo.png" class="logo" />
+	</div>
+	<mat-nav-list>
+		<a mat-list-item routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+			<mat-icon>home</mat-icon>
+			<span>Home</span>
+		</a>
+		<a mat-list-item routerLink="/search" routerLinkActive="active">
+			<mat-icon>search</mat-icon>
+			<span>Search Recipes</span>
+		</a>
+		<a mat-list-item routerLink="/my-recipe" routerLinkActive="active">
+			<mat-icon>person</mat-icon>
+			<span>My Recipes</span>
+		</a>
+		<a mat-list-item routerLink="/my-favourite-recipe" routerLinkActive="active">
+			<mat-icon>campaign</mat-icon>
+			<span>My Favorites Recipe</span>
+		</a>
+		<a mat-list-item routerLink="/message" routerLinkActive="active">
+			<mat-icon>mail</mat-icon>
+			<span>Messages</span>
+		</a>
+		
+	</mat-nav-list>
+	<div class="logout-section">
+		<button mat-stroked-button color="primary" class="logout-btn">
+			<mat-icon>logout</mat-icon>
+			Log out
+		</button>
+	</div>
+</div>

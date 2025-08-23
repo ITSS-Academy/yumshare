@@ -1,0 +1,211 @@
+/* You can add global styles to this file, and also import other style files */
+
+@use "@angular/material" as mat;
+
+// Global reset and layout styles
+
+
+
+/* Light Theme */
+:root, :host {
+  @include mat.theme-overrides((
+    primary: #3f6900,
+    on-primary: #ffffff,
+    primary-container: #adf752,
+    on-primary-container: #102000,
+    inverse-primary: #92da37,
+    primary-fixed: #adf752,
+    primary-fixed-dim: #92da37,
+    on-primary-fixed: #102000,
+    on-primary-fixed-variant: #2e4f00,
+    secondary: #476720,
+    on-secondary: #ffffff,
+    secondary-container: #c8ef98,
+    on-secondary-container: #102000,
+    secondary-fixed: #c8ef98,
+    secondary-fixed-dim: #add27e,
+    on-secondary-fixed: #102000,
+    on-secondary-fixed-variant: #314f08,
+    tertiary: #006d40,
+    on-tertiary: #ffffff,
+    tertiary-container: #9cf6bc,
+    on-tertiary-container: #002110,
+    tertiary-fixed: #9cf6bc,
+    tertiary-fixed-dim: #80d9a2,
+    on-tertiary-fixed: #002110,
+    on-tertiary-fixed-variant: #00522f,
+    background: #fcf9f6,
+    on-background: #1c1c1a,
+    surface: #fcf9f6,
+    surface-dim: #dcd9d7,
+    surface-bright: #fcf9f6,
+    surface-container-lowest: #ffffff,
+    surface-container-low: #f6f3f0,
+    surface-container: #f0edeb,
+    surface-container-high: #ebe8e5,
+    surface-container-highest: #e5e2df,
+    on-surface: #1c1c1a,
+    shadow: #000000,
+    scrim: #000000,
+    surface-tint: #5b6052,
+    inverse-surface: #31302f,
+    inverse-on-surface: #f3f0ee,
+    outline: #767870,
+    outline-variant: #c6c7bd,
+    neutral: #787775,
+    neutral10: #1c1c1a,
+    error: #ba1a1a,
+    error-container: #ffdad6,
+    on-error: #ffffff,
+    on-error-container: #410002,
+    surface-variant: #e2e3d9,
+    on-surface-variant: #454840,
+    neutral-variant: #76786f,
+    neutral-variant20: #2f312a,
+    inverse-secondary: #add27e,
+    inverse-tertiary: #80d9a2,
+  ));
+}
+
+/* Dark Theme */
+.dark {
+  @include mat.theme-overrides((
+    primary: #92da37,
+    on-primary: #1f3700,
+    primary-container: #2e4f00,
+    on-primary-container: #adf752,
+    inverse-primary: #3f6900,
+    primary-fixed: #adf752,
+    primary-fixed-dim: #92da37,
+    on-primary-fixed: #102000,
+    on-primary-fixed-variant: #2e4f00,
+    secondary: #add27e,
+    on-secondary: #1f3700,
+    secondary-container: #314f08,
+    on-secondary-container: #c8ef98,
+    secondary-fixed: #c8ef98,
+    secondary-fixed-dim: #add27e,
+    on-secondary-fixed: #102000,
+    on-secondary-fixed-variant: #314f08,
+    tertiary: #80d9a2,
+    on-tertiary: #00391f,
+    tertiary-container: #00522f,
+    on-tertiary-container: #9cf6bc,
+    tertiary-fixed: #9cf6bc,
+    tertiary-fixed-dim: #80d9a2,
+    on-tertiary-fixed: #002110,
+    on-tertiary-fixed-variant: #00522f,
+    background: #131312,
+    on-background: #e5e2df,
+    surface: #131312,
+    surface-dim: #131312,
+    surface-bright: #3a3938,
+    surface-container-lowest: #0e0e0d,
+    surface-container-low: #1c1c1a,
+    surface-container: #20201e,
+    surface-container-high: #2a2a29,
+    surface-container-highest: #353533,
+    on-surface: #e5e2df,
+    shadow: #000000,
+    scrim: #000000,
+    surface-tint: #c4c9b7,
+    inverse-surface: #e5e2df,
+    inverse-on-surface: #31302f,
+    outline: #909189,
+    outline-variant: #454840,
+    neutral: #787775,
+    neutral10: #1c1c1a,
+    error: #ffb4ab,
+    error-container: #93000a,
+    on-error: #690005,
+    on-error-container: #ffdad6,
+    surface-variant: #454840,
+    on-surface-variant: #c6c7bd,
+    neutral-variant: #76786f,
+    neutral-variant20: #2f312a,
+    inverse-secondary: #476720,
+    inverse-tertiary: #006d40,
+  ));
+}
+
+/* Typography */
+:root, :host {
+  /* core typography tokens are not generating css variables, hence below */
+  --mat-sys-brand-font-family: Noto Sans;
+  --mat-sys-plain-font-family: Noto Sans;
+  --mat-sys-bold-font-weight: 700;
+  --mat-sys-medium-font-weight: 500;
+  --mat-sys-regular-font-weight: 400;
+
+  @include mat.theme-overrides((
+    brand-family: Noto Sans,
+    plain-family: Noto Sans,
+    bold-weight: 700,
+    medium-weight: 500,
+    regular-weight: 400,
+    headline-large-font: var(--mat-sys-brand-font-family),
+    headline-medium-font: var(--mat-sys-brand-font-family),
+    headline-small-font: var(--mat-sys-brand-font-family),
+    display-large-font: var(--mat-sys-brand-font-family),
+    display-medium-font: var(--mat-sys-brand-font-family),
+    display-small-font: var(--mat-sys-brand-font-family),
+    title-large-font: var(--mat-sys-brand-font-family),
+    body-large: var(--mat-sys-body-large-weight) var(--mat-sys-body-large-size) / var(--mat-sys-body-large-line-height) var(--mat-sys-body-large-font),
+    body-medium: var(--mat-sys-body-medium-weight) var(--mat-sys-body-medium-size) / var(--mat-sys-body-medium-line-height) var(--mat-sys-body-medium-font),
+    body-small: var(--mat-sys-body-small-weight) var(--mat-sys-body-small-size) / var(--mat-sys-body-small-line-height) var(--mat-sys-body-small-font),
+    label-large: var(--mat-sys-label-large-weight) var(--mat-sys-label-large-size) / var(--mat-sys-label-large-line-height) var(--mat-sys-label-large-font),
+    label-medium: var(--mat-sys-label-medium-weight) var(--mat-sys-label-medium-size) / var(--mat-sys-label-medium-line-height) var(--mat-sys-label-medium-font),
+    label-small: var(--mat-sys-label-small-weight) var(--mat-sys-label-small-size) / var(--mat-sys-label-small-line-height) var(--mat-sys-label-small-font),
+    title-large: var(--mat-sys-title-large-weight) var(--mat-sys-title-large-size) / var(--mat-sys-title-large-line-height) var(--mat-sys-title-large-font),
+    title-medium: var(--mat-sys-title-medium-weight) var(--mat-sys-title-medium-size) / var(--mat-sys-title-medium-line-height) var(--mat-sys-title-medium-font),
+    title-small: var(--mat-sys-title-small-weight) var(--mat-sys-title-small-size) / var(--mat-sys-title-small-line-height) var(--mat-sys-title-small-font),
+    headline-large: var(--mat-sys-headline-large-weight) var(--mat-sys-headline-large-size) / var(--mat-sys-headline-large-line-height) var(--mat-sys-headline-large-font),
+    headline-medium: var(--mat-sys-headline-medium-weight) var(--mat-sys-headline-medium-size) / var(--mat-sys-headline-medium-line-height) var(--mat-sys-headline-medium-font),
+    headline-small: var(--mat-sys-headline-small-weight) var(--mat-sys-headline-small-size) / var(--mat-sys-headline-small-line-height) var(--mat-sys-headline-small-font),
+    display-large: var(--mat-sys-display-large-weight) var(--mat-sys-display-large-size) / var(--mat-sys-display-large-line-height) var(--mat-sys-display-large-font),
+    display-medium: var(--mat-sys-display-medium-weight) var(--mat-sys-display-medium-size) / var(--mat-sys-display-medium-line-height) var(--mat-sys-display-medium-font),
+    display-small: var(--mat-sys-display-small-weight) var(--mat-sys-display-small-size) / var(--mat-sys-display-small-line-height) var(--mat-sys-display-small-font),
+    body-large-font: var(--mat-sys-plain-font-family),
+    body-medium-font: var(--mat-sys-plain-font-family),
+    body-small-font: var(--mat-sys-plain-font-family),
+    label-large-font: var(--mat-sys-plain-font-family),
+    label-medium-font: var(--mat-sys-plain-font-family),
+    label-small-font: var(--mat-sys-plain-font-family),
+    title-medium-font: var(--mat-sys-plain-font-family),
+    title-small-font: var(--mat-sys-plain-font-family),
+    label-large-weight-prominent: var(--mat-sys-bold-font-weight),
+    label-medium-weight-prominent: var(--mat-sys-bold-font-weight),
+    label-large-weight: var(--mat-sys-medium-font-weight),
+    label-medium-weight: var(--mat-sys-medium-font-weight),
+    label-small-weight: var(--mat-sys-medium-font-weight),
+    title-medium-weight: var(--mat-sys-medium-font-weight),
+    title-small-weight: var(--mat-sys-medium-font-weight),
+    body-large-weight: var(--mat-sys-regular-font-weight),
+    body-medium-weight: var(--mat-sys-regular-font-weight),
+    body-small-weight: var(--mat-sys-regular-font-weight),
+    display-large-weight: var(--mat-sys-regular-font-weight),
+    display-medium-weight: var(--mat-sys-regular-font-weight),
+    display-small-weight: var(--mat-sys-regular-font-weight),
+    headline-large-weight: var(--mat-sys-regular-font-weight),
+    headline-medium-weight: var(--mat-sys-regular-font-weight),
+    headline-small-weight: var(--mat-sys-regular-font-weight),
+    title-large-weight: var(--mat-sys-regular-font-weight),
+  ));
+}
+html, body { height: 100%;
+::-webkit-scrollbar {
+  display: none;
+}
+
+}
+body { margin: 0; font-family: Noto Sans, sans-serif; }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}

@@ -1,0 +1,30 @@
+<div class="navbar">
+  <div class="search">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="searchQuery"
+      (keyup.enter)="onSearch()"
+      (input)="onSearchInput()"
+      placeholder="Search"
+    />
+  </div>
+
+  <div class="actions">
+    <button mat-icon-button (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <mat-icon>mail</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="onNotification()" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <button class="avatar-btn" mat-icon-button (click)="onProfile()">
+      <mat-icon>person</mat-icon>
+      <!-- <img class="avatar" [src]="userAvatar || 'assets/default-avatar.png'" alt="avatar" /> -->
+    </button>
+  </div>
+</div>
+
+
