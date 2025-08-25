@@ -1,13 +1,14 @@
 
 import { Component } from '@angular/core';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+import { ShareModule } from '../../shares/share.module';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    MatProgressSpinnerModule,
+    ShareModule
   
   ],
   templateUrl: './home.component.html',

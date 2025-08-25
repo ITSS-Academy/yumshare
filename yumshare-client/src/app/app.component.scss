@@ -6,64 +6,51 @@
   position: relative;
 }
 
-
+/* ---------- Sidebar ---------- */
 .sidebar-container {
   width: 17.5rem;
   min-width: 17.5rem;
-  background-color: #ffffff;
+  height: 100vh;
+  background: #fff;
   border-right: 1px solid #e0e0e0;
-  flex-shrink: 0;
   transition: all 0.3s ease;
-  border-radius: 0 16px 16px 0;
+  flex-shrink: 0;
+  z-index: 1000;
+
+  /* khi mini (desktop) */
+  :host(.sidebar-mini) & {
+    width: 4rem !important;
+    min-width: 4rem !important;
+  }
+
+  /* khi closed (mobile overlay) */
+  &.sidebar-closed {
+    transform: translateX(-100%);
+  }
 }
 
-// When app root has .sidebar-mini, shrink the sidebar container as well
-:host(.sidebar-mini) .sidebar-container {
-  width: 4rem !important;
-  min-width: 4rem !important;
-}
-
-.sidebar-container.sidebar-closed {
-  width: 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
+/* ---------- Main content ---------- */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
   width: 100%;
-  
 }
 
-.content-container{
- padding: 0 0 0 16px;
-}
-// Mobile responsive
-@media (max-width: 768px) {
-  .sidebar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1000;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-    
-    &.sidebar-closed {
-      transform: translateX(-100%);
-      width: 17.5rem;
-      min-width: 17.5rem;
-    }
-  }
-
-  .main-content {
-    width: 100%;
-  }
+.content-container {
+  padding: 0 0 0 16px;
 }
 
-// Responsive for common device widths
+/* ---------- Backdrop (mobile overlay) ---------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* ---------- Responsive ---------- */
 @media (max-width: 1199.98px) {
   .sidebar-container {
     width: 15rem;
@@ -76,19 +63,6 @@
     width: 13rem;
     min-width: 13rem;
   }
-  .main-content {
-    padding-left: 0;
-    width: 100%;
-    
-  }
-  .content-container{
- padding: 0 0 0 16px;
-}
-
-  .sidebar-container.sidebar-mini {
-    width: 3.5rem !important;
-    min-width: 3.5rem !important;
-  }
 }
 
 @media (max-width: 767.98px) {
@@ -96,84 +70,40 @@
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
     width: 80vw;
-    min-width: 0;
     max-width: 17.5rem;
-    z-index: 1001;
+    height: 100vh;
     box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    background: #fff;
-    transition: transform 0.3s;
-    &.sidebar-closed {
-      transform: translateX(-100%);
-      width: 80vw;
-    }
+    transition: transform 0.3s ease;
   }
+
   .main-content {
     width: 100vw !important;
-    
     margin-left: 0 !important;
-    min-width: 0;
   }
-  .content-container{
- padding: 0 0 0 16px;
-}
+
   .navbar-container {
     height: 56px;
     min-height: 56px;
   }
+
   .content-container {
     padding: 10px;
-  }
-  // Override when in mini mode: keep sidebar at 4rem and offset content
-  :host(.sidebar-mini) .sidebar-container {
-    width: 4rem !important;
-    min-width: 4rem !important;
-    max-width: 4rem !important;
-  }
-  :host(.sidebar-mini) .main-content {
-    padding-left: 4rem;
   }
 }
 
 @media (max-width: 480px) {
   .sidebar-container {
-    width: 100vw;
-    max-width: 100vw;
+    width: 80vw;
+    max-width: 320px;
   }
+
   .navbar-container {
     height: 48px;
     min-height: 48px;
   }
+
   .content-container {
     padding: 4px;
-  }
-}
-
-.sidebar-toggle-btn {
-  position: absolute;
-  top: 1rem;
-  right: -1.25rem;
-  z-index: 1100;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: right 0.3s;
-}
-
-.sidebar-container.sidebar-mini .sidebar-toggle-btn {
-  right: -1.25rem;
-}
-
-@media (max-width: 767.98px) {
-  .sidebar-toggle-btn {
-    display: none;
   }
 }

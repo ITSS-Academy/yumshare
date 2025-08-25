@@ -1,3 +1,4 @@
+
 /* You can add global styles to this file, and also import other style files */
 
 @use "@angular/material" as mat;
@@ -8,6 +9,13 @@
 
 /* Light Theme */
 :root, :host {
+
+   --success-color: #3f6900;
+  --success-on-color: #ffffff;
+
+  --error-color: #ba1a1a;
+  --error-on-color: #ffffff;
+
   @include mat.theme-overrides((
     primary: #3f6900,
     on-primary: #ffffff,
@@ -208,4 +216,74 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+.custom-dialog .mat-mdc-dialog-container {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+// Đảm bảo container của snackbar là flex row, căn giữa các thành phần
+.snackbar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.mat-mdc-snack-bar-container.custom-snackbar {
+  padding: 0;
+  min-width: unset !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+// CSS cho thông báo thành công
+.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
+  background-color: var(--success-color);
+  color: var(--success-on-color);
+  border-radius: 8px;
+}
+
+// CSS cho thông báo lỗi
+.mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
+  background-color: var(--error-color);
+  color: var(--error-on-color);
+  border-radius: 8px;
+}
+
+// CSS cho thông báo cảnh báo (sử dụng màu cam phổ biến cho cảnh báo)
+.mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
+  background-color: #ff6f00; // Một màu cam tiêu chuẩn cho cảnh báo
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+// Định nghĩa style cho icon và text bên trong component
+.snackbar-icon {
+  margin-right: 12px;
+  font-size: 24px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+}
+
+.snackbar-message {
+  flex-grow: 1;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+// Đảm bảo label trong snackbar căn giữa icon và text
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important;
+  justify-content: flex-start;
+  gap: 0;
 }

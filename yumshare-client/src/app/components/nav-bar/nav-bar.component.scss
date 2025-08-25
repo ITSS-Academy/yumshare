@@ -5,7 +5,7 @@
   gap: 12px;
   width: 100%;
   padding: 8px 12px;
-  background: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #f8faf5 100%);
   border: 1px solid #e0e0e0;
   border-radius: 0 0 16px 16px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
@@ -47,6 +47,35 @@
   align-items: center;
   gap: 16px;
   margin-left: auto;
+}
+
+.actions button[mat-icon-button] {
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  position: relative;
+}
+
+
+.actions button[mat-icon-button]:hover,
+.actions button[mat-icon-button]:focus {
+  background: #e8f5d8;
+  box-shadow: 0 2px 6px rgba(141, 198, 63, 0.08);
+  border: none;
+  outline: none;
+  border-radius: 50%;
+  transform: scale(1.08);
+}
+
+.actions button[mat-icon-button]:hover mat-icon,
+.actions button[mat-icon-button]:focus mat-icon {
+  color: #8DC63F !important;
+  transform: scale(1.1);
+}
+
+.actions button[mat-icon-button]:active {
+  border-radius: 50%;
+  transform: scale(0.97);
 }
 
 .avatar-btn {
@@ -101,3 +130,12 @@
   .search { padding: 6px 10px; }
 }
 
+.menu-btn {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .menu-btn {
+    display: inline-flex;
+  }
+}

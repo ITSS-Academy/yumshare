@@ -4,26 +4,107 @@ import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-
+import { Auth } from '@angular/fire/auth';
+import { Store } from '@ngrx/store';
+import { AuthState } from './ngrx/auth/auth.state';
+import { AuthModel } from './models/auth.model';
+import * as AuthActions from '../app/ngrx/auth/auth.actions';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SnackbarComponent } from './components/snackbar/snackbar.component';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet, SideBarComponent, NavBarComponent, CommonModule, MatIconModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   @HostBinding('class.sidebar-mini') isMini = false;
+  @HostBinding('class.sidebar-closed') isClosed = false;
 
-  constructor() {
+  isMobile = false;
+
+  constructor( 
+    private auth: Auth,
+    private store: Store<{
+      auth: AuthState
+    }>,
+    private dialog: MatDialog,
+    private _snackBar: MatSnackBar
+  ) {
     this.updateSidebarMode();
+
+    // Initialization logic can go here if needed
+    this.auth.onAuthStateChanged(async (auth: any) => {
+      if (auth) {
+        let idToken = await auth.getIdToken();
+        const user: AuthModel = {
+          uid: auth.uid,
+          displayName: auth.displayName,
+          email: auth.email,
+          photoURL: auth.photoURL,
+          phoneNumber: auth.phoneNumber
+        };
+        this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
+        // Hiển thị snackbar chỉ khi chưa từng hiển thị trong session này
+        if (!localStorage.getItem('loginSnackbarShown')) {
+          this._snackBar.openFromComponent(SnackbarComponent, {
+            duration: 3000,
+            panelClass: ['custom-snackbar', 'success-snackbar'],
+            data: {
+              message: 'Login successful!',
+              icon: 'check_circle'
+            }
+          });
+          localStorage.setItem('loginSnackbarShown', 'true');
+        }
+        console.log(user);
+
+        console.log(idToken)
+      } else {
+        console.log('No user is signed in.');
+        // Xoá flag khi logout để lần sau login lại sẽ hiện
+        localStorage.removeItem('loginSnackbarShown');
+        // Dispatch clearAuthState để clear hoàn toàn auth state
+        this.store.dispatch(AuthActions.clearAuthState());
+        // Đóng tất cả dialog nếu có
+        this.dialog.closeAll();
+      }
+    });
   }
 
-  @HostListener('window:resize') onResize() {
+  @HostListener('window:resize')
+  onResize() {
     this.updateSidebarMode();
   }
 
   private updateSidebarMode() {
-    this.isMini = window.innerWidth < 768;
+    this.isMobile = window.innerWidth < 768;
+
+    if (this.isMobile) {
+      // mobile mặc định đóng sidebar
+      this.isMini = false;
+      this.isClosed = true;
+    } else {
+      // desktop mặc định full sidebar
+      this.isClosed = false;
+      this.isMini = false;
+    }
+  }
+
+  toggleSidebar() {
+    if (this.isMobile) {
+      this.isClosed = !this.isClosed; // mobile: dạng drawer
+    } else {
+      this.isMini = !this.isMini;     // desktop: toggle mini
+    }
+  }
+
+  closeSidebarOnBackdrop() {
+    if (this.isMobile) {
+      this.isClosed = true;
+    }
   }
 }

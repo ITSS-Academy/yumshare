@@ -45,3 +45,12 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+/dimora-client/src/environments
+
+/booking-core/config
+/.env
+/.env.development.local
+/.env.test.local
+/.env.production.local
+/.env.local

@@ -1,4 +1,7 @@
 <div class="navbar">
+  <button mat-icon-button class="menu-btn" (click)="onToggleSidebar()">
+    <mat-icon>menu</mat-icon>
+  </button>
   <div class="search">
     <mat-icon class="search-icon">search</mat-icon>
     <input
@@ -12,18 +15,30 @@
   </div>
 
   <div class="actions">
-    <button mat-icon-button (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
-      <mat-icon>mail</mat-icon>
-    </button>
-
-    <button mat-icon-button (click)="onNotification()" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
-      <mat-icon>notifications</mat-icon>
-    </button>
-
-    <button class="avatar-btn" mat-icon-button (click)="onProfile()">
-      <mat-icon>person</mat-icon>
-      <!-- <img class="avatar" [src]="userAvatar || 'assets/default-avatar.png'" alt="avatar" /> -->
-    </button>
+    @if (isLoggedIn) {
+      <button mat-icon-button matTooltip="Add Recipe" aria-label="Add Recipe" (click)="onAddRecipe()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Messages" aria-label="Messages" [matBadgeHidden]="messageCount === 0" (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
+        <mat-icon>mail</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="notificationCount === 0" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button class="avatar-btn" mat-icon-button matTooltip="Profile" aria-label="Profile" (click)="onProfile()">
+        <img class="avatar" [src]="userAvatar" alt="avatar" *ngIf="userAvatar; else defaultAvatar" />
+        <ng-template #defaultAvatar>
+          <mat-icon>person</mat-icon>
+        </ng-template>
+      </button>
+    } @else {
+      <button mat-icon-button matTooltip="Post Recipe" aria-label="Add Recipe" (click)="openLogin()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Login" aria-label="Login" (click)="openLogin()">
+        <mat-icon>login</mat-icon>
+      </button>
+    }
   </div>
 </div>
 
