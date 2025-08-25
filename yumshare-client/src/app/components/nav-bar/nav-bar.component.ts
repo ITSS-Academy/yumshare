@@ -41,7 +41,7 @@ export class NavBarComponent {
   onSearch() {
     if (this.searchQuery.trim()) {
       this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
-    } 
+    }
   }
 
   onSearchInput() {
@@ -66,6 +66,12 @@ export class NavBarComponent {
   onLogin() {
     console.log('Open login dialog');
     // Open login dialog or navigate to login page
+  }
+
+  onAddRecipe() {
+    console.log('Navigate to add recipe');
+    // Navigate to add new recipe page
+    this.router.navigate(['/add-recipe']).then();
   }
 
   onProfile() {

@@ -12,6 +12,11 @@
   </div>
 
   <div class="actions">
+    <button class="btn-add" (click)="onAddRecipe()">+ Add new recipe</button>
+
+    <!-- Nút Login -->
+    <button class="btn-login" (click)="onLogin()">Login</button>
+
     <button mat-icon-button (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
       <mat-icon>mail</mat-icon>
     </button>
