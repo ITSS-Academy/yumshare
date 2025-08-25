@@ -41,7 +41,7 @@ export class NavBarComponent {
   onSearch() {
     if (this.searchQuery.trim()) {
       this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
-    } 
+    }
   }
 
   onSearchInput() {
@@ -70,6 +70,8 @@ export class NavBarComponent {
 
   onProfile() {
     console.log('Open profile');
+    this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });
+
     // Navigate to profile page
   }
 
