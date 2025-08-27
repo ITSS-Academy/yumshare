@@ -11,24 +11,33 @@
 			<mat-icon>search</mat-icon>
 			<span>Search Recipes</span>
 		</a>
-		<a mat-list-item routerLink="/my-recipe" routerLinkActive="active">
-			<mat-icon>person</mat-icon>
-			<span>My Recipes</span>
-		</a>
-		<a mat-list-item routerLink="/my-favourite-recipe" routerLinkActive="active">
-			<mat-icon>campaign</mat-icon>
-			<span>My Favorites Recipe</span>
-		</a>
-		<a mat-list-item routerLink="/message" routerLinkActive="active">
-			<mat-icon>mail</mat-icon>
-			<span>Messages</span>
+		<a mat-list-item routerLink="/#" routerLinkActive="active">
+			<mat-icon>help</mat-icon>
+			<span>FAQ</span>
 		</a>
 		
+		<!-- Các menu items chỉ hiển thị khi đã đăng nhập -->
+		@if (isLoggedIn) {
+			<a mat-list-item routerLink="/my-recipe" routerLinkActive="active">
+				<mat-icon>person</mat-icon>
+				<span>My Recipes</span>
+			</a>
+			<a mat-list-item routerLink="/my-favourite-recipe" routerLinkActive="active">
+				<mat-icon>campaign</mat-icon>
+				<span>My Favorites Recipe</span>
+			</a>
+			<a mat-list-item routerLink="/message" routerLinkActive="active">
+				<mat-icon>mail</mat-icon>
+				<span>Messages</span>
+			</a>
+		}
 	</mat-nav-list>
-	<div class="logout-section">
-		<button mat-stroked-button color="primary" class="logout-btn">
-			<mat-icon>logout</mat-icon>
-			Log out
-		</button>
-	</div>
+	@if (isLoggedIn) {
+		<div class="logout-section">
+			<button mat-stroked-button color="primary" class="logout-btn" (click)="onLogout()">
+				<mat-icon>logout</mat-icon>
+				Log out
+			</button>
+		</div>
+	}
 </div>
