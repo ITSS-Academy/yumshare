@@ -29,6 +29,8 @@
   }
 }
 
+
+
 /* ---------- Main content ---------- */
 .main-content {
   flex: 1;
@@ -38,8 +40,13 @@
   width: 100%;
 }
 
-.content-container {
+.content-container{
   padding: 0 0 0 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* iOS Safari mượt hơn /
+  scroll-behavior: smooth;          / Mượt trên hầu hết browser */
+  overscroll-behavior: contain;
+  will-change: scroll-position;
 }
 
 /* ---------- Backdrop (mobile overlay) ---------- */
