@@ -1,17 +1,24 @@
 <div class="app-container">
   <!-- Sidebar -->
-  <div class="sidebar-container">
+  <div class="sidebar-container" [class.sidebar-closed]="isClosed">
     <app-side-bar></app-side-bar>
   </div>
 
-  <!-- Main content area -->
+  <!-- Backdrop cho mobile -->
+  <div 
+    class="backdrop" 
+    *ngIf="isMobile && !isClosed" 
+    (click)="closeSidebarOnBackdrop()">
+  </div>
+
+  <!-- Main content -->
   <div class="main-content">
-    <!-- Top navigation bar -->
+    <!-- Top nav -->
     <div class="navbar-container">
-      <app-nav-bar ></app-nav-bar>
+      <app-nav-bar (toggleSidebar)="toggleSidebar()"></app-nav-bar>
     </div>
 
-    <!-- Router outlet for page content -->
+    <!-- Router content -->
     <div class="content-container">
       <router-outlet></router-outlet>
     </div>

@@ -1,50 +1,63 @@
 <div class="search-container">
   <h2>Search</h2>
 
-
   <div class="search-bar">
-    <input type="text" placeholder="Search ..." [(ngModel)]="keyword" />
+    <input type="text" placeholder="Search by keyword or author..." [(ngModel)]="keyword" />
     <select [(ngModel)]="selectedCategory">
       <option value="">All Categories</option>
       <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
     </select>
-    <input type="text" placeholder="Search Author ..." [(ngModel)]="author" />
     <button class="search-btn" (click)="onSearch()">
       <mat-icon>search</mat-icon>
     </button>
   </div>
 
-
-  <p *ngIf="results.length > 0">Showing results {{ results.length }} for keyword: <b>{{ keyword }}</b></p>
-<div class="results-grid">
-  @for (item of results; track item.title) {
-    <div class="container-card">
-      <mat-card class="dish-card" appearance="outlined">
-        <img mat-card-image [src]="item.image" alt="Dish Image">
-        <mat-card-content>
-          <h2 class="dish-title">{{ item.title }}</h2>
-          <p class="dish-description">
-            {{ item.description }}
-          </p>
-        </mat-card-content>
-        <div class="rating">
-          <mat-icon *ngFor="let star of [1,2,3,4,5]">
-            {{ star <= item.rating ? 'star' : 'star_border' }}
-          </mat-icon>
-        </div>
-        <mat-card-actions class="card-footer">
-          <div class="user-info">
-            <img class="avatar" [src]="item.authorAvatar" alt="User avatar">
-            <span class="username">{{ item.author }}</span>
+  <p *ngIf="results.length > 0">Showing results {{ results.length }} for: <b>{{ keyword }}</b></p>
+  <div class="results-grid">
+    @for (item of displayedResults; track item.title) {
+      <div class="container-card">
+        <mat-card class="dish-card" appearance="outlined">
+          <img mat-card-image [src]="item.image" alt="Dish Image">
+          <mat-card-content>
+            <h2 class="dish-title">{{ item.title }}</h2>
+            <p class="dish-description">
+              {{ item.description }}
+            </p>
+          </mat-card-content>
+          <div class="rating">
+            <mat-icon *ngFor="let star of [1,2,3,4,5]">
+              {{ star <= item.rating ? 'star' : 'star_border' }}
+            </mat-icon>
           </div>
-          <div class="actions">
-            <mat-icon>favorite_border</mat-icon>
-            <mat-icon>share</mat-icon>
-          </div>
-        </mat-card-actions>
-      </mat-card>
-    </div>
+          <mat-card-actions class="card-footer">
+            <div class="user-info">
+              <img class="avatar" [src]="item.authorAvatar" alt="User avatar">
+              <span class="username">{{ item.author }}</span>
+            </div>
+            <div class="actions">
+              <mat-icon class="favorite-icon" (click)="toggleFavorite(item)">
+                {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
+              </mat-icon>
+              <mat-icon>share</mat-icon>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    }
+  </div>
+  <div class="pagination">
+    <button (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
 
-  }
-</div>
+    <button *ngFor="let p of visiblePages"
+            (click)="goToPage(p)"
+            [class.active]="p === currentPage">
+      {{ p }}
+    </button>
+
+    <span *ngIf="showEllipsis">…</span>
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+    <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+  </div>
 </div>

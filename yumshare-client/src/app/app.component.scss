@@ -1,9 +1,8 @@
-
 .app-container {
   display: flex;
   height: 100vh;
   width: 100vw;
-  overflow: scroll;
+  overflow: hidden;
   position: relative;
 }
 
@@ -41,6 +40,7 @@
 
 .content-container{
  padding: 0 0 0 16px;
+  overflow: scroll;
 }
 // Mobile responsive
 @media (max-width: 768px) {
