@@ -1,0 +1,681 @@
+.add-recipe {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px 50px 60px 50px;
+  box-sizing: border-box;
+  padding-bottom: 140px; // Đảm bảo đủ không gian để nhìn thấy các nút ở cuối
+}
+
+.delete-and-post{
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  height: 40px;
+  margin: 10px 20px;
+}
+
+.delete{
+  width: 110px;
+  height: 30px;
+  border: 1.5px solid red;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: red;
+}
+
+.post{
+  width: 110px;
+  height: 30px;
+  background-color: #88C533;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+  margin-left: 20px;
+}
+
+.material-symbols-outlined{
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 0 0 0 !important; // keep left margin for spacing
+  min-width: 0 !important;
+  min-height: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle;
+}
+
+.new-recipe-card {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  background: #faf6fb;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+/* Left side: Image */
+.recipe-image-upload {
+  flex: 0 0 35%;
+  background: #f0eef2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.recipe-image-upload img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.upload-btn {
+  padding: 8px 12px;
+  border: 1px solid #88C533;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #88C533;
+}
+
+/* Right side: form */
+.recipe-form {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+}
+
+.form-top .recipe-name-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.form-middle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-middle .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.author-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.author-mail {
+  font-size: 14px;
+  color: #666;
+  margin-left: 6px;
+}
+
+.form-options {
+  display: flex;
+  gap: 12px;
+}
+
+/* Ẩn outline mặc định */
+::ng-deep .mat-mdc-form-field .mdc-notched-outline {
+  display: none !important;
+}
+
+/* Giữ wrapper gọn như button */
+::ng-deep .mat-mdc-text-field-wrapper {
+  border: 1.5px solid #88C533 !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 8px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Chữ bên trong */
+::ng-deep .mat-mdc-select-value {
+  color: #88C533 !important;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Icon mũi tên */
+::ng-deep .mat-mdc-select-arrow {
+  color: #88C533 !important;
+  font-size: 16px;
+}
+
+/* Option trong dropdown */
+::ng-deep .mat-mdc-option {
+  font-weight: bold;
+  color: #333;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected {
+  background: #88C533 !important;
+  color: white !important;
+}
+
+/* chỉnh khung */
+::ng-deep .mat-mdc-text-field-wrapper {
+  height: 30px !important;
+  min-height: 30px !important;
+  border: 1.5px solid #88C533 !important;
+  border-radius: 8px !important;
+  background: white !important;
+  padding: 0 8px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* chỉnh infix để không còn padding dư */
+::ng-deep .mat-mdc-form-field-infix {
+  padding: 0 !important;
+  min-height: unset !important;
+  height: 100% !important;
+  width: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* chữ hiển thị khi đã chọn */
+::ng-deep .mat-mdc-select-value {
+  font-size: 14px !important;   /* nhỏ hơn */
+  line-height: 1 !important;    /* thu nhỏ chiều cao dòng */
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  color: #88C533 !important;
+}
+
+.form-bottom .recipe-description-input {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.ingredient-steps-card {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.top-section {
+  display: flex;
+  gap: 24px;
+}
+
+.ingredient-box {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.steps-box {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ingredient-input, .step-input, .serving-input, .time-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.ingredient-input {
+  width: 95%;
+  margin-bottom: 10px;
+}
+
+
+.time-input, .serving-input {
+  width: 150px;
+}
+
+.step-input {
+  flex: 1;
+  max-width: 89%;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-ingredient-card{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.add-btn {
+  border: none;
+  background: none;
+  color: #2e7d32;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.del-btn {
+  border: none !important;
+  background: none !important;
+  color: red !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  margin-bottom: 10px;
+}
+
+.video-upload-box {
+  border: 1px dashed #aaa;
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.video-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.video-source-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.toggle-btn {
+  border: 1.5px solid #88C533;
+  background: white;
+  color: #88C533;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 18px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+.toggle-btn:last-child {
+  margin-right: 0;
+}
+
+.toggle-btn.active {
+  background-color: #88C533;
+  color: white;
+  border-color: #88C533;
+}
+
+/* Style input video URL giống add-recipe */
+.video-url-box .url-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.video-url-box label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #88C533;
+  font-size: 15px;
+}
+
+.video-url-box .url-input {
+  width: 350px;
+  max-width: 90vw;
+  padding: 10px 14px;
+  border: 1.5px solid #88C533;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  margin-bottom: 8px;
+  transition: border 0.2s;
+}
+
+.video-url-box .url-input:focus {
+  border-color: #5a8c1b;
+}
+
+.video-url-box .url-info {
+  color: #388e3c;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.video-url-box .url-help {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.video-url-box{
+  background: none;
+  border: none;
+  color: #88C533;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.clear-btn{
+  background-color: white;
+  border-radius: 12px;
+  height: 30px;
+  border: 1px solid red;
+  color: red;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.video-url-box .clear-btn:hover {
+  color: #5a8c1b;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .video-url-box .url-input {
+    width: 98vw;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .video-url-box label {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .video-source-toggle {
+    margin-bottom: 32px;
+  }
+  .video-url-box .url-input {
+    font-size: 20px;
+    padding: 18px 24px;
+    width: 600px;
+  }
+  .video-url-box label {
+    font-size: 20px;
+  }
+}
+
+/* ========== Responsive ========== */
+
+/* Tablet: <= 900px */
+@media (max-width: 900px) {
+  .add-recipe {
+    padding: 16px 10px 40px 10px;
+    padding-bottom: 100px; // Đảm bảo đủ không gian ở tablet
+  }
+
+  .new-recipe-card {
+    flex-direction: column;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .recipe-image-upload,
+  .recipe-form {
+    flex: 1 1 100%;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .ingredient-steps-card .top-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ingredient-box,
+  .steps-box {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .form-middle .avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .form-top .recipe-name-input,
+  .form-bottom .recipe-description-input {
+    font-size: 15px;
+  }
+
+  .delete-and-post {
+    margin: 10px 0;
+  }
+}
+
+/* Mobile: <= 600px */
+@media (max-width: 600px) {
+  .add-recipe {
+    padding: 8px 2vw 24px 2vw;
+    padding-bottom: 90px; // Đảm bảo đủ không gian ở mobile
+  }
+
+  .new-recipe-card {
+    border-radius: 6px;
+    border-width: 1px;
+    box-shadow: none;
+  }
+
+  .recipe-image-upload,
+  .recipe-form {
+    padding: 8px;
+  }
+
+  .form-top .recipe-name-input,
+  .form-bottom .recipe-description-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .form-middle .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .author-name {
+    font-size: 14px;
+  }
+
+  .author-mail {
+    font-size: 12px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ingredient-steps-card {
+    gap: 16px;
+  }
+
+  .ingredient-box,
+  .steps-box {
+    gap: 8px;
+  }
+
+  .ingredient-input,
+  .step-input,
+  .serving-input,
+  .time-input {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .step-number {
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+  }
+
+  .delete-and-post {
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+    height: auto;
+    padding-bottom: 30px !important;
+    padding-top: 10px !important;
+  }
+
+  .delete,
+  .post {
+    width: 100%;
+    min-width: 90px;
+    height: 28px;
+    font-size: 13px;
+    margin-left: 0;
+  }
+
+  .post {
+    margin-top: 8px;
+  }
+
+  .video-upload-box {
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .video-icon {
+    font-size: 28px;
+  }
+}
+
+/* 4K: >= 2000px */
+@media (min-width: 2000px) {
+  .add-recipe {
+    padding: 40px 20vw 80px 20vw;
+    font-size: 20px;
+    padding-bottom: 180px; // Đảm bảo đủ không gian ở 4K
+  }
+
+  .new-recipe-card {
+    max-width: 1600px;
+    border-radius: 24px;
+  }
+
+  .recipe-image-upload,
+  .recipe-form {
+    padding: 32px;
+    font-size: 20px;
+  }
+
+  .form-top .recipe-name-input,
+  .form-bottom .recipe-description-input {
+    font-size: 22px;
+    padding: 18px;
+  }
+
+  .form-middle .avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .author-name {
+    font-size: 22px;
+  }
+
+  .author-mail {
+    font-size: 18px;
+  }
+
+  .form-options {
+    gap: 24px;
+  }
+
+  .ingredient-steps-card {
+    gap: 48px;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  .ingredient-box,
+  .steps-box {
+    gap: 24px;
+  }
+
+  .ingredient-input,
+  .step-input,
+  .serving-input,
+  .time-input {
+    font-size: 20px;
+    padding: 14px;
+  }
+
+  .step-number {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  .delete,
+  .post {
+    width: 180px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .video-upload-box {
+    padding: 64px;
+    font-size: 20px;
+  }
+
+  .video-icon {
+    font-size: 64px;
+  }
+}
