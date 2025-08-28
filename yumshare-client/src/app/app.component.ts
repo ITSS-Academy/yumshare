@@ -12,11 +12,12 @@ import * as AuthActions from '../app/ngrx/auth/auth.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SnackbarComponent } from './components/snackbar/snackbar.component';
+import {FooterComponent} from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SideBarComponent, NavBarComponent, CommonModule, MatIconModule],
+  imports: [RouterOutlet, SideBarComponent, NavBarComponent, CommonModule, MatIconModule, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -26,7 +27,7 @@ export class AppComponent {
 
   isMobile = false;
 
-  constructor( 
+  constructor(
     private auth: Auth,
     private store: Store<{
       auth: AuthState
