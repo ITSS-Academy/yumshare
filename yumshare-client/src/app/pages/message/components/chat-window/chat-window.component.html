@@ -1,0 +1,31 @@
+<div class="chat-window">
+  <!-- Header -->
+  <div class="chat-header">
+    <button class="back-btn" (click)="onBack()" aria-label="Back"></button>
+    <img [src]="user.avatar" class="avatar" />
+    <div class="name">{{ user.name }}</div>
+    <div class="options">⋮</div>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-messages">
+    @for (msg of messages; track msg.id) {
+      <app-message-item
+        [message]="msg"
+        [currentUserId]="currentUserId">
+      </app-message-item>
+    } @empty {
+      <div class="no-messages">Chưa có tin nhắn nào</div>
+    }
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      placeholder="Write a message..."
+    />
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div>
