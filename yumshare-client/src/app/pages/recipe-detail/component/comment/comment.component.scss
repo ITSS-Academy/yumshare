@@ -1,0 +1,134 @@
+.comments-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  //margin-left: 3rem; /* 20px */
+}
+.comments-section p{
+  font-size: 1rem;
+}
+.comments-section h2 {
+  margin-bottom: 0.625rem; /* 10px */
+  font-size: 1.125rem; /* 18px */
+}
+
+/* Input giống YouTube */
+.comments-section .comment-input {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem; /* 10px */
+}
+
+.comments-section .comment-input .avatar {
+  width: 2.5rem;  /* 40px */
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+.comments-section .comment-input input {
+  flex: 1;
+  padding: 0.625rem; /* 10px */
+  border: none;
+  border-bottom: 0.0625rem solid #ccc; /* 1px */
+  outline: none;
+  font-size: 0.875rem; /* 14px */
+}
+
+.comments-section .comment-input input:focus {
+  border-bottom: 0.0625rem solid #000; /* 1px */
+}
+
+.comments-section .send-btn {
+  background: none;
+  border: none;
+  font-size: 1.125rem; /* 18px */
+  cursor: pointer;
+}
+
+/* Comment giống Facebook */
+.comments-section .comment {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 0.9375rem; /* 15px */
+  gap: 0.625rem; /* 10px */
+}
+
+.comments-section .comment .avatar {
+  width: 2.5rem; /* 40px */
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+.comments-section .comment-body {
+  background: #f0f2f5;
+  padding: 0.625rem 0.875rem; /* 10px 14px */
+  border-radius: 1.125rem; /* 18px */
+  max-width: 80%;
+}
+
+.comments-section .user-name {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.25rem; /* 4px */
+  font-size: 0.875rem; /* 14px */
+}
+
+.comments-section .comment-body p {
+  margin: 0;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+}
+
+/* ===== Responsive cho comment-section ===== */
+
+/* Mobile small (≤480px) */
+@media (max-width: 767px) {
+  .comments-section {
+    width: 100%;
+  }
+  .comments-section .comment {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center;
+    margin-top: 1rem;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .comments-section .comment-body {
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile small (≤320px) */
+@media (max-width: 320px) {
+  .comments-section {
+    width: 100%;
+  }
+  .comments-section .comment {
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 1rem;
+  }
+  .comments-section .comment-body {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile large (≤425px) */
+@media (max-width: 425px) {
+  .comments-section {
+    width: 100% !important;
+  }
+  .comments-section .comment-body {
+    font-size: 0.85rem !important;
+  }
+  .comments-section .comment {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    gap: 0.75rem;
+    margin-top: 1rem !important;
+  }
+}

@@ -1,1 +1,23 @@
-<p>message works!</p>
+<div class="chat-container" [ngClass]="{'chat-open': selectedUser}">
+  <!-- Sidebar -->
+  <div class="user">
+    <app-user-list
+      [users]="users"
+      (userSelected)="onUserSelected($event)">
+    </app-user-list>
+  </div>
+
+  <!-- Chat window -->
+  <div class="chat-area">
+    @if (selectedUser) {
+      <app-chat-window
+        [user]="selectedUser"
+        (back)="selectedUser = null">
+      </app-chat-window>
+    } @else {
+      <div class="empty-chat">
+        Hãy chọn một người để bắt đầu trò chuyện
+      </div>
+    }
+  </div>
+</div>

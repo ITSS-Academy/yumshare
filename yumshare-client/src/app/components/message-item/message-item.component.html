@@ -1,0 +1,19 @@
+<div class="message-row" [ngClass]="{ 'own-message': isOwnMessage }">
+  <div class="avatar-container" *ngIf="!isOwnMessage">
+    <div class="sender-avatar" [style.background-image]="message.sender.avatar ? 'url(' + message.sender.avatar + ')' : 'none'">
+      {{ message.sender.name.charAt(0).toUpperCase() }}
+    </div>
+  </div>
+  <div class="bubble-container" [ngClass]="{ 'own-bubble': isOwnMessage }">
+    <div class="message-bubble">
+      <p class="message-text">{{ message.content }}</p>
+      <span class="message-time">{{ formattedTime }}</span>
+    </div>
+    <span class="sender-name" *ngIf="!isOwnMessage">{{ message.sender.name }}</span>
+  </div>
+  <div class="avatar-container" *ngIf="isOwnMessage">
+    <div class="sender-avatar" [style.background-image]="message.sender.avatar ? 'url(' + message.sender.avatar + ')' : 'none'">
+      {{ message.sender.name.charAt(0).toUpperCase() }}
+    </div>
+  </div>
+</div>
