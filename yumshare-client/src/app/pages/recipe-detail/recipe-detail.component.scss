@@ -1,0 +1,659 @@
+h1 {
+  headline-large: var(--mat-sys-headline-large-weight) var(--mat-sys-headline-large-size) / var(--mat-sys-headline-large-line-height) var(--mat-sys-headline-large-font),
+}
+p {
+  title-medium: var(--mat-sys-title-medium-weight) var(--mat-sys-title-medium-size) / var(--mat-sys-title-medium-line-height) var(--mat-sys-title-medium-font),
+}
+.container-right {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top {
+  width: 100%;
+  //min-height: 55vh;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.food-name {
+  width: 100%;
+  height: 20%;
+  background-color: #88C533;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.mieu-ta {
+  width: 100%;
+  height: 80%;
+  display: flex;
+  flex-direction: row;
+  padding-top: 2rem;
+}
+
+.trai {
+  width: 60%;
+  height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 0.3125rem;
+}
+
+.hinh-mon-an {
+  width: 80%;
+  height: auto;
+  border-radius: 1.25rem;   /* 20px */
+  object-fit: contain;
+  /* 5px */
+}
+
+.phai {
+  width: 40%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.mieu-ta-monan {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 0.3125rem;  /* 5px */
+}
+
+.block {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.625rem;  /* 10px */
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+.small {
+  font-size: 1rem;
+  width: auto;
+  min-width: 4rem;
+  min-height: 2rem;
+  height: auto;
+  background-color: #88C533;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary{
+  background-color: #88C533 !important;
+}
+:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary{
+  border-radius: 10px !important;
+}
+:host ::ng-deep .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
+  color: white !important; /* 10px */
+}
+:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary{
+  border: transparent !important; /* 10px */
+}
+
+.middle {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.left {
+  width: 26%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* căn giữa ngang */
+  justify-content: flex-start; /* đẩy các phần tử từ trên xuống */
+  padding: 1rem;
+  margin-top: 1rem;
+  gap: 0.5rem; /* khoảng cách giữa title và serving */
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;        /* giữ font như bạn muốn */
+  font-weight: bold;
+  text-align: center;       /* căn giữa chữ */
+}
+
+.serving {
+  margin: 0;
+  font-size: 1.25rem !important;
+  color: #555;
+  text-align: center;
+}
+.ingredient-list {
+  width: 70%;
+  max-height: 20rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 0.5rem;   /* 8px */
+  border-bottom: 0.0625rem solid #000; /* 1px */
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.user-box {
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem; /* 8px */
+}
+
+.avatar {
+  width: 1.5rem;   /* 24px */
+  height: 1.5rem;
+  background: #000;
+  border-radius: 50%;
+}
+
+.username {
+  font-weight: 500;
+}
+::ng-deep .follow-toggle .mat-mdc-checkbox .mdc-checkbox {
+  display: none; /* Ẩn ô vuông tick mặc định */
+}
+
+::ng-deep .follow-toggle .mdc-label {
+  padding: 0.4rem 1rem;
+  border: 1px solid #000;
+  border-radius: 9999px; /* pill */
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  user-select: none;
+  color: #000;
+}
+::ng-deep .follow-toggle .mdc-checkbox {
+  display: none;
+}
+
+/* Trạng thái checked */
+::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* Hover */
+::ng-deep .follow-toggle .mdc-label:hover {
+  background: #f0f0f0;
+}
+
+::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label:hover {
+  background: #222;
+}
+
+
+.right {
+  width: 70%;
+  height: auto;
+}
+
+.step-number {
+  font-size: 1.25rem !important; /* 20px */
+}
+
+.instruction {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.instruction-box {
+  background: #fff;
+  border: 0.125rem solid #D9D9D9; /* 2px */
+  border-radius: 0.75rem; /* 12px */
+  padding: 1.5rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05); /* 4px 12px */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.instruction-box:hover {
+  transform: translateY(-0.25rem); /* -4px */
+  box-shadow: 0 0.375rem 1rem rgba(0,0,0,0.1); /* 6px 16px */
+}
+
+.step-number {
+  font-weight: bold;
+  color: black;
+  margin: 0 0 0.75rem 0;
+}
+
+.step-detail {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.cooking {
+  margin: 0;
+}
+
+.bottom {
+  width: 100%;
+  //min-height: 40vh;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.video iframe.clip {
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 1rem;
+  display: flex;
+  margin: 0 auto;
+}
+//RESPONSIVE
+/* ==================== Desktop lớn (≥1200px) ==================== */
+/* Không cần chỉnh nhiều, giữ layout hiện tại */
+
+/* ==================== Laptop / Tablet ngang (992px – 1199px) ==================== */
+@media screen and (max-width: 74.9375rem) {   /* 1199px */
+  .left {
+    width: 30%;
+  }
+  .right {
+    width: 68%;
+  }
+  .ingredient-list {
+    max-height: 18rem;
+  }
+  .mieu-ta{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    //background-color:red;
+  }
+  .trai{
+    width: 100%;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0;
+    //background-color: red;
+  }
+  .hinh-mon-an{
+    width: 60%;
+    height: auto;
+  }
+  .mieu-ta-monan{
+    font-size: 0.875rem;
+  }
+  .phai{
+    width: 100%;
+    height: auto;
+    margin-top: 1rem;
+    align-items: center;
+    justify-content: center;
+    //background-color: red;
+  }
+  .block{
+    width: 100%;
+    height: auto;
+    gap: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    margin:0;
+  }
+}
+//RESPONSIVE
+
+/* Tablet landscape (≥768px) */
+@media screen and (min-width: 48rem) and (max-width: 81.25rem){
+  .middle {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .left {
+    width: 40%;
+    padding: 0.75rem;
+
+  }
+  .right {
+    width: 68%;
+  }
+  .ingredient-list {
+    max-height: 18rem;
+    width: 80%;
+  }
+  .instruction-box{
+    width: 95%;
+  }
+  .title {
+    font-size: 1.75rem;
+  }
+  .serving {
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+ .user-box{
+   gap:0.5rem;
+   width: auto;
+   display: flex;
+   flex-direction: column;
+    align-items: center;
+    justify-content: center;
+ }
+  .follow-btn {
+    margin-left: auto;
+    padding: 0.25rem 0.75rem; /* 4px 12px */
+    border: 0.0625rem solid #000; /* 1px */
+    border-radius: 0.75rem; /* 12px */
+    background: none;
+    cursor: pointer;
+    font-size: 0.875rem; /* 14px */
+    transition: all 0.3s ease;
+    position: relative;
+    right: 1rem;
+  }
+}
+
+/* Desktop (≥1200px) */
+@media screen and (min-width: 75rem) {
+  .left {
+    width: 26%;
+    padding: 1rem;
+  }
+  .right {
+    width: 70%;
+  }
+  .ingredient-list {
+    max-height: 20rem;
+    width: 70%;
+  }
+  .middle {
+    margin-top: 2rem;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.serving {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+}
+
+/* ===== Mobile small (≤480px) ===== */
+@media (max-width: 767px) {
+  .container-right,
+  .top,
+  .middle,
+  .bottom,
+  .video,
+  .comments-section {
+    width: 100%;
+  }
+  .middle,
+  .block,
+  .comment {
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 1rem;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .left,
+  .right {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem;
+  }
+  .ingredient-list {
+    width: 100% !important;
+    max-height: 12rem;
+  }
+  .food-name {
+    font-size: 1.1rem;
+    padding: 0.5rem;
+  }
+  .title {
+    font-size: 1.2rem !important;
+    padding: 0 0.5rem;
+  }
+  .serving {
+    font-size: 0.85rem !important;
+    margin-top: 0.2rem;
+  }
+  .step-number {
+    font-size: 1rem !important;
+  }
+  .step-detail,
+  .comment-body {
+    font-size: 0.85rem;
+  }
+  .hinh-mon-an {
+    width: 90%;
+    border-radius: 1.25rem;
+  }
+  .mieu-ta,
+  .phai,
+  .trai {
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: center !important;
+    margin-top: 0 !important;
+    padding-top: 0.75rem !important;
+  }
+  .block {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+/* ===== Mobile small (≤320px) ===== */
+
+@media (max-width: 320px) {
+  .container-right,
+  .top,
+  .middle,
+  .bottom,
+  .video,
+  .comments-section {
+    width: 100%;
+  }
+  .middle,
+  .block,
+  .comment {
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 1rem;
+  }
+  .left,
+  .right {
+    width: 100% !important;
+    padding: 0.5rem !important;
+    gap: 0.25rem;
+  }
+  .ingredient-list {
+    width: 100% !important;
+    max-height: 10rem;
+  }
+  .food-name {
+    font-size: 0.9rem;
+    padding: 0.25rem;
+  }
+  .title {
+    font-size: 1rem !important;
+    padding: 0 0.25rem;
+  }
+  .serving {
+    font-size: 0.7rem !important;
+    margin-top: 0.1rem;
+  }
+  .step-number {
+    font-size: 0.9rem !important;
+  }
+  .step-detail,
+  .comment-body {
+    font-size: 0.75rem;
+  }
+  .hinh-mon-an {
+    width: 100%;
+    border-radius: 0.75rem;
+  }
+  .mieu-ta,
+  .phai,
+  .trai {
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: center !important;
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+  }
+  .block {
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+  .video iframe.clip {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 0.5rem;
+  }
+}
+
+/* ===== Mobile large (≤425px) ===== */
+@media (max-width: 425px) {
+  .middle {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    gap: 0.75rem;
+    margin-top: 1rem !important;
+  }
+  .left,
+  .right {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem;
+  }
+  .ingredient-list {
+    width: 100% !important;
+    max-height: 12rem;
+  }
+  .instruction-box {
+    width: 100% !important;
+    padding: 1rem;
+  }
+  .title,
+  .title2 {
+    font-size: 1.1rem !important;
+  }
+  .serving {
+    font-size: 0.85rem !important;
+  }
+  .step-number {
+    font-size: 1rem !important;
+  }
+  .step-detail {
+    font-size: 0.85rem !important;
+  }
+
+  .hinh-mon-an {
+    width: 90% !important;
+    border-radius: 1.5rem !important;
+  }
+
+  .block {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .small {
+    font-size: 0.7rem !important;
+  }
+}
+@media (max-width: 287px) {
+.user-box{
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  flex-direction: column;
+}
+}
+

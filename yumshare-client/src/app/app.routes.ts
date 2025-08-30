@@ -65,5 +65,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/message/message.component').then((m) => m.MessageComponent),
   },
+  {
+    path: 'faq',
+    loadComponent: () =>
+      import('./pages/faq/faq.component').then((m) => m.FaqComponent),
+  },
   { path: '**', redirectTo: 'home' },
 ];
