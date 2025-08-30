@@ -3,7 +3,7 @@ import {FormsModule} from '@angular/forms';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
-import {NgFor, NgIf} from '@angular/common';
+import {NgClass, NgFor, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -18,7 +18,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatIconButton,
     MatCardImage,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    NgClass
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']

@@ -39,8 +39,12 @@
 }
 
 .content-container{
- padding: 0 0 0 16px;
-  overflow: scroll;
+  //padding: 0 0 0 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  will-change: scroll-position;
 }
 // Mobile responsive
 @media (max-width: 768px) {
@@ -62,6 +66,8 @@
   .main-content {
     width: 100%;
   }
+.content-container {
+  padding: 0 0 0 16px;
 }
 
 // Responsive for common device widths
@@ -177,4 +183,4 @@
   .sidebar-toggle-btn {
     display: none;
   }
-}
+}}
