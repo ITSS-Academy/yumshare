@@ -1,15 +1,21 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Message, MessageItemComponent } from '../../../../components/message-item';
-import { NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInput} from '@angular/material/input';
 
 @Component({
   selector: 'app-chat-window',
   templateUrl: './chat-window.component.html',
   imports: [
     MessageItemComponent,
-    NgForOf,
-    FormsModule
+    FormsModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInput
   ],
   styleUrls: ['./chat-window.component.scss']
 })

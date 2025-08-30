@@ -51,8 +51,11 @@
           <div class="avatar"></div>
           <span class="username">User Name</span>
         </div>
-        <input type="checkbox" id="followToggle" class="follow-checkbox">
-        <label for="followToggle" class="follow-btn"></label>
+        <mat-checkbox
+          class="follow-toggle"
+          [(ngModel)]="isFollowed">
+          {{ isFollowed ? 'Followed' : 'Follow' }}
+        </mat-checkbox>
       </div>
 
     </div>

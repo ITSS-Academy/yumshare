@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {ChatWindowComponent} from './components/chat-window/chat-window.component';
 import {UserListComponent} from './components/user-list/user-list.component';
-import {NgClass, NgIf} from '@angular/common';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-message',
@@ -9,7 +9,6 @@ import {NgClass, NgIf} from '@angular/common';
   imports: [
     ChatWindowComponent,
     UserListComponent,
-    NgIf,
     NgClass
   ],
   styleUrls: ['./message.component.scss']

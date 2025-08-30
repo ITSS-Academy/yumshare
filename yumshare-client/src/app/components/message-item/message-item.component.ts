@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 export interface Message {
   id: string;
   content: string;
-  sender: {
+  sender: {  
     id: string;
     name: string;
     avatar: string;

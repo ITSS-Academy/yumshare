@@ -4,7 +4,7 @@
     <button class="back-btn" (click)="onBack()" aria-label="Back"></button>
     <img [src]="user.avatar" class="avatar" />
     <div class="name">{{ user.name }}</div>
-    <div class="options">⋮</div>
+   <!-- <div class="options">⋮</div>-->
   </div>
 
   <!-- Messages -->
@@ -21,11 +21,19 @@
 
   <!-- Input -->
   <div class="chat-input">
-    <input
-      type="text"
-      [(ngModel)]="newMessage"
-      placeholder="Write a message..."
-    />
-    <button (click)="sendMessage()">Send</button>
+    <div class="chat-input-box">
+      <input
+        matInput
+        placeholder="Write a message..."
+        [(ngModel)]="newMessage"
+        name="messageInput"
+        (keyup.enter)="sendMessage()"
+      />
+    </div>
+
+    <button mat-icon-button color="primary" (click)="sendMessage()">
+      <mat-icon>send</mat-icon>
+    </button>
   </div>
+
 </div>

@@ -6,7 +6,7 @@ p {
 }
 .container-right {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -110,8 +110,8 @@ p {
 :host ::ng-deep .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
   color: white !important; /* 10px */
 }
-:host ::ng-deep mat-mdc-chip mat-primary mdc-evolution-chip mat-mdc-standard-chip{
-  border-radius: 10px !important; /* 10px */
+:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary{
+  border: transparent !important; /* 10px */
 }
 
 .middle {
@@ -199,40 +199,42 @@ p {
 .username {
   font-weight: 500;
 }
+::ng-deep .follow-toggle .mat-mdc-checkbox .mdc-checkbox {
+  display: none; /* Ẩn ô vuông tick mặc định */
+}
 
-/* Ẩn checkbox */
-.follow-checkbox {
+::ng-deep .follow-toggle .mdc-label {
+  padding: 0.4rem 1rem;
+  border: 1px solid #000;
+  border-radius: 9999px; /* pill */
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  user-select: none;
+  color: #000;
+}
+::ng-deep .follow-toggle .mdc-checkbox {
   display: none;
 }
 
-/* Nút follow */
-.follow-btn {
-  margin-left: auto;
-  padding: 0.25rem 0.75rem; /* 4px 12px */
-  border: 0.0625rem solid #000; /* 1px */
-  border-radius: 0.75rem; /* 12px */
-  background: none;
-  cursor: pointer;
-  font-size: 0.875rem; /* 14px */
-  transition: all 0.3s ease;
-}
-
-/* Text mặc định */
-.follow-btn::before {
-  content: "Follow";
-  color: #000;
-}
-
-/* Khi checkbox được check -> thành Followed */
-.follow-checkbox:checked + .follow-btn {
+/* Trạng thái checked */
+::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label {
   background: #000;
   color: #fff;
+  border-color: #000;
 }
 
-.follow-checkbox:checked + .follow-btn::before {
-  content: "Followed";
-  color: #fff;
+/* Hover */
+::ng-deep .follow-toggle .mdc-label:hover {
+  background: #f0f0f0;
 }
+
+::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label:hover {
+  background: #222;
+}
+
 
 .right {
   width: 70%;
@@ -308,83 +310,6 @@ p {
   display: flex;
   margin: 0 auto;
 }
-//.comments-section {
-//  max-width: 100%;
-//  margin: 1.25rem auto; /* 20px */
-//  font-family: Arial, sans-serif;
-//}
-//
-//h2 {
-//  margin-bottom: 0.625rem; /* 10px */
-//  font-size: 1.125rem; /* 18px */
-//}
-//
-///* Input giống YouTube */
-//.comment-input {
-//  display: flex;
-//  align-items: center;
-//  gap: 0.625rem; /* 10px */
-//}
-//
-//.comment-input .avatar {
-//  width: 2.5rem;  /* 40px */
-//  height: 2.5rem;
-//  border-radius: 50%;
-//}
-//
-//.comment-input input {
-//  flex: 1;
-//  padding: 0.625rem; /* 10px */
-//  border: none;
-//  border-bottom: 0.0625rem solid #ccc; /* 1px */
-//  outline: none;
-//  font-size: 0.875rem; /* 14px */
-//}
-//
-//.comment-input input:focus {
-//  border-bottom: 0.0625rem solid #000; /* 1px */
-//}
-//
-//.send-btn {
-//  background: none;
-//  border: none;
-//  font-size: 1.125rem; /* 18px */
-//  cursor: pointer;
-//}
-//
-///* Comment giống Facebook */
-//.comment {
-//  display: flex;
-//  align-items: flex-start;
-//  margin-top: 0.9375rem; /* 15px */
-//  gap: 0.625rem; /* 10px */
-//}
-//
-//.comment .avatar {
-//  width: 2.5rem; /* 40px */
-//  height: 2.5rem;
-//  border-radius: 50%;
-//}
-//
-//.comment-body {
-//  background: #f0f2f5;
-//  padding: 0.625rem 0.875rem; /* 10px 14px */
-//  border-radius: 1.125rem; /* 18px */
-//  max-width: 80%;
-//}
-//
-//.user-name {
-//  font-weight: bold;
-//  display: block;
-//  margin-bottom: 0.25rem; /* 4px */
-//  font-size: 0.875rem; /* 14px */
-//}
-//
-//.comment-body p {
-//  margin: 0;
-//  font-size: 0.875rem; /* 14px */
-//  line-height: 1.4;
-//}
 //RESPONSIVE
 /* ==================== Desktop lớn (≥1200px) ==================== */
 /* Không cần chỉnh nhiều, giữ layout hiện tại */
@@ -723,5 +648,12 @@ p {
     font-size: 0.7rem !important;
   }
 }
-
+@media (max-width: 287px) {
+.user-box{
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  flex-direction: column;
+}
+}
 
