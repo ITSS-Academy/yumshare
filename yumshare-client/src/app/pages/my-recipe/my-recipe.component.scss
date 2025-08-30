@@ -34,6 +34,7 @@
   gap: 16px;
   padding-bottom: 32px;
   min-height: 0;
+  background-color: #F8FCF3;
 }
 
 .recipe-card {
@@ -107,6 +108,7 @@
   height: 200px;
   background-color: #88C533;
   display: block;
+  border-radius: 16px;
 }
 
 .my-recipe-header h1 {
@@ -166,12 +168,37 @@ mat-form-field {
   justify-content: center !important;
   align-items: center !important;
   color: white !important;
-  margin: 0 30px !important;
+  margin: 0 30px 0 0 !important;
   font-size: 16px !important;
   padding-bottom: 8px !important;
 }
 
 .category button {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  margin-top: 8px;
+}
+
+.difficulty {
+  width: 13% !important;
+  height: 69% !important;
+  background-color: #88C533 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  color: white !important;
+  margin: 0 15px 0 0 !important;
+  font-size: 16px !important;
+  padding-bottom: 8px !important;
+}
+
+.difficulty button {
   width: 100%;
   height: 100%;
   border-radius: 8px;
@@ -198,8 +225,6 @@ mat-form-field {
 
 .content-container{
   width: 100% !important;
-  max-height: calc(100vh - 60px) !important; /* Adjust based on navbar height or other fixed elements */
-  overflow-y: auto !important; /* Enable vertical scrolling for the entire content */
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -275,9 +300,28 @@ mat-form-field {
     font-size: 32px !important;
     border-radius: 20px !important;
     padding: 0 !important;
-    margin: 0 40px !important;
+    margin: 0 48px !important;
   }
   .category button {
+    font-size: 32px;
+    border-radius: 20px;
+    padding: 0 40px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 0;
+  }
+  .difficulty {
+    height: 80px !important;
+    width: 14% !important;
+    font-size: 32px !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    margin: 0 40px !important;
+  }
+  .difficulty button {
     font-size: 32px;
     border-radius: 20px;
     padding: 0 40px;
@@ -339,7 +383,7 @@ mat-form-field {
     height: 40px;
     width: 40px;
   }
-  
+
   .pages-navigation button.active {
     background-color: #88C533 !important;
     color: white !important;
@@ -352,6 +396,14 @@ mat-form-field {
   }
 
   .category button {
+    font-size: 18px;
+  }
+
+  .difficulty{
+    width: 20% !important;
+  }
+
+  .difficulty button {
     font-size: 18px;
   }
 }
@@ -385,6 +437,14 @@ mat-form-field {
     height: 40px !important;
     justify-content: flex-start !important;
     padding-bottom: 0 !important;
+  }
+  .difficulty {
+    width: 100% !important;
+    margin: 0 !important;
+    height: 40px !important;
+    justify-content: flex-start !important;
+    padding-top: 10px !important;
+    margin-top: 20px !important;
   }
   .sort-by-date {
     width: 100%;
@@ -464,6 +524,20 @@ mat-form-field {
   .category button {
     font-size: 16px;
   }
+
+  .difficulty {
+    width: 100% !important;
+    height: 36px !important;
+    font-size: 14px !important;
+    margin-top: 20px !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 9px !important;
+  }
+
+  .difficulty button {
+    font-size: 16px;
+  }
+
   .pages-navigation {
     height: auto;
     flex-wrap: wrap;
@@ -474,11 +548,44 @@ mat-form-field {
     font-size: 14px;
     padding: 6px 10px;
   }
-  
+
   .pages-navigation button.active {
     background-color: #88C533 !important;
     color: white !important;
   }
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.del-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  margin-left: 8px;
+  margin-right: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: #f5f5f5;
+  color: #e53935;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.del-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.del-btn:hover:not(:disabled) {
+  background: #ffeaea;
 }
 
 .navbar-wrapper {
@@ -493,4 +600,17 @@ mat-form-field {
   overflow: hidden;
 }
 
+  .delete-menu-item .delete-icon,
+.delete-menu-item .delete-text {
+  color: #e53935 !important;
+  font-weight: bold;
+}
 
+.center-dialog .mat-dialog-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 320px;
+  min-height: 120px;
+}

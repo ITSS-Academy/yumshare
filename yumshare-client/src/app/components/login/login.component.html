@@ -1,1 +1,24 @@
-<p>login works!</p>
+<div class="login-dialog" @dialogAnim>
+    <div class="header">
+      <img
+        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800"
+        alt="YumShare"
+        class="header-img"
+      />
+      <div class="overlay"></div>
+      <h1 class="title">YumShare</h1>
+    </div>
+  
+    <div class="content">
+      <h2>Welcome to YumShare</h2>
+      <p>
+        Continue with Google to join our community — whether you are new here or already have an account.
+      </p>
+  
+      <button mat-raised-button color="primary" class="google-btn" (click)="onGoogleLogin()">
+        <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" />
+        Continue with Google
+      </button>
+    </div>
+  </div>
+  

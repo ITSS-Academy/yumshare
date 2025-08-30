@@ -107,6 +107,7 @@
   height: 200px;
   background-color: #88C533;
   display: block;
+  border-radius: 16px;
 }
 
 .my-recipe-header h1 {
@@ -166,7 +167,7 @@ mat-form-field {
   justify-content: center !important;
   align-items: center !important;
   color: white !important;
-  margin: 0 30px !important;
+  margin: 0 30px 0 0 !important;
   font-size: 16px !important;
   padding-bottom: 8px !important;
 }
@@ -181,12 +182,29 @@ mat-form-field {
   margin-top: 8px;
 }
 
-.dropdown-button {
-  width: 100% !important;
-  height: 100% !important;
+.difficulty {
+  width: 13% !important;
+  height: 69% !important;
+  background-color: #88C533 !important;
   border-radius: 8px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
   color: white !important;
+  margin: 0 15px 0 0 !important;
   font-size: 16px !important;
+  padding-bottom: 8px !important;
+}
+
+.difficulty button {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  margin-top: 8px;
 }
 
 .home-root {
@@ -198,11 +216,10 @@ mat-form-field {
 
 .content-container{
   width: 100% !important;
-  max-height: calc(100vh - 60px) !important; /* Adjust based on navbar height or other fixed elements */
-  overflow-y: auto !important; /* Enable vertical scrolling for the entire content */
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
+  background-color: #F8FCF3 !important;
 }
 
 .material-symbols-outlined {
@@ -275,9 +292,28 @@ mat-form-field {
     font-size: 32px !important;
     border-radius: 20px !important;
     padding: 0 !important;
-    margin: 0 40px !important;
+    margin: 0 20px !important;
   }
   .category button {
+    font-size: 32px;
+    border-radius: 20px;
+    padding: 0 40px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 0;
+  }
+  .difficulty {
+    height: 80px !important;
+    width: 14% !important;
+    font-size: 32px !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    margin: 0 20px !important;
+  }
+  .difficulty button {
     font-size: 32px;
     border-radius: 20px;
     padding: 0 40px;
@@ -339,7 +375,7 @@ mat-form-field {
     height: 40px;
     width: 40px;
   }
-  
+
   .pages-navigation button.active {
     background-color: #88C533 !important;
     color: white !important;
@@ -347,12 +383,15 @@ mat-form-field {
 }
 
 @media (max-width: 1200px) {
-  .category {
+  .difficulty{
     width: 20% !important;
+    margin: 0 10px !important;
   }
-
-  .category button {
+  .difficulty button {
     font-size: 18px;
+  }
+  .category{
+    margin: 0 10px !important;
   }
 
   mat-form-field {
@@ -384,6 +423,14 @@ mat-form-field {
     padding: 0 8px;
   }
   .category {
+    width: 100% !important;
+    margin: 0 !important;
+    margin-bottom: 20px !important;
+    height: 40px !important;
+    justify-content: flex-start !important;
+    padding-bottom: 0 !important;
+  }
+  .difficulty {
     width: 100% !important;
     margin: 0 !important;
     margin-bottom: 20px !important;
@@ -479,7 +526,7 @@ mat-form-field {
     font-size: 14px;
     padding: 6px 10px;
   }
-  
+
   .pages-navigation button.active {
     background-color: #88C533 !important;
     color: white !important;
@@ -498,3 +545,43 @@ mat-form-field {
     font-size: 48px;
   }
 
+.favourite-btn .mat-icon.filled {
+  color: #88C533 !important;
+  background: transparent !important;
+}
+
+.favourite-btn .mat-icon.outlined {
+  color: #777474 !important;
+  background: transparent !important;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(1.2);
+  }
+  20% {
+    transform: scale(0.95);
+  }
+  30% {
+    transform: scale(1.1);
+  }
+  40% {
+    transform: scale(0.98);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  60% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.favourite-btn .mat-icon.heartbeat {
+  animation: heartbeat 1.5s;
+}

@@ -15,6 +15,7 @@ import {SideBarComponent} from '../../components/side-bar/side-bar.component';
 import {NavBarComponent} from '../../components/nav-bar/nav-bar.component';
 import {MatNativeDateModule} from '@angular/material/core';
 import {MatTimepickerModule} from '@angular/material/timepicker';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-my-favourite-recipe',
@@ -39,6 +40,7 @@ import {MatTimepickerModule} from '@angular/material/timepicker';
     MatIcon,
     MatIconButton,
     MatMiniFabButton,
+    NgClass,
   ],
   templateUrl: './my-favourite-recipe.component.html',
   styleUrl: './my-favourite-recipe.component.scss'
@@ -54,8 +56,13 @@ export class MyFavouriteRecipeComponent implements OnInit {
     name: `Recipe Name ${i + 1}`,
     author: `Author ${i + 1}`,
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    date: 'Post date'
+    date: 'Post date',
+    isFavourite: true, // Ban đầu là yêu thích
+    heartbeat: false   // Hiệu ứng nhịp tim
   }));
+
+  selectedCategory: string = 'Category';
+  selectedDifficulty: string = 'Difficulty';
 
   get totalPages(): number {
     return Math.ceil(this.totalRecipes / this.pageSize);
@@ -105,6 +112,16 @@ export class MyFavouriteRecipeComponent implements OnInit {
     }
   }
 
+  setCategory(option: string) {
+    this.selectedCategory = option;
+    // ...nếu cần lọc dữ liệu theo category, thêm logic tại đây...
+  }
+
+  setDifficulty(option: string) {
+    this.selectedDifficulty = option;
+    // ...nếu cần lọc dữ liệu theo difficulty, thêm logic tại đây...
+  }
+
   goToPage(page: number) {
     if (page >= 0 && page < this.totalPages) {
       this.pageIndex = page;
@@ -134,5 +151,14 @@ export class MyFavouriteRecipeComponent implements OnInit {
       this.pageIndex++;
       this.reloadPageAndScrollToTop();
     }
+  }
+
+  toggleFavourite(recipe: any) {
+    recipe.isFavourite = !recipe.isFavourite;
+    recipe.heartbeat = false;
+    setTimeout(() => {
+      recipe.heartbeat = true;
+      setTimeout(() => recipe.heartbeat = false, 500);
+    }, 0);
   }
 }

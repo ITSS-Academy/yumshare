@@ -111,67 +111,55 @@ export class AddRecipeComponent {
     }
   }
 
-  // Sửa lại toggle: mỗi nút chỉ chuyển sang đúng chế độ
-  setVideoSource(isUrl: boolean) {
-    this.isVideoFromUrl = isUrl;
-    if (isUrl) {
-      // Chuyển sang chế độ URL, giữ lại URL nếu đã nhập
-      this.videoFile = null;
-      this.videoPreviewUrl = null;
-      this.recipeForm.patchValue({ videoFile: null });
-    } else {
-      // Chuyển sang chế độ upload file, giữ lại file nếu đã chọn
-      this.videoUrl = '';
-      this.recipeForm.patchValue({ videoUrl: '' });
-      this.videoPreviewUrl = this.videoFile ? URL.createObjectURL(this.videoFile) : null;
-    }
-  }
-
   onVideoSelected(event: any) {
+    console.log('Video file selected:', event);
     const file = event.target.files[0];
     if (file) {
+      console.log('File details:', file.name, file.type, file.size);
+
+      // Validate file type
       if (!file.type.startsWith('video/')) {
         alert('Please select a video file');
         return;
       }
+
+      // Validate file size (max 100MB)
       if (file.size > 100 * 1024 * 1024) {
         alert('Video file size should be less than 100MB');
         return;
       }
+
       this.videoFile = file;
       this.isVideoFromUrl = false;
       this.videoUrl = '';
+      this.videoPreviewUrl = null;
       this.recipeForm.patchValue({
         videoFile: file,
         videoUrl: ''
       });
+
+      // Create preview URL for video
       this.videoPreviewUrl = URL.createObjectURL(file);
+      console.log('Video preview URL created:', this.videoPreviewUrl);
     }
   }
 
   onVideoUrlChange() {
     const url = this.recipeForm.get('videoUrl')?.value;
+    console.log('Video URL changed:', url);
     if (url) {
+      // Basic URL validation
       if (this.isValidVideoUrl(url)) {
+        console.log('Valid video URL:', url);
         this.videoUrl = url;
         this.isVideoFromUrl = true;
         this.videoFile = null;
+        this.videoPreviewUrl = null;
         this.recipeForm.patchValue({ videoFile: null });
-        // Hiển thị preview nếu là mp4 hoặc YouTube
-        if (url.match(/\.mp4$/)) {
-          this.videoPreviewUrl = url;
-        } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-          this.videoPreviewUrl = this.getYoutubeEmbedUrl(url);
-        } else if (url.includes('vimeo.com')) {
-          this.videoPreviewUrl = this.getVimeoEmbedUrl(url);
-        } else {
-          this.videoPreviewUrl = null;
-        }
       } else {
+        console.log('Invalid video URL:', url);
         alert('Please enter a valid video URL (YouTube, Vimeo, etc.)');
         this.recipeForm.patchValue({ videoUrl: '' });
-        this.videoUrl = '';
-        this.videoPreviewUrl = null;
       }
     } else {
       this.videoUrl = '';
@@ -257,6 +245,19 @@ export class AddRecipeComponent {
     const avi = /\.avi(\?.*)?$/i;
     const wmv = /\.wmv(\?.*)?$/i;
     return youtube.test(url) || vimeo.test(url) || mp4.test(url) || mov.test(url) || avi.test(url) || wmv.test(url);
+  }
+
+  setVideoSource(isUrl: boolean) {
+    this.isVideoFromUrl = isUrl;
+    if (isUrl) {
+      this.videoFile = null;
+      this.videoPreviewUrl = null;
+      this.recipeForm.patchValue({ videoFile: null });
+    } else {
+      this.videoUrl = '';
+      this.recipeForm.patchValue({ videoUrl: '' });
+      this.videoPreviewUrl = this.videoFile ? URL.createObjectURL(this.videoFile) : null;
+    }
   }
 
   onSubmit() {

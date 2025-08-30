@@ -92,7 +92,7 @@ const materialModules = [
   MatStepperModule,
   ReactiveFormsModule,
   CommonModule,
-IdToNamePipe
+IdToNamePipe,
 
 
 

@@ -66,7 +66,7 @@
                      class="serving-input">
 
               <div formArrayName="ingredients">
-                @for (ingredient of ingredients.controls; track ingredient; let i = $index) {
+                @for (ingredient of ingredients.controls; track $index; let i = $index) {
                   <div class="add-ingredient-card" [formGroupName]="i">
                     <input type="text"
                            formControlName="name"
@@ -95,7 +95,7 @@
               <label>Time</label>
               <input type="text" formControlName="time" placeholder="1 hour 30 minutes" class="time-input">
               <div formArrayName="steps">
-                @for (step of steps.controls; track step; let i = $index) {
+                @for (step of steps.controls; track $index; let i = $index) {
                   <div class="step-item" [formGroupName]="i">
                     <span class="step-number">{{ i + 1 }}</span>
                     <input type="text"
@@ -117,9 +117,12 @@
             </div>
           </div>
         </div>
-        <div class="delete-and-post">
-          <button mat-button class="post" type="button" (click)="stepper.next()">Next</button>
-        </div>
+      </div>
+      <div class="delete-and-save">
+        <button mat-button class="delete" type="button">
+          <span class="material-symbols-outlined">delete</span>Delete
+        </button>
+        <button mat-button class="post" type="button" (click)="stepper.next()">Next</button>
       </div>
     </form>
   </mat-step>
@@ -228,13 +231,14 @@
             </div>
           }
         </div>
-        <div class="delete-and-post">
-          <button mat-button matStepperPrevious class="delete" type="button">
-            <span class="material-symbols-outlined">arrow_back</span>Back
-          </button>
-          <button mat-button class="post" type="button" (click)="onSubmit()">Post</button>
-        </div>
+      </div>
+      <div class="delete-and-save">
+        <button mat-button matStepperPrevious class="delete" type="button">
+          <span class="material-symbols-outlined">delete</span>Delete
+        </button>
+        <button mat-button class="post" type="button" (click)="onSubmit()">Save</button>
       </div>
     </form>
   </mat-step>
 </mat-horizontal-stepper>
+

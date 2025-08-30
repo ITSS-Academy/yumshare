@@ -1,57 +1,61 @@
 <div class="content-container">
   <div class="my-recipe-header">
-    <h1>My Favourite</h1>
-    <p>Share your favorite recipes with friends and family to inspire their cooking adventures! Encourage them to try new dishes and explore different flavors together. Cooking is more fun when it’s a shared experience!</p>
+    <h1>My Favourite Recipes</h1>
+    <p>Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your favourites. Enjoy exploring and saving your best-loved dishes!</p>
   </div>
 
   <div class="sort-and-category">
-    <div class="sort-by-date">
-      <mat-form-field>
-        <input matInput [matDatepicker]="datepicker" [(ngModel)]="value" placeholder="Sort by date">
-        <mat-datepicker #datepicker></mat-datepicker>
-        <mat-datepicker-toggle [for]="datepicker" matSuffix></mat-datepicker-toggle>
-      </mat-form-field>
+    <div class="difficulty">
+      <button mat-button [matMenuTriggerFor]="Difficulty">
+        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <mat-menu #Difficulty="matMenu">
+        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+      </mat-menu>
     </div>
 
     <div class="category">
-      <button mat-button [matMenuTriggerFor]="Category">Category<span class="material-symbols-outlined">arrow_drop_down</span></button>
+      <button mat-button [matMenuTriggerFor]="Category">
+        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
       <mat-menu #Category="matMenu">
-        <button mat-menu-item [matMenuTriggerFor]="Meat">Meat</button>
-        <button mat-menu-item [matMenuTriggerFor]="SeaFood">Sea food</button>
-        <button mat-menu-item [matMenuTriggerFor]="SeaFood">Vegetable</button>
-        <button mat-menu-item [matMenuTriggerFor]="Drinks">Drinks</button>
+        <button mat-menu-item [matMenuTriggerFor]="Meat" (click)="setCategory('Meat')">Meat</button>
+        <button mat-menu-item [matMenuTriggerFor]="SeaFood" (click)="setCategory('Sea food')">Sea food</button>
+        <button mat-menu-item [matMenuTriggerFor]="Vegetable" (click)="setCategory('Vegetable')">Vegetable</button>
+        <button mat-menu-item [matMenuTriggerFor]="Drinks" (click)="setCategory('Drinks')">Drinks</button>
       </mat-menu>
 
       <mat-menu #Meat="matMenu">
-        <button mat-menu-item>Beef</button>
-        <button mat-menu-item>pork</button>
-        <button mat-menu-item>Chicken</button>
-        <button mat-menu-item>Sheep</button>
+        <button mat-menu-item (click)="setCategory('Beef')">Beef</button>
+        <button mat-menu-item (click)="setCategory('Pork')">Pork</button>
+        <button mat-menu-item (click)="setCategory('Chicken')">Chicken</button>
+        <button mat-menu-item (click)="setCategory('Sheep')">Sheep</button>
       </mat-menu>
 
       <mat-menu #SeaFood="matMenu">
-        <button mat-menu-item>fish</button>
-        <button mat-menu-item>Octopus</button>
-        <button mat-menu-item>Crab</button>
-        <button mat-menu-item>shrimp</button>
+        <button mat-menu-item (click)="setCategory('Fish')">Fish</button>
+        <button mat-menu-item (click)="setCategory('Octopus')">Octopus</button>
+        <button mat-menu-item (click)="setCategory('Crab')">Crab</button>
+        <button mat-menu-item (click)="setCategory('Shrimp')">Shrimp</button>
       </mat-menu>
 
       <mat-menu #Vegetable="matMenu">
-        <button mat-menu-item>Salad</button>
-        <button mat-menu-item>Potato</button>
-        <button mat-menu-item>Carrot</button>
-        <button mat-menu-item>Tomato</button>
-        <button mat-menu-item>Beans</button>
+        <button mat-menu-item (click)="setCategory('Salad')">Salad</button>
+        <button mat-menu-item (click)="setCategory('Potato')">Potato</button>
+        <button mat-menu-item (click)="setCategory('Carrot')">Carrot</button>
+        <button mat-menu-item (click)="setCategory('Tomato')">Tomato</button>
+        <button mat-menu-item (click)="setCategory('Beans')">Beans</button>
       </mat-menu>
 
       <mat-menu #Drinks="matMenu">
-        <button mat-menu-item>Juices</button>
-        <button mat-menu-item>Milk</button>
-        <button mat-menu-item>Tea</button>
-        <button mat-menu-item>smoothie</button>
-        <button mat-menu-item>Coffee</button>
+        <button mat-menu-item (click)="setCategory('Juices')">Juices</button>
+        <button mat-menu-item (click)="setCategory('Milk')">Milk</button>
+        <button mat-menu-item (click)="setCategory('Tea')">Tea</button>
+        <button mat-menu-item (click)="setCategory('Smoothie')">Smoothie</button>
+        <button mat-menu-item (click)="setCategory('Coffee')">Coffee</button>
       </mat-menu>
-
     </div>
   </div>
 
@@ -73,8 +77,17 @@
             </div>
             <div class="example-button-row">
               <div class="example-flex-container">
-                <button mat-icon-button aria-label="Favorite">
-                  <mat-icon>favorite</mat-icon>
+                <button mat-icon-button
+                        class="favourite-btn"
+                        (click)="toggleFavourite(recipe)">
+                  <mat-icon
+                    [ngClass]="{
+                      'filled': recipe.isFavourite,
+                      'outlined': !recipe.isFavourite,
+                      'heartbeat': recipe.heartbeat
+                    }">
+                    {{ recipe.isFavourite ? 'favorite' : 'favorite_border' }}
+                  </mat-icon>
                 </button>
               </div>
             </div>

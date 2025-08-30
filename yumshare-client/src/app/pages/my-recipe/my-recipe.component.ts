@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SideBarComponent } from '../../components/side-bar/side-bar.component';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
@@ -20,6 +20,8 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton, MatMiniFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { Router } from '@angular/router';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
   selector: 'app-my-recipe',
   standalone: true,
@@ -45,6 +47,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatIconButton,
     MatMiniFabButton,
     MatPaginatorModule,
+    MatDialogModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './my-recipe.component.html',
@@ -63,6 +66,11 @@ export class MyRecipeComponent implements OnInit {
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     date: 'Post date'
   }));
+
+  selectedDifficulty: string = 'Difficulty';
+  selectedCategory: string = 'Category';
+
+  constructor(private router: Router, private dialog: MatDialog) {}
 
   get totalPages(): number {
     return Math.ceil(this.totalRecipes / this.pageSize);
@@ -142,4 +150,79 @@ export class MyRecipeComponent implements OnInit {
       this.reloadPageAndScrollToTop();
     }
   }
+
+  onEditRecipe(recipe: any) {
+    // Giả sử dùng index làm id, bạn có thể thay bằng recipe.id nếu có
+    const recipeIndex = this.recipes.indexOf(recipe);
+    this.router.navigate(['/edit-recipe', recipeIndex]);
+  }
+
+  onDeleteRecipe(recipe: any) {
+    const dialogRef = this.dialog.open(DeleteRecipeDialogComponent, {
+      width: '340px',
+      data: { recipe },
+      disableClose: true,
+      autoFocus: false,
+      panelClass: 'center-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        const idx = this.recipes.indexOf(recipe);
+        if (idx > -1) {
+          this.recipes.splice(idx, 1);
+          this.totalRecipes--;
+          if (this.pageIndex > 0 && this.displayedRecipes.length === 0) {
+            this.pageIndex--;
+          }
+        }
+      }
+    });
+  }
+
+  setDifficulty(option: string) {
+    this.selectedDifficulty = option;
+    // ...nếu cần lọc dữ liệu theo độ khó, thêm logic tại đây...
+  }
+
+  setCategory(option: string) {
+    this.selectedCategory = option;
+    // ...nếu cần lọc dữ liệu theo category, thêm logic tại đây...
+  }
+
+}
+
+// Dialog component
+@Component({
+  selector: 'delete-recipe-dialog',
+  template: `
+    <h2 mat-dialog-title>Delete Recipe</h2>
+    <mat-dialog-content>
+      <p>Are you sure you want to delete this recipe?</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button class="close-dialog-btn" mat-button mat-dialog-close>No</button>
+      <button class="Delete-recipe-btn" mat-button color="warn" [mat-dialog-close]="true">Delete</button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    h2 {
+      margin-bottom: 8px;
+    }
+    mat-dialog-content p {
+      margin: 0 0 12px 0;
+    }
+    mat-dialog-actions button[color="warn"] {
+      color: #e53935;
+      font-weight: bold;
+    }
+  `],
+  standalone: true,
+  imports: [MatDialogModule, MatButton]
+})
+export class DeleteRecipeDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<DeleteRecipeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
 }

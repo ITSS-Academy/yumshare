@@ -110,6 +110,9 @@
       </div>
 
       <div class="step-actions">
+        <button mat-button class="delete-add-recipe" type="button">
+          <span class="material-symbols-outlined">delete</span>Delete
+        </button>
         <button mat-button matStepperNext class="next-btn">Next</button>
       </div>
     </mat-step>
@@ -233,15 +236,15 @@
 
       <div class="step-actions">
         <button mat-button matStepperPrevious class="prev-btn">Previous</button>
-        <button mat-button class="submit-btn" (click)="onSubmit()">Post Recipe</button>
+        <div class="step2-delete-post-btn">
+          <button mat-button class="delete-add-recipe" type="button">
+            <span class="material-symbols-outlined">delete</span>Delete
+          </button>
+          <button mat-button class="submit-btn" (click)="onSubmit()">Post Recipe</button>
+        </div>
+
       </div>
     </mat-step>
 
   </mat-stepper>
-
-  <div class="delete-and-post">
-    <button mat-button class="delete" type="button">
-      <span class="material-symbols-outlined">delete</span>Delete
-    </button>
-  </div>
 </div>

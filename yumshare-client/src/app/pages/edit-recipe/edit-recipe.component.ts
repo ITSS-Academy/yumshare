@@ -309,7 +309,6 @@ export class EditRecipeComponent implements OnInit {
       originalImageUrl: this.originalImageUrl,
       editedImageUrl: this.imgURL
       // Thêm videoFile/videoUrl nếu cần gửi lên server
-    };
-    console.log(result);
+    }
   }
 }
