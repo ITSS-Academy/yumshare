@@ -1,0 +1,23 @@
+<div class="sidebar">
+  <input
+    type="text"
+    placeholder="Search..."
+    [(ngModel)]="searchTerm"
+    class="search-box"
+  />
+
+  <div class="user-list">
+    @for (user of filteredUsers; track user.id) {
+      <div
+        class="user-item"
+        (click)="selectUser(user)">
+        <img [src]="user.avatar" class="avatar" />
+        <div class="user-info">
+          <div class="name">{{ user.name }}</div>
+          <div class="last-message">{{ user.lastMessage }}</div>
+        </div>
+        <!-- <div class="time">{{ user.time }}</div> -->
+      </div>
+    }
+  </div>
+</div>
