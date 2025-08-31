@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import { Category } from '../../models/category.model';
 import { RecipeStep } from '../../models/recipe-step.model';
@@ -40,7 +41,7 @@ import { AuthState } from '../../ngrx/auth/auth.state';
   templateUrl: './add-recipe.component.html',
   styleUrl: './add-recipe.component.scss'
 })
-export class AddRecipeComponent implements OnInit {
+export class AddRecipeComponent implements OnInit, OnDestroy {
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
   @ViewChild('videoInput') videoInput!: ElementRef<HTMLInputElement>;
   
@@ -56,6 +57,9 @@ export class AddRecipeComponent implements OnInit {
   difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
   countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
   currentUser: AuthModel | null = null;
+
+  // Subscriptions management
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private recipeService: RecipeService,
@@ -78,6 +82,11 @@ export class AddRecipeComponent implements OnInit {
         this.createStepFormGroup(1)
       ])
     });
+  }
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
   }
 
   ngOnInit() {
@@ -241,56 +250,70 @@ export class AddRecipeComponent implements OnInit {
   async loadCategories() {
     try {
       // Try to load from API first
-      const response = await this.recipeService.getCategories().toPromise();
-     
-      // Handle paginated response format
-      let categories: Category[] = [];
-      if (response && typeof response === 'object' && 'data' in response) {
-        const paginatedResponse = response as any;
-        if (Array.isArray(paginatedResponse.data)) {
-          categories = paginatedResponse.data;
-          console.log('Extracted categories from paginated response:', categories.length);
+      const categoriesSubscription = this.recipeService.getCategories().subscribe({
+        next: (response) => {
+          // Handle paginated response format
+          let categories: Category[] = [];
+          if (response && typeof response === 'object' && 'data' in response) {
+            const paginatedResponse = response as any;
+            if (Array.isArray(paginatedResponse.data)) {
+              categories = paginatedResponse.data;
+              console.log('Extracted categories from paginated response:', categories.length);
+            }
+          } else if (response && Array.isArray(response)) {
+            categories = response as Category[];
+          }
+          
+          // If API returns valid data, use it
+          if (categories && categories.length > 0) {
+            this.categories = categories;
+          } else {
+            // Use mock data if API returns empty or invalid data
+            this.categories = this.getMockCategories();
+            console.log('Using mock categories:', this.categories.length);
+            this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
+          }
+          
+          // Ensure categories is always an array
+          if (!Array.isArray(this.categories)) {
+            this.categories = this.getMockCategories();
+            console.log('Fallback to mock categories:', this.categories.length);
+          }
+          
+          console.log('Final categories count:', this.categories.length);
+        },
+        error: (error) => {
+          console.error('Error loading categories from API:', error);
+          // Use mock data if API fails
+          this.categories = this.getMockCategories();
+          console.log('Using mock categories due to API error:', this.categories.length);
+          this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
         }
-      } else if (response && Array.isArray(response)) {
-        categories = response as Category[];
-       
-      }
+      });
       
-      // If API returns valid data, use it
-      if (categories && categories.length > 0) {
-        this.categories = categories;
-       
-      } else {
-        // Use mock data if API returns empty or invalid data
-        this.categories = this.getMockCategories();
-        console.log('Using mock categories:', this.categories.length);
-        this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
-      }
+      // Add subscription to array
+      this.subscriptions.push(categoriesSubscription);
+      
     } catch (error) {
-      console.error('Error loading categories from API:', error);
+      console.error('Error in loadCategories:', error);
       // Use mock data if API fails
       this.categories = this.getMockCategories();
-      console.log('Using mock categories due to API error:', this.categories.length);
+      console.log('Using mock categories due to error:', this.categories.length);
       this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
     }
-    
-    // Ensure categories is always an array
-    if (!Array.isArray(this.categories)) {
-      this.categories = this.getMockCategories();
-      console.log('Fallback to mock categories:', this.categories.length);
-    }
-    
-    console.log('Final categories count:', this.categories.length);
   }
 
   loadCurrentUser() {
-    this.store.select('auth').subscribe((authState: AuthState) => {
+    const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
       if (authState.currentUser && authState.currentUser.uid) {
         this.currentUser = authState.currentUser;
       } else {
         this.currentUser = null;
       }
     });
+    
+    // Add subscription to array
+    this.subscriptions.push(authSubscription);
   }
 
   private getMockCategories(): Category[] {

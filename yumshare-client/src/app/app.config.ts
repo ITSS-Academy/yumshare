@@ -8,7 +8,11 @@ import { routes } from './app.routes';
 import { provideEffects } from '@ngrx/effects';
 import { provideStore } from '@ngrx/store';
 import { authReducer } from './ngrx/auth/auth.reducer';
+import { followReducer } from './ngrx/follow/follow.reducer';
+import { chatReducer } from './ngrx/chat/chat.reducer';
 import * as authEffects from '../app/ngrx/auth/auth.effect';
+import * as followEffects from '../app/ngrx/follow/follow.effect';
+
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -29,9 +33,11 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
-    provideEffects(authEffects),
+    provideEffects([authEffects, followEffects]),
     provideStore({
       auth: authReducer,
+      follow: followReducer,
+      chat: chatReducer,
     }),
     provideFirebaseApp(() =>
       initializeApp({

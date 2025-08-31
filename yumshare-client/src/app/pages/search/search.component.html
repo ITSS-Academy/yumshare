@@ -1,1 +1,72 @@
-<p>search works!</p>
+<div class="search-container">
+  <h2>Search</h2>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Search by keyword or author..." [(ngModel)]="keyword" (keyup.enter)="onSearch()" />
+    <select [(ngModel)]="selectedCategory">
+      <option value="">All Categories</option>
+      @for (c of categories; track c) {
+        <option [value]="c">{{ c }}</option>
+      }
+    </select>
+    <button class="search-btn" (click)="onSearch()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+
+  @if (results.length > 0) {
+    <p>Showing results {{ results.length }} for: <b>{{ keyword }}</b></p>
+  }
+
+  <div class="results-grid">
+    @for (item of displayedResults; track item.title) {
+      <div class="container-card">
+        <mat-card class="dish-card" appearance="outlined">
+          <img mat-card-image [src]="item.image" alt="Dish Image">
+          <mat-card-content>
+            <h2 class="dish-title">{{ item.title }}</h2>
+            <p class="dish-description">
+              {{ item.description }}
+            </p>
+          </mat-card-content>
+          <div class="rating">
+            @for (star of [1,2,3,4,5]; track star) {
+              <mat-icon>
+                {{ star <= item.rating ? 'star' : 'star_border' }}
+              </mat-icon>
+            }
+          </div>
+          <mat-card-actions class="card-footer">
+            <div class="user-info">
+              <img class="avatar" [src]="item.authorAvatar" alt="User avatar">
+              <span class="username">{{ item.author }}</span>
+            </div>
+            <div class="actions">
+              <mat-icon class="favorite-icon" (click)="toggleFavorite(item)">
+                {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
+              </mat-icon>
+              <mat-icon>share</mat-icon>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    }
+  </div>
+  <div class="pagination">
+    <button (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+    @for (p of visiblePages; track p) {
+      <button (click)="goToPage(p)" [class.active]="p === currentPage">
+        {{ p }}
+      </button>
+    }
+
+    @if (showEllipsis) {
+      <span>…</span>
+    }
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+    <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+  </div>
+</div>

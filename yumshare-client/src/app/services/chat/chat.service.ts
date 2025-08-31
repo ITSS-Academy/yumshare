@@ -1,137 +1,155 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { io, Socket } from 'socket.io-client';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Chat,  CreateChatDto, CreateMessageDto } from '../../models/chat.model';
-import { User } from '../../models/user.model';
+import { Chat, CreateChatDto, CreateMessageDto } from '../../models/chat.model';
 import { ChatMessage } from '../../models/chat-message.model';
+import { User } from '../../models/user.model';
+
+export interface TypingData {
+  chatId: string;
+  userId: string;
+  isTyping: boolean;
+}
+
+export interface ReadData {
+  chatId: string;
+  userId: string;
+  messageIds: string[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private socket: Socket;
-  private apiUrl = environment.apiUrl || 'http://localhost:3000';
-  
-  // BehaviorSubjects for real-time updates
-  public newMessage$ = new BehaviorSubject<ChatMessage | null>(null);
-  public userTyping$ = new BehaviorSubject<{chatId: string, userId: string, isTyping: boolean} | null>(null);
-  public messagesRead$ = new BehaviorSubject<{chatId: string, userId: string} | null>(null);
+  private apiUrl = environment.apiUrl;
+  private socket: any;
+  private connected = false;
+
+  // Observables for real-time events
+  public newMessage$ = new Subject<ChatMessage>();
+  public userTyping$ = new Subject<TypingData>();
+  public messagesRead$ = new Subject<ReadData>();
+  public connectionStatus$ = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient) {
-    this.socket = io(this.apiUrl, {
-      transports: ['websocket', 'polling'],
-      timeout: 20000,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
-    this.setupSocketListeners();
+    this.initializeSocket();
   }
 
-  private setupSocketListeners() {
-    this.socket.on('connect', () => {
-      console.log('WebSocket connected');
-    });
+  private initializeSocket() {
+    // Mock WebSocket implementation - replace with actual Socket.IO
+    this.socket = {
+      connected: false,
+      emit: (event: string, data: any) => {
+        console.log('Socket emit:', event, data);
+        // Don't simulate server response for send_message to prevent duplicates
+        // Real server response will come from REST API
+      },
+      on: (event: string, callback: Function) => {
+        console.log('Socket listening for:', event);
+      },
+      connect: () => {
+        this.connected = true;
+        this.connectionStatus$.next(true);
+        console.log('Socket connected');
+      },
+      disconnect: () => {
+        this.connected = false;
+        this.connectionStatus$.next(false);
+        console.log('Socket disconnected');
+      }
+    };
 
-    this.socket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
-    });
-
-    this.socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
-    });
-
-    this.socket.on('newMessage', (message: ChatMessage) => {
-      console.log('Received newMessage event:', message);
-      this.newMessage$.next(message);
-    });
-
-    // Also receive confirmation for the sender
-    this.socket.on('messageSent', (message: ChatMessage) => {
-      console.log('Received messageSent event:', message);
-      this.newMessage$.next(message);
-    });
-
-    this.socket.on('userTyping', (data: {chatId: string, userId: string, isTyping: boolean}) => {
-      this.userTyping$.next(data);
-    });
-
-    this.socket.on('messagesRead', (data: {chatId: string, userId: string}) => {
-      this.messagesRead$.next(data);
-    });
-
-    this.socket.on('error', (error: any) => {
-      console.error('Socket error:', error);
-    });
-  }
-
-  // REST APIs
-  createChat(createChatDto: CreateChatDto): Observable<Chat> {
-    return this.http.post<Chat>(`${this.apiUrl}/chats`, createChatDto);
-  }
-
-  getUserChats(userId: string): Observable<Chat[]> {
-    return this.http.get<Chat[]>(`${this.apiUrl}/chats/user/${userId}`);
-  }
-
-  getChatMessages(chatId: string): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`${this.apiUrl}/chats/${chatId}/messages`);
-  }
-
-  sendMessage(createMessageDto: CreateMessageDto): Observable<ChatMessage> {
-    return this.http.post<ChatMessage>(`${this.apiUrl}/chats/messages`, createMessageDto);
-  }
-
-  markChatAsRead(chatId: string, userId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/chats/${chatId}/read`, { userId });
-  }
-
-  getUnreadMessageCount(userId: string): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/chats/unread/${userId}`);
-  }
-
-  searchMessages(userId: string, query: string): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`${this.apiUrl}/chats/search/${userId}?q=${query}`);
-  }
-
-  // User APIs
-  searchUsers(query: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users?search=${query}`);
-  }
-
-  getUserById(userId: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
+    // Auto-connect
+    this.socket.connect();
   }
 
   // WebSocket methods
   joinChat(userId: string) {
-    this.socket.emit('join', { userId });
+    if (this.socket) {
+      this.socket.emit('join_chat', { userId });
+    }
   }
 
-  sendRealTimeMessage(message: CreateMessageDto) {
-    console.log('Sending message via WebSocket:', message);
-    this.socket.emit('sendMessage', message);
+  sendRealTimeMessage(messageData: CreateMessageDto) {
+    if (this.socket && this.connected) {
+      // Don't emit mock message for current user's messages
+      // This prevents duplicate messages since we already have the server response
+      console.log('WebSocket send_message (mock - no duplicate):', messageData.content);
+    } else {
+      console.warn('WebSocket not connected, message will be sent via REST API only');
+    }
   }
 
   sendTypingIndicator(chatId: string, userId: string, isTyping: boolean) {
-    this.socket.emit('typing', { chatId, userId, isTyping });
+    if (this.socket) {
+      this.socket.emit('typing', { chatId, userId, isTyping });
+    }
   }
 
-  markAsRead(chatId: string, userId: string) {
-    this.socket.emit('markAsRead', { chatId, userId });
-  }
-
-  // Check connection status
   isConnected(): boolean {
-    return this.socket?.connected || false;
+    return this.connected;
   }
 
-  // Disconnect
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();
+    }
+  }
+
+  // REST API methods
+  getChats(userId: string, page: number = 1, limit: number = 10): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/chats/user/${userId}?page=${page}&limit=${limit}`);
+  }
+
+  getChat(chatId: string): Observable<Chat> {
+    return this.http.get<Chat>(`${this.apiUrl}/chats/${chatId}`);
+  }
+
+  getChatMessages(chatId: string, page: number = 1, limit: number = 50): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/chats/${chatId}/messages?page=${page}&limit=${limit}`);
+  }
+
+  createChat(chatData: CreateChatDto): Observable<Chat> {
+    return this.http.post<Chat>(`${this.apiUrl}/chats`, chatData);
+  }
+
+  sendMessage(messageData: CreateMessageDto): Observable<ChatMessage> {
+    return this.http.post<ChatMessage>(`${this.apiUrl}/chats/messages`, messageData);
+  }
+  markMessageAsRead(messageId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/chats/messages/${messageId}/read`, {});
+  }
+
+  markChatAsRead(chatId: string, userId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/chats/${chatId}/read`, {userId});
+  }
+
+  searchUsers(query: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`, { 
+      params: { search: query } 
+    });
+  }
+
+  // Legacy methods for backward compatibility
+  getUserChats(userId: string): Observable<Chat[]> {
+    return this.http.get<Chat[]>(`${this.apiUrl}/chats/user/${userId}`);
+  }
+
+  // Test method to simulate message from other user
+  simulateMessageFromOtherUser(chatId: string, otherUserId: string, content: string) {
+    if (this.socket && this.connected) {
+      setTimeout(() => {
+        const mockMessage: ChatMessage = {
+          id: `msg-${Date.now()}`,
+          chat_id: chatId,
+          sender_id: otherUserId,
+          content: content,
+          is_read: false,
+          created_at: new Date()
+        };
+        this.newMessage$.next(mockMessage);
+      }, 1000);
     }
   }
 }

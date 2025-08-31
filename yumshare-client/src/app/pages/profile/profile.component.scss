@@ -1,0 +1,467 @@
+
+/* Profile Edit */
+.profile-edit {
+  max-width: 800px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+  padding: 0 8px;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.profile-header h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+.delete-account {
+  background: none;
+  border: 1px solid red;
+  color: red;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  width: 280px;
+  max-width: 90%;
+  text-align: center;
+  animation: scaleIn 0.25s ease;
+}
+
+.dialog-box h3 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.dialog-box p {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dialog-actions button {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dialog-actions .confirm {
+  background: #e53935;
+  color: #fff;
+}
+
+.dialog-actions .confirm:hover {
+  background: #c62828;
+}
+
+.dialog-actions .cancel {
+  background: #f1f1f1;
+  color: #333;
+}
+
+.dialog-actions .cancel:hover {
+  background: #ddd;
+}
+
+/* Bio Section Styles */
+.bio-section {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.bio-input {
+  flex: 1;
+  min-height: 60px;
+  max-height: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: text;
+}
+
+.bio-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.bio-input:hover {
+  border-color: #007bff;
+}
+
+.bio-input::placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.edit-icon {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.edit-icon:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.edit-icon img {
+  transition: transform 0.2s;
+}
+
+.edit-icon:hover img {
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+}
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: opacity 0.2s;
+}
+.avatar-container:hover .avatar {
+  opacity: 0.7;
+}
+.avatar-container:hover::after {
+  content: '\f030'; /* FontAwesome camera icon */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 20px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.avatar-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.avatar-section h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.edit-icon {
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.profile-form {
+  margin-top: 10px;
+}
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+.form-group input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.social-links {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+.social-links a {
+  font-size: 18px;
+  color: black;
+  text-decoration: none;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+.btn.save {
+  background: #8bc34a;
+  color: white;
+}
+.btn.cancel {
+  background: #9e9e9e;
+  color: white;
+}
+
+/* Social Tabs (Facebook-like) */
+.social-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 15px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #65676b;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.tab-button.active {
+  color: #1877f2;
+  border-bottom: 2px solid #1877f2;
+}
+
+.tab-button:hover {
+  color: #1877f2;
+}
+
+/* Followers and Following */
+.social-content {
+  margin: 15px 0;
+}
+
+.followers, .following {
+  display: flex;
+  flex-direction: column;
+}
+
+.followers ul, .following ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.social-item:hover {
+  background: #f0f2f5;
+}
+
+.small-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+ .user-bio {
+   font-size: 12px;
+   color: #65676b;
+ }
+
+ .user-actions {
+   margin-left: auto;
+ }
+
+ .follow-btn,
+ .unfollow-btn {
+   padding: 4px 12px;
+   border: none;
+   border-radius: 6px;
+   font-size: 12px;
+   cursor: pointer;
+   transition: background-color 0.2s;
+ }
+
+ .follow-btn {
+   background: #007bff;
+   color: white;
+ }
+
+ .follow-btn:hover {
+   background: #0056b3;
+ }
+
+ .unfollow-btn {
+   background: #6c757d;
+   color: white;
+ }
+
+ .unfollow-btn:hover {
+   background: #545b62;
+ }
+
+ .follow-btn:disabled,
+ .unfollow-btn:disabled {
+   opacity: 0.6;
+   cursor: not-allowed;
+ }
+
+ .no-data {
+   text-align: center;
+   padding: 20px;
+   color: #65676b;
+   font-style: italic;
+ }
+
+/* Responsive cho form */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .avatar-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .social-links {
+    justify-content: flex-start;
+  }
+  .form-actions {
+    justify-content: flex-start;
+  }
+  .social-tabs {
+    flex-direction: row;
+    gap: 4px;
+  }
+  .followers ul, .following ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 425px) {
+  .profile-edit {
+    padding: 0 4px;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+  .profile-header h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 375px) {
+  .tab-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 320px) {
+  .social-links a {
+    font-size: 16px;
+  }
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

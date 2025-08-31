@@ -1,0 +1,59 @@
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Chat } from '../../../../models/chat.model';
+import { User } from '../../../../models/user.model';
+import { ChatMessage } from '../../../../models/chat-message.model';
+import { ChatMessageSkeletonComponent } from '../../../../components/skeleton/chat-message-skeleton.component';
+import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
+
+@Component({
+  selector: 'app-chat-window',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe],
+  templateUrl: './chat-window.component.html',
+  styleUrls: ['./chat-window.component.scss']
+})
+export class ChatWindowComponent {
+  @Input() chat: Chat | null = null;
+  @Input() messages: ChatMessage[] = [];
+  @Input() currentUser: User | null = null;
+  @Input() otherUser: User | null = null;
+  @Input() messagesLoading: boolean = false;
+
+  @Output() back = new EventEmitter<void>();
+  @Output() sendMessage = new EventEmitter<string>();
+  @Output() typing = new EventEmitter<void>();
+
+  newMessage: string = '';
+
+  // Helpers to avoid showing "null" avatar/name
+  safeAvatar(url?: string): string {
+    return url && url !== 'null' && url !== 'undefined' && url.trim() !== ''
+      ? url
+      : 'assets/default-avatar.png';
+  }
+
+  onBack() {
+    this.back.emit();
+  }
+
+  onTyping() {
+    this.typing.emit();
+  }
+
+  onKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage.emit(this.newMessage);
+      this.newMessage = '';
+    }
+  }
+
+  sendMessageHandler() {
+    if (this.newMessage.trim()) {
+      this.sendMessage.emit(this.newMessage);
+      this.newMessage = '';
+    }
+  }
+}

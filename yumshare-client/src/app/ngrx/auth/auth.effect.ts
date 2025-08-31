@@ -56,3 +56,36 @@ export const getCurrentUserEffects = createEffect(
   },
   { functional: true }
 );
+
+export const getMineProfileEffects = createEffect(
+  (actions$ = inject(Actions), authService = inject(AuthService)) => {
+    return actions$.pipe(
+      ofType(AuthActions.getMineProfile),
+      switchMap((action) =>
+        from(authService.getMineProfile(action.idToken)).pipe(
+          map((mineProfile) => AuthActions.getMineProfileSuccess({ mineProfile })),
+          catchError((error) =>
+            of(AuthActions.getMineProfileFailure({ error: error.message }))
+          )
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+export const updateProfileEffects = createEffect(
+  (actions$ = inject(Actions), authService = inject(AuthService)) => {
+    return actions$.pipe(
+      ofType(AuthActions.updateProfile),
+      switchMap((action) =>
+        from(authService.updateProfile(action.UserId, action.updateData)).pipe(
+          map((updateProfile) => AuthActions.updateProfileSuccess({ updateProfile })),
+          catchError((error) =>
+            of(AuthActions.updateProfileFailure({ error: error.message }))
+            )
+          )
+        )
+      )
+    },{ functional: true }
+  );

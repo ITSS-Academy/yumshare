@@ -5,23 +5,25 @@ import { ChatService } from '../../services/chat/chat.service';
 import { Chat, CreateMessageDto } from '../../models/chat.model';
 import { User } from '../../models/user.model';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
-import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ChatMessageSkeletonComponent } from '../../components/skeleton/chat-message-skeleton.component';
-import { ShareModule } from "../../shares/share.module";
+import { ShareModule } from '../../shares/share.module';
 import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import { ChatMessage } from '../../models/chat-message.model';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { ChatWindowComponent } from './components/chat-window/chat-window.component';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, ShareModule, LocalTimePipe],
+  imports: [CommonModule, FormsModule, ShareModule, UserListComponent, ChatWindowComponent],
   templateUrl: './message.component.html',
-  styleUrl: './message.component.scss'
+  styleUrls: ['./message.component.scss']
 })
 export class MessageComponent implements OnInit, OnDestroy {
   // Current user (mock - should come from auth service)
   currentUser: User = {
-    id: '550e8400-e29b-41d4-a716-446655440000', // Valid UUID format
+    id: '550e8400-e29b-41d4-a716-446655440000',
     username: 'Current User',
     email: 'current@example.com',
     avatar_url: 'https://via.placeholder.com/40',
@@ -44,9 +46,15 @@ export class MessageComponent implements OnInit, OnDestroy {
   isSearching: boolean = false;
   
   // Message input
-  newMessage: string = '';
   isTyping: boolean = false;
   typingTimeout: any;
+  
+  // Track optimistic messages to avoid duplicates
+  private optimisticMessageIds = new Set<string>();
+  
+  // Polling for new messages
+  private pollingInterval: any;
+  private lastMessageId: string | null = null;
   
   // UI states
   showSearchResults: boolean = false;
@@ -54,9 +62,6 @@ export class MessageComponent implements OnInit, OnDestroy {
   
   // Subscriptions
   private subscriptions: Subscription[] = [];
-
-  // Responsive sidebar properties
-  sidebarOpen = false;
 
   // Debug method to show current time
   getCurrentTime(): string {
@@ -75,10 +80,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     let messageDate: Date;
     
     if (typeof date === 'string') {
-      // Handle ISO string format
       messageDate = new Date(date);
-      
-      // If the string doesn't have timezone info, assume it's UTC
       if (date.includes('T') && !date.includes('Z') && !date.includes('+')) {
         messageDate = new Date(date + 'Z');
       }
@@ -88,15 +90,8 @@ export class MessageComponent implements OnInit, OnDestroy {
     
     const now = new Date();
     const diffInMs = now.getTime() - messageDate.getTime();
-    const diffInHours = diffInMs / (1000 * 60 * 60);
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-    // Debug: Log the time conversion
-    console.log('formatTime - Original:', date);
-    console.log('formatTime - Converted:', messageDate);
-    console.log('formatTime - Local time:', messageDate.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }));
-
-    // Same day - show time only
     if (diffInDays < 1) {
       return messageDate.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
@@ -106,12 +101,10 @@ export class MessageComponent implements OnInit, OnDestroy {
       });
     }
     
-    // Yesterday
     if (diffInDays < 2) {
       return 'Hôm qua';
     }
     
-    // Within a week
     if (diffInDays < 7) {
       return messageDate.toLocaleDateString('vi-VN', {
         weekday: 'short',
@@ -119,7 +112,6 @@ export class MessageComponent implements OnInit, OnDestroy {
       });
     }
     
-    // Older - show date
     return messageDate.toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
@@ -155,34 +147,65 @@ export class MessageComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.chatService.disconnect();
+    this.stopPolling();
   }
 
   private setupWebSocketListeners() {
     // Listen for new messages
     this.subscriptions.push(
       this.chatService.newMessage$.subscribe(message => {
-        if (message && this.selectedChat && message.chat_id === this.selectedChat.id) {
-          console.log('Received message via WebSocket:', message);
-          
-          // Try to reconcile optimistic temp message sent by this client
-          if (message.sender_id === this.currentUser.id) {
-            const tempIndex = this.messages.findIndex(m =>
-              (m as any).id?.toString().startsWith('temp-') &&
-              m.content === message.content
-            );
-            if (tempIndex !== -1) {
-              console.log('Replacing temp message with server message');
-              this.messages[tempIndex] = message;
-            } else if (!this.messages.some(m => m.id === message.id)) {
-              console.log('Adding new message from current user');
-              this.messages.push(message);
-            }
-          } else if (!this.messages.some(m => m.id === message.id)) {
-            console.log('Adding new message from other user');
-            this.messages.push(message);
+        console.log('WebSocket received message:', {
+          id: message.id,
+          content: message.content,
+          sender_id: message.sender_id,
+          isCurrentUser: message.sender_id === this.currentUser.id,
+          currentMessagesCount: this.messages.length
+        });
+        
+        if (message && this.selectedChat && message.chat_id === this.selectedChat?.id) {
+          // Check if message already exists by ID first
+          const existingMessageById = this.messages.find(m => m.id === message.id);
+          if (existingMessageById) {
+            console.log('Message already exists by ID, skipping:', message.id);
+            return;
           }
           
-          // Update chat preview
+          // For current user's messages, only handle if it's not from optimistic update
+          if (message.sender_id === this.currentUser.id) {
+            // Check if this is a duplicate of an optimistic message we're tracking
+            const isOptimisticDuplicate = Array.from(this.optimisticMessageIds).some(tempId => {
+              const tempMessage = this.messages.find(m => m.id === tempId);
+              return tempMessage && 
+                     tempMessage.content === message.content && 
+                     tempMessage.sender_id === message.sender_id;
+            });
+            
+            if (isOptimisticDuplicate) {
+              console.log('Skipping duplicate of optimistic message:', message.content);
+              return;
+            }
+            
+            // Check if we already have this message by content and sender (within 5 seconds)
+            const duplicateByContent = this.messages.find(m => 
+              m.content === message.content && 
+              m.sender_id === message.sender_id &&
+              Math.abs(new Date(m.created_at).getTime() - new Date(message.created_at).getTime()) < 5000
+            );
+            if (duplicateByContent) {
+              console.log('Skipping duplicate message by content:', message.content);
+              return;
+            }
+            
+            // Only add if it's a new message from current user (shouldn't happen with current setup)
+            console.log('Adding new message from current user via WebSocket:', message.id);
+            this.messages.push(message);
+          } else {
+            // Add message from other user
+            this.messages.push(message);
+            console.log('Added message from other user:', message.id);
+          }
+          
+          // Update chat list
           const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
           if (chatIndex !== -1) {
             this.chats[chatIndex].messages = [message];
@@ -241,19 +264,22 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.loadMessages(chat.id);
     this.markChatAsRead(chat.id);
     
-    // Auto-hide sidebar on mobile
-    if (window.innerWidth <= 768) {
-      this.sidebarOpen = false;
-    }
+    // Start polling for new messages
+    this.startPolling();
   }
 
   private loadMessages(chatId: string) {
     this.chatService.getChatMessages(chatId).subscribe({
       next: (messages) => {
         this.messages = messages;
+        
+        // Set last message ID for polling
+        if (messages && messages.length > 0) {
+          this.lastMessageId = messages[messages.length - 1].id as string;
+        }
+        
         this.scrollToBottom();
         
-        // If this is a new chat with no messages, show a welcome message
         if (messages.length === 0 && this.selectedChat) {
           const otherUser = this.getOtherUser(this.selectedChat);
           if (otherUser) {
@@ -267,103 +293,11 @@ export class MessageComponent implements OnInit, OnDestroy {
     });
   }
 
-  sendMessage() {
-    if (!this.newMessage.trim() || !this.selectedChat) return;
 
-    const messageData: CreateMessageDto = {
-      chat_id: this.selectedChat.id,
-      sender_id: this.currentUser.id,
-      content: this.newMessage.trim()
-    };
-
-    // Store the message content before clearing
-    const messageContent = this.newMessage.trim();
-    
-    // Clear input immediately for better UX
-    this.newMessage = '';
-    this.stopTyping();
-
-    // Create optimistic message for immediate UI feedback
-    const tempId = `temp-${Date.now()}`;
-    const optimisticMessage: ChatMessage = {
-      id: tempId as any,
-      chat_id: this.selectedChat.id,
-      sender_id: this.currentUser.id,
-      content: messageContent,
-      is_read: true,
-      created_at: new Date() as any
-    } as ChatMessage;
-    
-    // Add optimistic message to UI immediately
-    this.messages.push(optimisticMessage);
-    
-    // Update chat preview
-    const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
-    if (chatIndex !== -1) {
-      this.chats[chatIndex].messages = [optimisticMessage];
-      this.chats[chatIndex].updated_at = new Date();
-    }
-    
-    // Scroll to bottom immediately
-    this.scrollToBottom();
-
-    // Check WebSocket connection before sending
-    if (this.chatService.isConnected()) {
-      console.log('WebSocket is connected, sending via WebSocket');
-      this.chatService.sendRealTimeMessage(messageData);
-    } else {
-      console.log('WebSocket not connected, sending via REST API');
-      this.chatService.sendMessage(messageData).subscribe({
-        next: (serverMessage) => {
-          // Replace temp message with server message
-          const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
-          if (tempMessageIndex !== -1) {
-            this.messages[tempMessageIndex] = serverMessage;
-            this.scrollToBottom();
-          }
-        },
-        error: (error) => {
-          console.error('Failed to send message:', error);
-          // Remove temp message on error
-          const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
-          if (tempMessageIndex !== -1) {
-            this.messages.splice(tempMessageIndex, 1);
-            // Restore message to input
-            this.newMessage = messageContent;
-          }
-        }
-      });
-    }
-    
-    // Add fallback: if no response from server after 3 seconds, try REST API (only if WebSocket was used)
-    if (this.chatService.isConnected()) {
-      setTimeout(() => {
-        const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
-        if (tempMessageIndex !== -1) {
-          console.log('No WebSocket response, trying REST API fallback');
-          this.chatService.sendMessage(messageData).subscribe({
-            next: (serverMessage) => {
-              // Replace temp message with server message
-              this.messages[tempMessageIndex] = serverMessage;
-              this.scrollToBottom();
-            },
-            error: (error) => {
-              console.error('Failed to send message via REST API:', error);
-              // Remove temp message on error
-              this.messages.splice(tempMessageIndex, 1);
-              // Restore message to input
-              this.newMessage = messageContent;
-            }
-          });
-        }
-      }, 3000);
-    }
-  }
 
   private markChatAsRead(chatId: string) {
     this.chatService.markChatAsRead(chatId, this.currentUser.id).subscribe({
       next: () => {
-        // Mark messages as read locally
         this.messages.forEach(msg => {
           if (msg.sender_id !== this.currentUser.id) {
             msg.is_read = true;
@@ -384,12 +318,10 @@ export class MessageComponent implements OnInit, OnDestroy {
       this.chatService.sendTypingIndicator(this.selectedChat.id, this.currentUser.id, true);
     }
 
-    // Clear existing timeout
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout);
     }
 
-    // Set new timeout
     this.typingTimeout = setTimeout(() => {
       this.stopTyping();
     }, 1000);
@@ -429,37 +361,20 @@ export class MessageComponent implements OnInit, OnDestroy {
       user2_id: user.id
     };
 
-    console.log('Creating chat with data:', chatData);
-
     this.chatService.createChat(chatData).subscribe({
       next: (chat) => {
-        // Add the new chat to the beginning of the list
         this.chats.unshift(chat);
-
-        // Attach the other user info so UI does not show nulls
         if (chat.user1_id === this.currentUser.id) {
           (this.chats[0] as any).user2 = user;
         } else {
           (this.chats[0] as any).user1 = user;
         }
-        
-        // Select the new chat immediately
         this.selectChat(chat);
-        
-        // Hide search results and clear search query
         this.showSearchResults = false;
         this.searchQuery = '';
-        
-        // Show success message (optional)
-        console.log(`Started new chat with ${user.username}`);
       },
       error: (error) => {
         console.error('Error creating chat:', error);
-        console.error('Error details:', error.error);
-        console.error('Request data:', chatData);
-        
-        // Show user-friendly error message
-        alert(`Failed to create chat: ${error.error?.message || error.message || 'Unknown error'}`);
       }
     });
   }
@@ -474,7 +389,6 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   // Method to start chat or select existing chat
   startOrSelectChat(user: User) {
-    // Check if chat already exists
     const existingChat = this.chats.find(chat => 
       (chat.user1_id === this.currentUser.id && chat.user2_id === user.id) ||
       (chat.user1_id === user.id && chat.user2_id === this.currentUser.id)
@@ -508,7 +422,6 @@ export class MessageComponent implements OnInit, OnDestroy {
       return otherUser.username;
     }
     
-    // Fallback: use a more descriptive name based on user ID
     const otherUserId = chat.user1_id === this.currentUser.id ? chat.user2_id : chat.user1_id;
     return `User ${otherUserId.substring(0, 8)}`;
   }
@@ -536,22 +449,141 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   private scrollToBottom() {
     setTimeout(() => {
-      const messageContainer = document.querySelector('.messages-container');
+      const messageContainer = document.querySelector('.chat-messages');
       if (messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
+        (messageContainer as HTMLElement).scrollTop = (messageContainer as HTMLElement).scrollHeight;
       }
     }, 100);
   }
 
-  onKeyPress(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.sendMessage();
+  private startPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+    
+    this.pollingInterval = setInterval(() => {
+      if (this.selectedChat) {
+        this.pollForNewMessages();
+      }
+    }, 3000); // Poll every 3 seconds
+  }
+
+  private stopPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
     }
   }
 
-  // Responsive sidebar methods
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+  private pollForNewMessages() {
+    if (!this.selectedChat) return;
+    
+    this.chatService.getChatMessages(this.selectedChat.id).subscribe({
+      next: (messages) => {
+        if (messages && messages.length > 0) {
+          const latestMessage = messages[messages.length - 1];
+          
+          // Check if we have new messages
+          if (this.lastMessageId !== latestMessage.id) {
+            // Update messages if there are new ones
+            this.messages = messages;
+            this.lastMessageId = latestMessage.id;
+            this.scrollToBottom();
+            console.log('Polling: Found new messages, updated UI');
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Polling error:', error);
+      }
+    });
+  }
+
+
+  // Handle message sending from child component
+  handleSendMessage(messageContent: string) {
+    console.log('handleSendMessage called with:', messageContent);
+    
+    if (!messageContent.trim() || !this.selectedChat) return;
+
+    const messageData: CreateMessageDto = {
+      chat_id: this.selectedChat.id,
+      sender_id: this.currentUser.id,
+      content: messageContent.trim()
+    };
+
+    this.stopTyping();
+
+    // Create optimistic message
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: ChatMessage = {
+      id: tempId as any,
+      chat_id: this.selectedChat.id,
+      sender_id: this.currentUser.id,
+      content: messageContent.trim(),
+      is_read: true,
+      created_at: new Date() as any
+    } as ChatMessage;
+    
+    // Track this optimistic message
+    this.optimisticMessageIds.add(tempId);
+    console.log('Added optimistic message:', tempId, 'Total optimistic messages:', this.optimisticMessageIds.size);
+    
+    // Add optimistic message to UI immediately
+    this.messages.push(optimisticMessage);
+    console.log('Added optimistic message to UI. Total messages:', this.messages.length);
+    
+    // Update chat list
+    const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
+    if (chatIndex !== -1) {
+      this.chats[chatIndex].messages = [optimisticMessage];
+      this.chats[chatIndex].updated_at = new Date();
+    }
+    
+    this.scrollToBottom();
+
+    // Send message via REST API (primary method)
+    console.log('Sending message via REST API...');
+    this.chatService.sendMessage(messageData).subscribe({
+      next: (serverMessage) => {
+        console.log('REST API response received:', serverMessage.id);
+        
+        // Replace optimistic message with server message
+        const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
+        if (tempMessageIndex !== -1) {
+          // Update optimistic message properties without changing object reference
+          Object.assign(this.messages[tempMessageIndex], {
+            id: serverMessage.id,
+            created_at: serverMessage.created_at,
+            is_read: serverMessage.is_read
+          });
+          
+          this.optimisticMessageIds.delete(tempId);
+          console.log('Updated optimistic message with server data. Total messages:', this.messages.length);
+          
+          // Update chat list with server message
+          if (chatIndex !== -1) {
+            this.chats[chatIndex].messages = [this.messages[tempMessageIndex]];
+          }
+          
+          this.scrollToBottom();
+        } else {
+          console.warn('Optimistic message not found for replacement:', tempId);
+        }
+        
+        // Don't send via WebSocket since we already have the server message
+        // WebSocket is only for real-time updates from other users
+      },
+      error: (error) => {
+        console.error('Failed to send message:', error);
+        // Remove optimistic message
+        const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
+        if (tempMessageIndex !== -1) {
+          this.messages.splice(tempMessageIndex, 1);
+          this.optimisticMessageIds.delete(tempId);
+          console.log('Removed optimistic message due to error. Total messages:', this.messages.length);
+        }
+      }
+    });
   }
 }

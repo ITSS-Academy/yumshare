@@ -41,8 +41,8 @@ import {MatTreeModule} from '@angular/material/tree';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatSnackBarContainer} from '@angular/material/snack-bar';
 import {MatStepperModule} from '@angular/material/stepper';
-import { ReactiveFormsModule} from '@angular/forms';
-import { IdToNamePipe} from './id-to-name.pipe';
+import { ReactiveFormsModule, FormsModule} from '@angular/forms';
+import { IdToNamePipe} from '../pipes/id-to-name.pipe';
 
 
 
@@ -91,6 +91,7 @@ const materialModules = [
   MatSnackBarContainer,
   MatStepperModule,
   ReactiveFormsModule,
+  FormsModule,
   CommonModule,
 IdToNamePipe,
 
@@ -105,7 +106,7 @@ IdToNamePipe,
 @NgModule({
   declarations: [],
   imports: [CommonModule, ...materialModules],
-  exports: [...materialModules,ReactiveFormsModule],
+  exports: [...materialModules,ReactiveFormsModule,FormsModule],
 })
 
 

@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import {Auth, signInWithPopup, GoogleAuthProvider} from '@angular/fire/auth';
 import { AuthModel } from '../../models/auth.model';
 import { environment } from '../../../environments/environment';
+import { User } from '../../models';
+import { Observable } from 'rxjs';
   
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,6 @@ export class AuthService {
   async login() {
     const credential = await signInWithPopup(this.auth, new GoogleAuthProvider());
     return credential.user
-
   }
 
   async logout() {
@@ -28,5 +29,36 @@ export class AuthService {
         Authorization: `Bearer ${idToken}`
       }
     });
+  }
+
+
+
+  // Get current user profile
+  getMineProfile(idToken: string): Observable<User> {
+    return this.http.get<User>(`${environment.apiUrl}/users/verify`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
+  }
+
+  updateProfile(UserId: string, updateData: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${environment.apiUrl}/users/${UserId}`, updateData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
+  // Get current user ID from token
+  async getCurrentUserId(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.uid : null;
+  }
+
+  // Get current user ID token
+  async getCurrentIdToken(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? await user.getIdToken() : null;
   }
 }

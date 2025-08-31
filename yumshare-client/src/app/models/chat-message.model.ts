@@ -8,8 +8,5 @@ export interface ChatMessage {
   content: string;
   is_read: boolean;
   created_at: Date;
-  
-  // Relations
-  chat?: Chat;
-  sender?: User;
+  updated_at?: Date;
 }

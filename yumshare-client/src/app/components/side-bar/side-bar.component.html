@@ -11,11 +11,11 @@
 			<mat-icon>search</mat-icon>
 			<span>Search Recipes</span>
 		</a>
-		<a mat-list-item routerLink="/#" routerLinkActive="active">
+		<a mat-list-item routerLink="/faq" routerLinkActive="active">
 			<mat-icon>help</mat-icon>
 			<span>FAQ</span>
 		</a>
-		
+
 		<!-- Các menu items chỉ hiển thị khi đã đăng nhập -->
 		@if (isLoggedIn) {
 			<a mat-list-item routerLink="/my-recipe" routerLinkActive="active">

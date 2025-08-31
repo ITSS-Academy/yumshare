@@ -339,20 +339,19 @@ Z-Index Scale:
     title-large-weight: var(--mat-sys-regular-font-weight),
   ));
 }
-html, body { height: 100%;
-
-
-}
-body { margin: 0; font-family: Noto Sans, sans-serif; }
-* {
-  box-sizing: border-box;
-}
-
-html, body {
+html, body { 
   height: 100vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+body { 
+  font-family: Noto Sans, sans-serif; 
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .custom-dialog .mat-mdc-dialog-container {

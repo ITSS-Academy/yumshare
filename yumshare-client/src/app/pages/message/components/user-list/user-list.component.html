@@ -1,0 +1,96 @@
+<div class="user-list-container">
+  <!-- Header -->
+  <div class="user-list-header">
+    <h2>Messages</h2>
+    <!-- Debug: Current time -->
+    <div class="debug-time">
+      Hiện tại: {{ getCurrentTime() }}
+    </div>
+    <div class="search-container">
+      <input 
+        type="text" 
+        placeholder="Search users..." 
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+        class="search-input"
+      />
+    
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  @if (showSearchResults) {
+    <div class="search-results">
+      <div class="search-header">
+        <h3>Search Results</h3>
+        <button (click)="closeSearch()" class="close-btn">×</button>
+      </div>
+      <div class="user-list">
+        @for (user of searchResults; track user.id) {
+          <div 
+            class="user-item"
+            (click)="onUserSelect(user)"
+          >
+            <img [src]="user.avatar_url || 'assets/default-avatar.png'" [alt]="user.username" class="user-avatar">
+            <div class="user-info">
+              <div class="user-name">{{ user.username }}</div>
+              <div class="user-email">{{ user.email }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Chat List -->
+  @if (!showSearchResults) {
+    <div class="chat-list">
+      @for (chat of chats; track chat.id) {
+        <div
+          class="chat-item"
+          [class.active]="isActiveChat(chat)"
+          (click)="onChatSelect(chat)"
+        >
+          <img 
+            [src]="safeAvatar(getOtherUser(chat)?.avatar_url)" 
+            [alt]="otherUserName(chat)" 
+            class="chat-avatar"
+          >
+          <div class="chat-info">
+            <div class="chat-header">
+              <div class="chat-name">{{ otherUserName(chat) }}</div>
+              <div class="chat-time">{{ formatTime(chat.updated_at) }}</div>
+            </div>
+            <div class="chat-preview">
+              <span class="last-message" [class.new-chat]="isNewChat(chat)">
+                {{ getLastMessage(chat) }}
+              </span>
+              @if (getUnreadCount(chat) > 0) {
+                <span class="unread-count">
+                  {{ getUnreadCount(chat) }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      
+      <!-- Loading State -->
+      @if (loading) {
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>Loading chats...</span>
+        </div>
+      }
+      
+      <!-- Empty State -->
+      @if (!loading && chats.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h3>No conversations yet</h3>
+          <p>Start a new conversation by searching for users</p>
+        </div>
+      }
+    </div>
+  }
+</div>

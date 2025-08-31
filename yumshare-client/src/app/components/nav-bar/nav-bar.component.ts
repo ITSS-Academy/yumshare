@@ -93,11 +93,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  onProfile() { 
-    if (this.isLoggedIn) {
-      this.router.navigate(['/profile']);
-    }
-  }
+
 
   async onLogout() {
     try {
@@ -121,6 +117,26 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  onLogin() {
+    console.log('Open login dialog');
+    // Open login dialog or navigate to login page
+  }
+
+  onProfile() {
+    console.log('Open profile');
+    this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });
+
+    // Navigate to profile page
+  }
+
+  onSettings() {
+    console.log('Open settings');
+    // Navigate to settings page
+  }
+
+
+
+  // Method to simulate login (for testing)
   // helper to simulate - có thể xóa sau khi test xong
   simulateLogin(name: string, avatar: string) {
     this.isLoggedIn = true;
