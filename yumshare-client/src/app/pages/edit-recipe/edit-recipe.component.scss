@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   padding: 20px 50px 60px 50px;
-  background-color: #F8FCF3;
   box-sizing: border-box;
   padding-bottom: 140px; // Đảm bảo đủ không gian để nhìn thấy các nút ở cuối
 }
@@ -383,6 +382,10 @@
   margin-bottom: 8px;
 }
 
+.video-icon .material-symbols-outlined{
+  font-size: 40px;
+}
+
 .video-source-toggle {
   display: flex;
   justify-content: center;
@@ -478,7 +481,9 @@
   cursor: pointer;
   font-weight: 500;
   transition: color 0.2s;
+  padding-top: 4px;
 }
+
 
 .video-url-box .clear-btn:hover {
   color: #5a8c1b;

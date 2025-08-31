@@ -33,6 +33,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>Country</mat-label>
                 <mat-select formControlName="country">
+                  <mat-option class="default-option" value="Country">Country</mat-option>
                   @for (country of countries; track country) {
                     <mat-option [value]="country.value">{{country.viewValue}}</mat-option>
                   }
@@ -42,6 +43,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>Difficulty</mat-label>
                 <mat-select formControlName="difficulty">
+                  <mat-option class="default-option" value="Difficulty">Difficulty</mat-option>
                   @for (difficulty of difficulties; track difficulty) {
                     <mat-option [value]="difficulty.value">{{difficulty.viewValue}}</mat-option>
                   }
@@ -129,13 +131,13 @@
                     class="toggle-btn"
                     [class.active]="!isVideoFromUrl"
                     (click)="setVideoSource(false)">
-              📁 Upload File
+              <span class="material-symbols-outlined" style="color: #88C533 !important">attach_file</span> Upload File
             </button>
             <button type="button"
                     class="toggle-btn"
                     [class.active]="isVideoFromUrl"
                     (click)="setVideoSource(true)">
-              🔗 Video URL
+              <span class="material-symbols-outlined" style="color: #88C533 !important">add_link</span>Video URL
             </button>
           </div>
 
@@ -145,7 +147,7 @@
             @if (!isVideoFromUrl) {
               <div class="video-upload-box">
                 <div class="video-upload-label" (click)="triggerFileUpload(); $event.preventDefault();">
-                  <div class="video-icon">📹</div>
+                  <div class="video-icon"><span class="material-symbols-outlined">video_call</span></div>
                   <p><strong>Click here to choose video file</strong></p>
                   <span>Supported formats: MP4, AVI, MOV, WMV (Max 100MB)</span>
                   @if (videoFile) {
@@ -164,7 +166,7 @@
                       Your browser does not support the video tag.
                     </video>
                     <button type="button" class="clear-btn" (click)="clearVideoData()">
-                      🗑️ Clear Video
+                      <span class="material-symbols-outlined">delete</span> Clear Video
                     </button>
                   </div>
                 }

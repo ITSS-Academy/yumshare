@@ -3,7 +3,6 @@
   flex-direction: column;
   padding: 20px 50px 60px 50px;
   box-sizing: border-box;
-  background-color: #F8FCF3;
 }
 
 /* Stepper Styles */
@@ -153,7 +152,7 @@
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  color: white;
+  color: white !important;
   background-color: red;
   transition: all 0.3s ease;
 }
@@ -185,6 +184,7 @@
   min-height: 0 !important;
   line-height: 1 !important;
   vertical-align: middle;
+  color: white !important;
 }
 
 .new-recipe-card {
@@ -269,6 +269,7 @@
 .form-options {
   display: flex;
   gap: 12px;
+  width: 100%;
 }
 
 /* Ẩn outline mặc định */
@@ -282,6 +283,7 @@
   border-radius: 8px !important;
   background-color: white !important;
   height: 30px !important;
+  width: 150px !important;
   min-height: 30px !important;
   padding: 0 8px !important;
   display: flex;
@@ -459,6 +461,9 @@
   background: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .video-preview h4 {
@@ -586,6 +591,11 @@
   transition: transform 0.3s ease;
 }
 
+.video-icon .material-symbols-outlined{
+  color: black !important;
+  font-size: 40px;
+}
+
 /* URL Input Enhancement */
 .url-input {
   width: 100%;
@@ -703,6 +713,7 @@
     border-radius: 6px;
     border-width: 1px;
     box-shadow: none;
+    width: 100%;
   }
 
   .recipe-image-upload,
@@ -732,6 +743,7 @@
   .form-options {
     flex-direction: column;
     gap: 8px;
+    width: 100%;
   }
 
   .ingredient-steps-card {

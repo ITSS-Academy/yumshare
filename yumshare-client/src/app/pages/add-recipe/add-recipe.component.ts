@@ -46,8 +46,8 @@ export class AddRecipeComponent {
   constructor(private fb: FormBuilder) {
     this.recipeForm = this.fb.group({
       name: ['', Validators.required],
-      country: ['', Validators.required],
-      difficulty: ['', Validators.required],
+      country: ['Country', Validators.required],
+      difficulty: ['Difficulty', Validators.required],
       description: ['', Validators.required],
       serving: ['', Validators.required],
       time: ['', Validators.required],
