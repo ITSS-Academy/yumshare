@@ -4,6 +4,8 @@ import { ShareModule } from '../../shares/share.module';
 import {CardComponent} from '../../components/card/card.component';
 import {DessertsComponent} from '../../components/card/desserts/desserts.component';
 import {BeveragesComponent} from '../../components/card/beverages/beverages.component';
+import {AppetizersComponent} from '../../components/card/appetizers/appetizers.component';
+import {VeganDishesComponent} from '../../components/card/vegan-dishes/vegan-dishes.component';
 
 
 @Component({
@@ -14,7 +16,9 @@ import {BeveragesComponent} from '../../components/card/beverages/beverages.comp
     ShareModule,
     CardComponent,
     DessertsComponent,
-    BeveragesComponent
+    BeveragesComponent,
+    AppetizersComponent,
+    VeganDishesComponent
 
   ],
   templateUrl: './home.component.html',
@@ -22,9 +26,9 @@ import {BeveragesComponent} from '../../components/card/beverages/beverages.comp
 })
 export class HomeComponent implements OnInit, OnDestroy {
   carouselImages: string[] = [
+    'https://d3design.vn/uploads/Food_menu_web_banner_social_media_banner_template_Free_Psd7.jpg',
     'https://beptueu.vn/hinhanh/tintuc/top-15-hinh-anh-mon-an-ngon-viet-nam-khien-ban-khong-the-roi-mat-1.jpg',
-    'https://img-global.cpcdn.com/contest_banners/c6c26b4f7b87600f/1932x366cq80/banner.webp',
-    'https://img-global.cpcdn.com/contest_banners/f9c0dbd9f3830efb/1932x366cq80/banner.webp'
+    'https://img.pikbest.com/templates/20240714/delicious-food-menu-facebook-cover-and-web-banner-template_10667180.jpg!w700wp',
   ];
 
 
@@ -35,7 +39,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.intervalId = setInterval(() => {
       this.nextImage();
     }, 3000);
-
   }
 
   ngOnDestroy() {
@@ -53,6 +56,23 @@ export class HomeComponent implements OnInit, OnDestroy {
       (this.currentImageIndex - 1 + this.carouselImages.length) % this.carouselImages.length;
   }
 
+  nextTodayDish() {
+    // TODO: Thêm logic chuyển trang Today's Dish ở đây
+  }
 
+  viewAllFamilyMeal() {
+    // TODO: Th��m logic chuyển trang hoặc hiển thị toàn bộ Desserts ở đây
+  }
 
+  viewAllRefreshingDishes() {
+    // TODO: Thêm logic chuyển trang hoặc hiển thị toàn bộ Beverages ở đây
+  }
+
+  viewAllNutritiousMeals() {
+    // TODO: Thêm logic chuyển trang hoặc hiển thị toàn bộ ở đây
+  }
+
+  viewAllEasyMeals() {
+
+  }
 }
