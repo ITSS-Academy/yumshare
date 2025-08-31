@@ -1,1 +1,123 @@
-<p>recipe-detail works!</p>
+
+
+<div class="container-right">
+  <div class="top">
+    <div class="food-name">
+      <h1 class="title">Recipe Name</h1>
+    </div>
+    <div class="mieu-ta">
+      <div class="trai">
+        <img class="hinh-mon-an" src="https://www.shutterstock.com/shutterstock/videos/3608011573/thumb/1.jpg?ip=x480">
+      </div>
+      <div class="phai">
+        <p class="mieu-ta-monan">Spaghetti is one of the most beloved pasta dishes in the world, known for its long, thin strands and endless versatility. Whether paired with a rich tomato sauce, creamy Alfredo, or simply tossed with olive oil and garlic, spaghetti offers comfort and flavor in every bite. It’s a classic that can be enjoyed at family dinners, quick lunches, or festive gatherings alike.</p>
+        <div class="block">
+          <mat-chip>One fish</mat-chip>
+          <mat-chip>Sushi Platter</mat-chip>
+          <mat-chip> Chicken Shawarma</mat-chip>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="middle">
+    <div class="left">
+      <h1 class="title">Ingredients</h1>
+      <p class="serving">Serving: 1</p>
+      <div class="ingredient-list">
+        <div class="row">
+          <p>Sugar</p>
+          <p>200g</p>
+        </div>
+        <div class="row">
+          <p>Thịt Trâu Gác Bếp</p>
+          <p>500g</p>
+        </div>
+        <div class="row">
+          <p>Chân gà xả tắc</p>
+          <p>1 hộp</p>
+        </div>
+        <div class="row">
+          <p>Cơm chiên dương châu</p>
+          <p>1 hộp</p>
+        </div>
+        <div class="row">
+          <p>Cơm sườn bì chả trứng</p>
+          <p>3 hộp</p>
+        </div>
+      </div>
+      <div class="user-box">
+        <span class="label">Up by:</span>
+        <div class="user-info">
+          <div class="avatar"></div>
+          <span class="username">User Name</span>
+        </div>
+        <mat-checkbox
+          class="follow-toggle"
+          [(ngModel)]="isFollowed">
+          {{ isFollowed ? 'Followed' : 'Follow' }}
+        </mat-checkbox>
+      </div>
+
+    </div>
+    <div class="right">
+      <h1 class="title2">
+        Process Steps
+      </h1>
+      <div class="instruction">
+        <div class="instruction-box">
+          <div class="step">
+            <h1 class="step-number">1.Boil the pasta</h1>
+          </div>
+          <div class="step-detail">
+            <p class="cooking">
+              Start by bringing about 1 liter of water to a boil in a pot, then add ½ teaspoon of salt. Once the water is boiling, drop in 80–100 g of spaghetti and cook it for 8–10 minutes, or accordi ng to the package instructions, until it reaches an al dente texture. When done, drain the pasta and set it aside, remembering to save 2–3 tablespoons of the cooking water for later use.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="instruction">
+        <div class="instruction-box">
+          <div class="step">
+            <h1 class="step-number">1.Boil the pasta</h1>
+          </div>
+          <div class="step-detail">
+            <p class="cooking">
+              Start by bringing about 1 liter of water to a boil in a pot, then add ½ teaspoon of salt. Once the water is boiling, drop in 80–100 g of spaghetti and cook it for 8–10 minutes, or accordi ng to the package instructions, until it reaches an al dente texture. When done, drain the pasta and set it aside, remembering to save 2–3 tablespoons of the cooking water for later use.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="instruction">
+        <div class="instruction-box">
+          <div class="step">
+            <h1 class="step-number">1.Boil the pasta</h1>
+          </div>
+          <div class="step-detail">
+            <p class="cooking">
+              Start by bringing about 1 liter of water to a boil in a pot, then add ½ teaspoon of salt. Once the water is boiling, drop in 80–100 g of spaghetti and cook it for 8–10 minutes, or accordi ng to the package instructions, until it reaches an al dente texture. When done, drain the pasta and set it aside, remembering to save 2–3 tablespoons of the cooking water for later use.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="instruction">
+        <div class="instruction-box">
+          <div class="step">
+            <h1 class="step-number">1.Boil the pasta</h1>
+          </div>
+          <div class="step-detail">
+            <p class="cooking">
+              Start by bringing about 1 liter of water to a boil in a pot, then add ½ teaspoon of salt. Once the water is boiling, drop in 80–100 g of spaghetti and cook it for 8–10 minutes, or accordi ng to the package instructions, until it reaches an al dente texture. When done, drain the pasta and set it aside, remembering to save 2–3 tablespoons of the cooking water for later use.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="video">
+      <h1 class="title3">Video Tutorial</h1>
+      <iframe class="clip" width="650" height="400" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <app-comment></app-comment>
+</div>
+
