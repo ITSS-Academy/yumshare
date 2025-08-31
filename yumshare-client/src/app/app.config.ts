@@ -1,5 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, provideZoneChangeDetection, ErrorHandler } from '@angular/core';
+import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { GlobalErrorHandler } from './services/error-handler/global-error-handler.service';
+import { httpErrorInterceptor } from './services/error-handler/http-error.interceptor';
 
 import { routes } from './app.routes';
 import { provideEffects } from '@ngrx/effects';
@@ -13,7 +16,19 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withEnabledBlockingInitialNavigation(),
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top',
+        anchorScrolling: 'enabled'
+      })
+    ),
+    provideHttpClient(
+      withInterceptors([
+        httpErrorInterceptor
+      ])
+    ),
     provideEffects(authEffects),
     provideStore({
       auth: authReducer,
@@ -30,5 +45,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
+    // Temporarily disabled to avoid error spam
+    // {
+    //   provide: ErrorHandler,
+    //   useClass: GlobalErrorHandler
+    // },
   ],
 };

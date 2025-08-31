@@ -1,1 +1,34 @@
-<p>Welcome to YumShare!</p>
+<div class="content-wrapper">
+  <div class="image-title">
+    <div class="carousel">
+      <button class="carousel-nav prev" (click)="prevImage()">
+        &#10094;
+      </button>
+      <img
+        class="carousel-image"
+        [src]="carouselImages[currentImageIndex]"
+        alt="carousel"
+      />
+      <button class="carousel-nav next" (click)="nextImage()">
+        &#10095;
+      </button>
+    </div>
+  </div>
+  <h3>Recipe Categories</h3>
+  <div class="container-image-categories">
+    <h2 class="dish-type"><span>Appetizers</span></h2>
+    <h2 class="dish-type"><span>Main courses</span></h2>
+    <h2 class="dish-type"><span>Side dishes</span></h2>
+    <h2 class="dish-type"><span>Soups</span></h2>
+    <h2 class="dish-type"><span>Desserts</span></h2>
+    <h2 class="dish-type"><span>Beverages</span></h2>
+    <h2 class="dish-type"><span>Snacks</span></h2>
+    <h2 class="dish-type"><span>Vegan dishes</span></h2>
+  </div>
+  <h3>Today's Dish</h3>
+  <app-card></app-card>
+  <h3>Desserts</h3>
+  <app-desserts></app-desserts>
+  <h3>Beverages</h3>
+  <app-beverages></app-beverages>
+</div>

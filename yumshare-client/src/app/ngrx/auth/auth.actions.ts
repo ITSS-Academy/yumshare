@@ -33,3 +33,18 @@ export const logoutFailure = createAction(
 export const clearAuthState = createAction(
   '[Auth] Clear Auth State',
 )
+
+export const getCurrentUser = createAction(
+  '[Auth] Get Current User',
+  props<{idToken: string}>()
+)
+
+export const getCurrentUserSuccess = createAction(
+  '[Auth] Get Current User Success',
+  props<{user: AuthModel}>()
+)
+export const getCurrentUserFailure = createAction(
+  '[Auth] Get Current User Failure',
+  props<{error: any}>()
+)
+

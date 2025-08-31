@@ -1,7 +1,10 @@
-import { Component, HostBinding, HostListener } from '@angular/core';
+import { Component, HostBinding, HostListener, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { LoadingComponent } from './components/loading/loading.component';
+// import { PwaInstallComponent } from './components/pwa-install/pwa-install.component';
+// import { OfflineIndicatorComponent } from './components/offline-indicator/offline-indicator.component';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Auth } from '@angular/fire/auth';
@@ -12,21 +15,28 @@ import * as AuthActions from '../app/ngrx/auth/auth.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SnackbarComponent } from './components/snackbar/snackbar.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { DarkModeService } from './services/dark-mode/dark-mode.service';
+import { RouteLoadingService } from './core/route-loading.service';
+// import { PwaInstallComponent } from "./components/pwa-install/pwa-install.component";
+// import { OfflineIndicatorComponent } from "./components/offline-indicator/offline-indicator.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SideBarComponent, NavBarComponent, CommonModule, MatIconModule],
+  imports: [RouterOutlet, SideBarComponent, NavBarComponent, LoadingComponent, CommonModule, MatIconModule, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   @HostBinding('class.sidebar-mini') isMini = false;
   @HostBinding('class.sidebar-closed') isClosed = false;
 
   isMobile = false;
+  private darkModeService = inject(DarkModeService);
+  routeLoadingService = inject(RouteLoadingService);
 
-  constructor( 
+  constructor(
     private auth: Auth,
     private store: Store<{
       auth: AuthState
@@ -35,6 +45,7 @@ export class AppComponent {
     private _snackBar: MatSnackBar
   ) {
     this.updateSidebarMode();
+    this.darkModeService.initSystemThemeListener();
 
     // Initialization logic can go here if needed
     this.auth.onAuthStateChanged(async (auth: any) => {
@@ -73,6 +84,10 @@ export class AppComponent {
         this.dialog.closeAll();
       }
     });
+  }
+
+  ngOnInit(): void {
+    // Dark mode is already initialized in constructor
   }
 
   @HostListener('window:resize')

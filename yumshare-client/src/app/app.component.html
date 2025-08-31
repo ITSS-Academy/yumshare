@@ -1,15 +1,22 @@
 <div class="app-container">
+  <!-- Offline indicator - Temporarily disabled -->
+  <!-- <app-offline-indicator></app-offline-indicator> -->
+
+  <!-- PWA install prompt - Temporarily disabled -->
+  <!-- <app-pwa-install></app-pwa-install> -->
+
   <!-- Sidebar -->
   <div class="sidebar-container" [class.sidebar-closed]="isClosed">
     <app-side-bar></app-side-bar>
   </div>
 
   <!-- Backdrop cho mobile -->
-  <div 
-    class="backdrop" 
-    *ngIf="isMobile && !isClosed" 
-    (click)="closeSidebarOnBackdrop()">
-  </div>
+  @if (isMobile && !isClosed) {
+    <div
+      class="backdrop"
+      (click)="closeSidebarOnBackdrop()">
+    </div>
+  }
 
   <!-- Main content -->
   <div class="main-content">
@@ -20,7 +27,17 @@
 
     <!-- Router content -->
     <div class="content-container">
+      <!-- Route loading indicator -->
+      @if (routeLoadingService.isLoading()) {
+        <app-loading
+          [message]="'Loading page'"
+          [showProgress]="true"
+          [progressValue]="routeLoadingService.loadingProgress()">
+        </app-loading>
+      }
+
       <router-outlet></router-outlet>
+      <app-footer></app-footer>
     </div>
   </div>
 </div>

@@ -1,0 +1,44 @@
+<cdk-virtual-scroll-viewport class="container-card" itemSize="300" minBufferPx="400" maxBufferPx="800">
+  @if (isLoading()) {
+    @for (item of [1,2,3,4]; track item) {
+      <app-recipe-card-skeleton></app-recipe-card-skeleton>
+    }
+  } @else {
+    @for (item of cardData; track item.id) {
+    <mat-card
+      class="dish-card"
+      appearance="outlined">
+      <img
+        [src]="item.imageUrl"
+        [alt]="item.title + ' image'"
+        class="dish-image">
+      <mat-card-content>
+        <h2 class="dish-title">{{ item.title }}</h2>
+        <p class="dish-description">
+          {{ item.description }}
+        </p>
+      </mat-card-content>
+      <div class="rating">
+        <mat-icon>star_border</mat-icon>
+        <mat-icon>star_border</mat-icon>
+        <mat-icon>star_border</mat-icon>
+        <mat-icon>star_border</mat-icon>
+        <mat-icon>star_border</mat-icon>
+      </div>
+      <mat-card-actions class="card-footer">
+        <div class="user-info">
+          <img
+            class="avatar"
+            src="https://images-platform.99static.com//5_oXjjUVqCOk-6snmE7s_cdr-dI=/229x0:1041x812/fit-in/590x590/99designs-contests-attachments/47/47482/attachment_47482097"
+            alt="User avatar">
+          <span class="username">AnhVu-1904</span>
+        </div>
+        <div class="actions">
+          <mat-icon>favorite_border</mat-icon>
+          <mat-icon>share</mat-icon>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+    }
+  }
+</cdk-virtual-scroll-viewport>

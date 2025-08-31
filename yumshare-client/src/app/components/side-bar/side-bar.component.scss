@@ -23,7 +23,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, #8DC63F 0%, #7FC520 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 1px;
   }
 
@@ -79,7 +79,7 @@ mat-nav-list {
       }
       
       mat-icon {
-        color: #8DC63F !important;
+        color: var(--primary) !important;
         transform: scale(1.1);
       }
       
@@ -114,7 +114,7 @@ mat-nav-list {
     }
 
     &.active {
-      background: linear-gradient(135deg, #8DC63F 0%, #7FC520 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: #fff;
       box-shadow: 0 8px 25px rgba(141, 198, 63, 0.3);
       transform: translateX(4px);
@@ -166,7 +166,7 @@ mat-nav-list {
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, #8DC63F 0%, #7FC520 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 1px;
   }
 

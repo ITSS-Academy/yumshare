@@ -1,1 +1,206 @@
-<p>message works!</p>
+<div class="chat-container">
+  <!-- Mobile Hamburger Menu Button -->
+  <button class="mobile-menu-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
+  <!-- Left Sidebar - Chat List -->
+  <div class="chat-sidebar" [class.open]="sidebarOpen">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <h2>Messages</h2>
+      <button class="close-sidebar" (click)="toggleSidebar()">×</button>
+      <!-- Debug: Current time -->
+      <div style="font-size: 12px; color: #666; margin-top: 5px;">
+        Hiện tại: {{ getCurrentTime() }}
+      </div>
+      <div class="search-container">
+        <input 
+          type="text" 
+          placeholder="Search users..." 
+          [(ngModel)]="searchQuery"
+          (input)="searchUsers()"
+          class="search-input"
+        />
+        <i class="search-icon">🔍</i>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    @if (showSearchResults) {
+      <div class="search-results">
+        <div class="search-header">
+          <h3>Search Results</h3>
+          <button (click)="showSearchResults = false" class="close-btn">×</button>
+        </div>
+        <div class="user-list">
+          @for (user of searchResults; track user.id) {
+            <div 
+              class="user-item"
+              (click)="startOrSelectChat(user)"
+            >
+              <img [src]="user.avatar_url || 'assets/default-avatar.png'" [alt]="user.username" class="user-avatar">
+              <div class="user-info">
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-email">{{ user.email }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Chat List with Virtual Scrolling -->
+    @if (!showSearchResults) {
+      <cdk-virtual-scroll-viewport class="chat-list" itemSize="72" minBufferPx="200" maxBufferPx="400">
+        @for (chat of chats; track chat.id) {
+          <div
+            class="chat-item"
+            [class.active]="selectedChat?.id === chat.id"
+            (click)="selectChat(chat)"
+          >
+            <img 
+              [src]="safeAvatar(getOtherUser(chat)?.avatar_url)" 
+              [alt]="otherUserName(chat)" 
+              class="chat-avatar"
+            >
+            <div class="chat-info">
+              <div class="chat-header">
+                <div class="chat-name">{{ otherUserName(chat) }}</div>
+                <div class="chat-time">{{ formatTime(chat.updated_at) }}</div>
+              </div>
+              <div class="chat-preview">
+                <span class="last-message" [class.new-chat]="isNewChat(chat)">
+                  {{ getLastMessage(chat) }}
+                </span>
+                @if (getUnreadCount(chat) > 0) {
+                  <span class="unread-count">
+                    {{ getUnreadCount(chat) }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        
+        <!-- Loading State -->
+        @if (loading) {
+          <div class="loading">
+            <div class="spinner"></div>
+            <span>Loading chats...</span>
+          </div>
+        }
+        
+        <!-- Empty State -->
+        @if (!loading && chats.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <h3>No conversations yet</h3>
+            <p>Start a new conversation by searching for users</p>
+          </div>
+        }
+      </cdk-virtual-scroll-viewport>
+    }
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chat-main">
+    <!-- Chat Header -->
+    @if (selectedChat) {
+      <div class="chat-header">
+        <div class="chat-user-info">
+          <button class="mobile-back" (click)="toggleSidebar()">←</button>
+          <img 
+            [src]="safeAvatar(getOtherUser(selectedChat)?.avatar_url)" 
+            [alt]="otherUserName(selectedChat)" 
+            class="chat-user-avatar"
+          >
+          <div class="chat-user-details">
+            <div class="chat-user-name">{{ otherUserName(selectedChat) }}</div>
+            <div class="chat-user-status">Online</div>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="action-btn">📞</button>
+          <button class="action-btn">📹</button>
+          <button class="action-btn">⋮</button>
+        </div>
+      </div>
+    }
+
+    <!-- Messages Container with Virtual Scrolling -->
+    @if (selectedChat) {
+      <cdk-virtual-scroll-viewport class="messages-container" itemSize="80" minBufferPx="300" maxBufferPx="600" orientation="vertical">
+        <div class="messages-list">
+          @if (messagesLoading()) {
+            <app-chat-message-skeleton></app-chat-message-skeleton>
+          } @else {
+            @for (message of messages; track message.id) {
+            <div 
+              class="message-item"
+              [class.sent]="message.sender_id === currentUser.id"
+              [class.received]="message.sender_id !== currentUser.id"
+            >
+              <div class="message-content">
+                @if (message.sender_id !== currentUser.id) {
+                  <div class="message-meta">
+                    <img [src]="getOtherUser(selectedChat!)?.avatar_url || 'assets/default-avatar.png'" class="bubble-avatar" alt="avatar">
+                  </div>
+                }
+                <div class="message-text">{{ message.content }}</div>
+                <div class="message-time">
+                  {{ message.created_at | localTime:'shortTime' }}
+                  @if (message.sender_id === currentUser.id) {
+                    <span class="read-status">
+                      {{ message.is_read ? '✓✓' : '✓' }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+            }
+          }
+        </div>
+      </cdk-virtual-scroll-viewport>
+    }
+
+    <!-- Message Input -->
+    @if (selectedChat) {
+      <div class="message-input-container">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            placeholder="Type a message..." 
+            [(ngModel)]="newMessage"
+            (input)="onTyping()"
+            (keypress)="onKeyPress($event)"
+            class="message-input"
+          >
+          <button 
+            (click)="sendMessage()" 
+            [disabled]="!newMessage.trim()"
+            class="send-btn"
+          >
+            ➤
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Empty Chat State -->
+    @if (!selectedChat) {
+      <div class="empty-chat">
+        <div class="empty-chat-icon">💬</div>
+        <h2>Select a conversation</h2>
+        <p>Choose a chat from the sidebar to start messaging</p>
+      </div>
+    }
+  </div>
+
+  <!-- Mobile Overlay -->
+  @if (sidebarOpen) {
+    <div class="mobile-overlay" (click)="toggleSidebar()"></div>
+  }
+</div>

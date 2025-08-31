@@ -1,1 +1,342 @@
-<p>add-recipe works!</p>
+k
+<!-- Top Bar -->
+
+<!-- Main Form -->
+<div class="main-content">
+  <form [formGroup]="recipeForm" class="recipe-form">
+    <!-- Recipe Header Section -->
+    <div class="recipe-header">
+      <!-- Recipe Image Section -->
+      <div class="image-section">
+        <h4 class="image-section-title">Recipe Image</h4>
+
+        <!-- File Upload Option -->
+        <div class="image-upload-area" (click)="imageInput.click()">
+          @if (!imagePreview) {
+          <div class="image-placeholder">
+            <div class="placeholder-shapes">
+              <div class="shape triangle"></div>
+              <div class="shape star"></div>
+              <div class="shape square"></div>
+            </div>
+            <p>Click to upload recipe image</p>
+          </div>
+          } @if (imagePreview) {
+          <img [src]="imagePreview" alt="Recipe Image" class="recipe-image" />
+          }
+          <input
+            #imageInput
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- Recipe Basic Info -->
+      <div class="recipe-basic-info">
+        <div class="form-row">
+          <mat-form-field class="recipe-title-field">
+            <mat-label>Name of Recipe</mat-label>
+            <input
+              matInput
+              formControlName="title"
+              placeholder="Enter recipe name"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row user-info">
+          <div class="user-avatar-small">
+            @if (currentUser?.photoURL) {
+            <img [src]="currentUser?.photoURL" alt="User Avatar" />
+            } @else {
+            <img src="assets/default-avatar.png" alt="User Avatar" />
+            }
+          </div>
+          @if (currentUser) {
+          <span class="user-name">{{
+            currentUser.displayName || currentUser.email || "User"
+          }}</span>
+          } @else {
+          <span class="user-name">Please login to create recipe</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <mat-form-field class="country-field">
+            <mat-label>Country</mat-label>
+            <mat-select formControlName="country">
+                             @for (country of safeCountries; track country) {
+              <mat-option [value]="country">
+                {{ country }}
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="difficulty-field">
+            <mat-label>Difficulty</mat-label>
+            <mat-select formControlName="difficulty">
+                             @for (level of safeDifficultyLevels; track level) {
+              <mat-option [value]="level">
+                {{ level }}
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field class="description-field">
+            <mat-label>Description</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              rows="3"
+              placeholder="Describe your recipe"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recipe Content Sections -->
+    <div class="recipe-content">
+      <!-- INGREDIENTS Section -->
+      <div class="section">
+        <h3 class="section-title">INGREDIENTS</h3>
+
+        <div class="form-row">
+          <mat-form-field class="serving-field">
+            <mat-label>Serving</mat-label>
+            <input
+              matInput
+              formControlName="servings"
+              type="number"
+              min="1"
+              placeholder="How many people"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="ingredients-section">
+          <label class="ingredient-label">Ingredient name</label>
+
+          @for (ingredient of (ingredients?.controls || []); track $index; let i
+          = $index) {
+          <div class="ingredient-item">
+            <mat-form-field class="ingredient-field">
+              <mat-label>Label</mat-label>
+              <input
+                matInput
+                [formControl]="getIngredientControl(i)"
+                placeholder="Enter ingredient"
+              />
+              @if (ingredients && ingredients.length > 1) {
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="removeIngredient(i)"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              }
+            </mat-form-field>
+          </div>
+          }
+
+          <button
+            type="button"
+            class="btn-add-ingredient"
+            (click)="addIngredient()"
+          >
+            <mat-icon>add</mat-icon>
+            Ingredient
+          </button>
+        </div>
+      </div>
+
+      <!-- PROCESS STEPS Section -->
+      <div class="section">
+        <h3 class="section-title">PROCESS STEPS</h3>
+
+        <div class="form-row">
+          <mat-form-field class="time-field">
+            <mat-label>Time</mat-label>
+            <input
+              matInput
+              formControlName="total_cooking_time"
+              type="number"
+              min="1"
+              min="1"
+              placeholder="Enter cooking time in minutes"
+            />
+          </mat-form-field>
+          @if (recipeForm.get('total_cooking_time')?.value) {
+          <div class="time-display">
+            <small>{{
+              formatTime(recipeForm.get("total_cooking_time")?.value)
+            }}</small>
+          </div>
+          }
+        </div>
+
+        <div class="steps-section">
+          @for (step of (steps?.controls || []); track $index; let i = $index) {
+          <div class="step-item">
+            <div class="step-number">{{ i + 1 }}</div>
+            <mat-form-field class="step-field">
+              <mat-label>Step {{ i + 1 }}</mat-label>
+              <textarea
+                matInput
+                [formControl]="getStepDescriptionControl(i)"
+                rows="2"
+                placeholder="Describe this step"
+              ></textarea>
+              @if (steps && steps.length > 1) {
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="removeStep(i)"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              }
+            </mat-form-field>
+          </div>
+          }
+
+          <button type="button" class="btn-add-step" (click)="addStep()">
+            <mat-icon>add</mat-icon>
+            Step
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Selection -->
+      <div class="section">
+        <h3 class="section-title">CATEGORY</h3>
+        <mat-form-field class="category-field">
+          <mat-label>Select Category</mat-label>
+          <mat-select formControlName="category_id">
+            @for (category of safeCategories; track category.id) {
+            <mat-option [value]="category.id">
+              {{ category.name }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Video Upload Section -->
+      <div class="section">
+        <h3 class="section-title">VIDEO UPLOAD</h3>
+
+        <!-- Video Type Selection -->
+        <div class="video-type-selection">
+          <mat-button-toggle-group
+            [value]="videoType"
+            (change)="onVideoTypeChange($event)"
+          >
+            <mat-button-toggle value="file">
+              <mat-icon>upload_file</mat-icon>
+              Upload Video File
+            </mat-button-toggle>
+            <mat-button-toggle value="youtube">
+              <mat-icon>video_library</mat-icon>
+              YouTube Link
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <!-- File Upload Option -->
+        @if (videoType === 'file') {
+        <div
+          class="video-upload-area"
+          (dragover)="onVideoDragOver($event)"
+          (drop)="onVideoDrop($event)"
+          (click)="onVideoClick()"
+        >
+          @if (!selectedVideo) {
+          <div class="video-placeholder">
+            <mat-icon class="video-icon">videocam</mat-icon>
+            <p class="upload-text">
+              Drag here to upload or click to choose file
+            </p>
+            <p class="upload-hint">
+              video will helps others follow along easier
+            </p>
+          </div>
+          } @if (videoPreview && videoType === 'file') {
+          <video [src]="videoPreview" controls class="video-preview"></video>
+          }
+
+          <input
+            #videoInput
+            type="file"
+            id="videoInput"
+            accept="video/*"
+            (change)="onVideoSelected($event)"
+            style="display: none"
+          />
+        </div>
+        }
+
+        <!-- YouTube URL Option -->
+        @if (videoType === 'youtube') {
+        <div class="youtube-url-area">
+          <mat-form-field class="youtube-url-field">
+            <mat-label>YouTube Video URL</mat-label>
+            <input
+              matInput
+              [(ngModel)]="youtubeUrl"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onYoutubeUrlChange($event)"
+              placeholder="https://www.youtube.com/watch?v=..."
+              [class.invalid-url]="youtubeUrl && !isValidYoutubeUrl(youtubeUrl)"
+            />
+            <mat-hint>Paste YouTube video link here</mat-hint>
+            @if (youtubeUrl && !isValidYoutubeUrl(youtubeUrl)) {
+            <mat-error> Please enter a valid YouTube URL </mat-error>
+            }
+          </mat-form-field>
+
+          <!-- YouTube Preview -->
+          @if (videoPreview && videoType === 'youtube') {
+          <div class="youtube-preview">
+            <iframe
+              [src]="videoPreview | safe"
+              width="100%"
+              height="315"
+              frameborder="0"
+              allowfullscreen
+              class="youtube-iframe"
+            >
+            </iframe>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </form>
+  <div class="action-buttons">
+    <button class="btn-delete" (click)="onDelete()">
+      <mat-icon>delete</mat-icon>
+      Delete
+    </button>
+    <button
+      class="btn-save"
+      (click)="onSubmit()"
+      [disabled]="uploading || !currentUser"
+    >
+      <mat-icon>save</mat-icon>
+      @if (uploading) { Saving... } @else { Save and close }
+    </button>
+  </div>
+</div>
