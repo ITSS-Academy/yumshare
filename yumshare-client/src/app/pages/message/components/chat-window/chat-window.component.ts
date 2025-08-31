@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Message, MessageItemComponent } from '../../../../components/message-item';
+import { Message, MessageItemComponent } from '../message-item';
 import { FormsModule } from '@angular/forms';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
