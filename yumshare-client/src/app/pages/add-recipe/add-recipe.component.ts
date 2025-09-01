@@ -1,14 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { Store } from '@ngrx/store';
@@ -20,22 +13,13 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
+import { ShareModule } from '../../shares/share.module';
 
 @Component({
   selector: 'app-add-recipe',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatCardModule,
-    MatDividerModule,
+  ShareModule,
     SafePipe
   ],
   templateUrl: './add-recipe.component.html',
@@ -83,6 +67,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       ])
     });
   }
+  
   ngOnDestroy(): void {
     // Unsubscribe from all subscriptions
     this.subscriptions.forEach(subscription => subscription.unsubscribe());

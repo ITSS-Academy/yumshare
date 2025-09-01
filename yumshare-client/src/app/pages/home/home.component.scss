@@ -1,24 +1,25 @@
 .content-wrapper {
-  padding: 16px 16px;
+  padding: 1rem 1rem;
+  box-sizing: border-box;
 
+  // ===== Image Title Section =====
   .image-title {
     width: 100%;
-    height: 200px;
-    object-fit: inherit;
+    height: 220px;
     position: relative;
 
     .carousel {
       display: flex;
       align-items: center;
       height: 100%;
+      width: 100%;
       overflow: hidden;
-      position: relative;
 
       .carousel-image {
         flex: 1 0 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 5s;
+        transition: transform 0.5s;
       }
 
       .carousel-nav {
@@ -37,92 +38,404 @@
         cursor: pointer;
         z-index: 2;
         font-size: 20px;
-        /* Ensure icon is centered */
         padding: 0;
         line-height: 1;
       }
-      .carousel-nav.prev {
-        left: 8px;
-      }
-      .carousel-nav.next {
-        right: 8px;
-      }
+
+      .carousel-nav.prev { left: 8px; }
+      .carousel-nav.next { right: 8px; }
     }
   }
 
+  // ===== Categories Section =====
   .container-image-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 29.5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    width: 100%;
     align-items: center;
-    //justify-content: space-between;
 
-
-
-    .dish-type {
-      background-image: url('https://beptueu.vn/hinhanh/tintuc/top-15-hinh-anh-mon-an-ngon-viet-nam-khien-ban-khong-the-roi-mat-1.jpg');
+    .dish-type-1,
+    .dish-type-2,
+    .dish-type-3,
+    .dish-type-4,
+    .dish-type-5,
+    .dish-type-6,
+    .dish-type-7,
+    .dish-type-8 {
       background-size: cover;
       color: white;
-      font-size: var(--mat-sys-title-medium);
+      font-size: var(--mat-sys-title-medium, 1rem);
       border-radius: 10px;
       background-position: center;
       width: 100%;
-      max-width: 280px;
       height: 110px;
       display: flex;
       align-items: flex-end;
       position: relative;
       overflow: hidden;
       z-index: 2;
+      transition: transform 0.2s;
+      aspect-ratio: 16 / 9;
+
+      span {
+        padding: 0.625rem;
+        z-index: 1;
+      }
+
+      &:hover {
+        transform: scale(1.04);
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        z-index: 0;
+      }
     }
 
-    .dish-type::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.25);
-      z-index: 0;
+    // ===== Category Images =====
+    .dish-type-1 {
+      background-image: url('https://mediaen.vietnamplus.vn/images/cc571c067c64d4f85fb35f04673bf2966f07fd908a368407617c5e829869ab5e80d4dbbd5769a82642c930a0c61f0ef1/nem_8.jpg');
     }
-
-    .dish-type span {
-      padding: 10px;
-      z-index: 1;
+    .dish-type-2 {
+      background-image: url('https://poliva.vn/wp-content/uploads/2019/09/main-course-la-gi-2.jpeg');
     }
-
-    .dish-type {
-      z-index: 1;
+    .dish-type-3 {
+      background-image: url('https://hips.hearstapps.com/thepioneerwoman/wp-content/uploads/2018/09/5-easy-korean-side-dishes-banchan-ebb098ecb0ac-01.jpg');
+    }
+    .dish-type-4 {
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM4jdoehlwbtd9ljdkGNnFb-jNuHJHyyWInA&s');
+    }
+    .dish-type-5 {
+      background-image: url('https://www.anhngumshoa.com/uploads/images/userfiles/2021/01/05/dessert1.jpg');
+    }
+    .dish-type-6 {
+      background-image: url('https://cdn2.fptshop.com.vn/unsafe/800x0/beverage_la_gi_01_069a4d406f.png');
+    }
+    .dish-type-7 {
+      background-image: url('https://nld.mediacdn.vn/2018/5/25/nguoi-viet-nam-chi-khoang-8000-nghin-ty-dong-de-mua-bim-bim-trong-nam-2017-bb-baaad2ox2a-1527230871633283738328.jpg');
+    }
+    .dish-type-8 {
+      background-image: url('https://img.lovepik.com/photo/48024/9638.jpg_wh860.jpg');
     }
   }
 
-  .dish-type:hover {
-    transform: scale(1.05);
-  }
+  // ===== Section Titles =====
   h3 {
-    margin-top: 35px;
-    color: var(--primary);
-    font-size: var(--mat-sys-body-medium);
+    margin-top: 2rem;
+    color: var(--mat-sys-primary, #ff9800);
+    font-size: var(--mat-sys-body-medium, 1rem);
   }
 
-}
+  // ===== Today's Dish Button =====
+  .today-dish-full-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2rem 0 0 0;
+    padding: 0 1.25rem;
+    height: 3rem;
+    background: var(--mat-sys-primary, #ff9800);
+    color: #fff;
+    border: none;
+    border-radius: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: none;
 
-@media (min-width: 1024px) and (max-width: 1440px) {
-  .content-wrapper {
-    padding: 24px 32px 0 32px;
+    .arrow {
+      font-size: 1.375rem;
+      display: flex;
+      align-items: center;
+    }
+
+    &:hover {
+      background: #e68900;
+      transform: translateY(-2px) scale(1.02);
+    }
+  }
+
+  // ===== Section Header =====
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+
+    h3 {
+      color: var(--mat-sys-primary, #ff9800);
+      font-size: var(--mat-sys-body-medium, 1rem);
+      margin: 0;
+    }
+
+    .view-all-btn {
+      display: flex;
+      align-items: center;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--mat-sys-primary, #ff9800);
+      cursor: pointer;
+      gap: 0.375rem;
+
+      .arrow {
+        font-size: 1.125rem;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover .arrow {
+        transform: translateX(4px);
+      }
+    }
+  }
+
+  // ===== Responsive Design =====
+  // Mobile S (320px)
+  @media screen and (max-width: 320px) {
+    padding: 0.75rem;
 
     .image-title {
-      height: 280px;
+      height: 150px;
+
+      .carousel-nav {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+      }
     }
 
     .container-image-categories {
-      gap: 0 36px;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
 
-      .dish-type {
-        max-width: 220px;
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
         height: 90px;
+        font-size: 0.9rem;
+
+        span {
+          padding: 0.5rem;
+        }
+      }
+    }
+
+    .today-dish-full-btn {
+      height: 2.5rem;
+      font-size: 0.9rem;
+      padding: 0 1rem;
+
+      .arrow {
+        font-size: 1.125rem;
+      }
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .view-all-btn {
+        font-size: 0.9rem;
+
+        .arrow {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Mobile M (375px)
+  @media screen and (min-width: 321px) and (max-width: 375px) {
+    padding: 1rem;
+
+    .image-title {
+      height: 180px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 100px;
+      }
+    }
+
+    .today-dish-full-btn {
+      height: 2.75rem;
+      font-size: 1rem;
+    }
+  }
+
+  // Mobile L (425px)
+  @media screen and (min-width: 376px) and (max-width: 425px) {
+    padding: 1.2rem;
+
+    .image-title {
+      height: 200px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 110px;
+      }
+    }
+  }
+
+  // Tablet (767px)
+  @media screen and (min-width: 426px) and (max-width: 767px) {
+    padding: 1.5rem;
+
+    .image-title {
+      height: 200px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 120px;
+      }
+    }
+
+    .today-dish-full-btn {
+      height: 3rem;
+      font-size: 1.1rem;
+    }
+  }
+
+  // Laptop (1024px)
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    padding: 1.5rem 2rem;
+
+    .image-title {
+      height: 220px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 130px;
+      }
+    }
+  }
+
+  // Laptop L (1440px)
+  @media screen and (min-width: 1025px) and (max-width: 1440px) {
+    padding: 1.5rem 2.5rem;
+
+    .image-title {
+      height: 240px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 140px;
+      }
+    }
+  }
+
+  // 4K (2560px)
+  @media screen and (min-width: 1441px) {
+    padding: 1rem 2rem;
+    max-width: 1920px;
+    margin: 0 auto;
+
+    .image-title {
+      height: 300px;
+    }
+
+    .container-image-categories {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+
+      .dish-type-1,
+      .dish-type-2,
+      .dish-type-3,
+      .dish-type-4,
+      .dish-type-5,
+      .dish-type-6,
+      .dish-type-7,
+      .dish-type-8 {
+        height: 160px;
+        font-size: 1.2rem;
+      }
+    }
+
+    .today-dish-full-btn {
+      height: 3.5rem;
+      font-size: 1.2rem;
+      padding: 0 1.5rem;
+
+      .arrow {
+        font-size: 1.5rem;
+      }
+    }
+
+    .section-header {
+      .view-all-btn {
         font-size: 1.1rem;
+
+        .arrow {
+          font-size: 1.25rem;
+        }
       }
     }
   }

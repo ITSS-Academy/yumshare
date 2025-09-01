@@ -1,34 +1,80 @@
 <div class="content-wrapper">
   <div class="image-title">
     <div class="carousel">
-      <button class="carousel-nav prev" (click)="prevImage()">
-        &#10094;
-      </button>
+      <button class="carousel-nav prev" (click)="prevImage()">&#10094;</button>
       <img
         class="carousel-image"
         [src]="carouselImages[currentImageIndex]"
         alt="carousel"
       />
-      <button class="carousel-nav next" (click)="nextImage()">
-        &#10095;
-      </button>
+      <button class="carousel-nav next" (click)="nextImage()">&#10095;</button>
     </div>
   </div>
+
   <h3>Recipe Categories</h3>
   <div class="container-image-categories">
-    <h2 class="dish-type"><span>Appetizers</span></h2>
-    <h2 class="dish-type"><span>Main courses</span></h2>
-    <h2 class="dish-type"><span>Side dishes</span></h2>
-    <h2 class="dish-type"><span>Soups</span></h2>
-    <h2 class="dish-type"><span>Desserts</span></h2>
-    <h2 class="dish-type"><span>Beverages</span></h2>
-    <h2 class="dish-type"><span>Snacks</span></h2>
-    <h2 class="dish-type"><span>Vegan dishes</span></h2>
+    <h2 class="dish-type-1"><span>Appetizers</span></h2>
+    <h2 class="dish-type-2"><span>Main courses</span></h2>
+    <h2 class="dish-type-3"><span>Side dishes</span></h2>
+    <h2 class="dish-type-4"><span>Soups</span></h2>
+    <h2 class="dish-type-5"><span>Desserts</span></h2>
+    <h2 class="dish-type-6"><span>Beverages</span></h2>
+    <h2 class="dish-type-7"><span>Snacks</span></h2>
+    <h2 class="dish-type-8"><span>Vegan dishes</span></h2>
   </div>
-  <h3>Today's Dish</h3>
-  <app-card></app-card>
-  <h3>Desserts</h3>
-  <app-desserts></app-desserts>
-  <h3>Beverages</h3>
-  <app-beverages></app-beverages>
+
+  <div class="section-header">
+    <h3>Today's Dish</h3>
+    <button class="view-all-btn" (click)="nextTodayDish()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+  <div class="container-card">
+    <app-card></app-card>
+  </div>
+
+  <div class="section-header">
+    <h3>Family Meal</h3>
+    <button class="view-all-btn" (click)="viewAllFamilyMeal()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+  <div class="container-card">
+    <app-desserts></app-desserts>
+  </div>
+
+  <div class="section-header">
+    <h3>Refreshing Dishes</h3>
+    <button class="view-all-btn" (click)="viewAllRefreshingDishes()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+  <div class="container-card">
+    <app-beverages></app-beverages>
+  </div>
+
+  <div class="section-header">
+    <h3>Nutritious Meals</h3>
+    <button class="view-all-btn" (click)="viewAllNutritiousMeals()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+  <div class="container-card">
+    <app-appetizers></app-appetizers>
+  </div>
+
+  <div class="section-header">
+    <h3>Easy Meals</h3>
+    <button class="view-all-btn" (click)="viewAllEasyMeals()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+  <div class="container-card">
+    <app-vegan-dishes></app-vegan-dishes>
+  </div>
 </div>
