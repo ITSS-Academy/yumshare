@@ -1,1 +1,254 @@
-<p>add-recipe works!</p>
+<div class="add-recipe" [formGroup]="recipeForm">
+  <mat-stepper #stepper>
+
+    <!-- Bước 1: Thông tin cơ bản -->
+    <mat-step label="Recipe Information">
+      <div class="step-content">
+        <div class="new-recipe-card">
+          <!-- Left side -->
+          <div class="recipe-image-upload">
+            <img [src]="previewUrl || ''">
+            <input type="file" id="upload" (change)="onImageSelected($event)" hidden>
+            <label for="upload" class="upload-btn">Upload Image</label>
+          </div>
+
+          <!-- Right side -->
+          <div class="recipe-form">
+            <!-- Top: recipe name -->
+            <div class="form-top">
+              <input type="text" formControlName="name" placeholder="Name of Recipe" class="recipe-name-input">
+            </div>
+
+            <!-- Middle: author -->
+            <div class="form-middle">
+              <img src="https://via.placeholder.com/60" alt="avatar" class="avatar">
+              <div>
+                <span class="author-name">Your Name</span>
+                <span class="author-mail">gmail</span>
+              </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-options">
+              <mat-form-field appearance="outline">
+                <mat-label>Country</mat-label>
+                <mat-select formControlName="country">
+                  <mat-option class="default-option" value="Country">Country</mat-option>
+                  @for (country of countries; track country) {
+                    <mat-option [value]="country.value">{{country.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Difficulty</mat-label>
+                <mat-select formControlName="difficulty">
+                  <mat-option class="default-option" value="Difficulty">Difficulty</mat-option>
+                  @for (difficulty of difficulties; track difficulty) {
+                    <mat-option [value]="difficulty.value">{{difficulty.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- Bottom: description -->
+            <div class="form-bottom">
+              <textarea formControlName="description" placeholder="Description" class="recipe-description-input"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="ingredient-steps-card">
+          <div class="top-section">
+            <!-- Ingredient Left -->
+            <div class="ingredient-box">
+              <h3>INGREDIENT</h3>
+              <label>Serving</label>
+              <input type="text" formControlName="serving" placeholder="How many people" class="serving-input">
+
+              <div formArrayName="ingredients">
+                @for (ing of ingredients.controls; track $index; let i = $index) {
+                  <div class="add-ingredient-card" [formGroupName]="i">
+                    <input type="text" formControlName="name" placeholder="Ingredient name" class="ingredient-input">
+                    <button class="del-btn" type="button" (click)="removeIngredient(i)">x</button>
+                  </div>
+                }
+              </div>
+
+              <button type="button" id="add-ingredient" class="add-btn" (click)="addIngredient()">
+                <b>+ Ingredient</b>
+              </button>
+            </div>
+
+            <!-- Steps Right -->
+            <div class="steps-box">
+              <h3>PROCESS STEPS</h3>
+              <label>Time</label>
+              <input type="text" formControlName="time" placeholder="1 hour 30 minutes" class="time-input">
+
+              <div formArrayName="steps">
+                @for (step of steps.controls; track $index; let i = $index) {
+                  <div class="step-item" [formGroupName]="i">
+                    <span class="step-number">{{ i + 1 }}</span>
+                    <input type="text"
+                           formControlName="detail"
+                           placeholder="Step {{ i + 1 }}"
+                           class="step-input">
+                    <button class="del-btn" type="button"
+                            (click)="removeStep(i)"
+                            [disabled]="steps.length === 1">
+                      x
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <button type="button" id="add-step" class="add-btn" (click)="addStep()">
+                <b>+ Step</b>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button mat-button class="delete-add-recipe" type="button">
+          <span class="material-symbols-outlined">delete</span>Delete
+        </button>
+        <button mat-button matStepperNext class="next-btn">Next</button>
+      </div>
+    </mat-step>
+
+    <!-- Bước 2: Upload Video -->
+    <mat-step label="Video Upload">
+      <div class="step-content">
+        <div class="video-upload-section">
+          <h3>VIDEO UPLOAD</h3>
+
+          <!-- Toggle between file upload and URL -->
+          <div class="video-source-toggle">
+            <button type="button"
+                    class="toggle-btn"
+                    [class.active]="!isVideoFromUrl"
+                    (click)="setVideoSource(false)">
+              <span class="material-symbols-outlined" style="color: #88C533 !important">attach_file</span> Upload File
+            </button>
+            <button type="button"
+                    class="toggle-btn"
+                    [class.active]="isVideoFromUrl"
+                    (click)="setVideoSource(true)">
+              <span class="material-symbols-outlined" style="color: #88C533 !important">add_link</span>Video URL
+            </button>
+          </div>
+
+          <!-- Video Input Area -->
+          <div class="video-input-area">
+            <!-- File Upload Option -->
+            @if (!isVideoFromUrl) {
+              <div class="video-upload-box">
+                <div class="video-upload-label" (click)="triggerFileUpload(); $event.preventDefault();">
+                  <div class="video-icon"><span class="material-symbols-outlined">video_call</span></div>
+                  <p><strong>Click here to choose video file</strong></p>
+                  <span>Supported formats: MP4, AVI, MOV, WMV (Max 100MB)</span>
+                  @if (videoFile) {
+                    <p class="file-info">
+                      ✅ Selected: {{ videoFile?.name }}
+                    </p>
+                  }
+                </div>
+                <input type="file" id="video-upload" (change)="onVideoSelected($event)" accept="video/*" hidden>
+
+                <!-- Video Preview -->
+                @if (videoPreviewUrl) {
+                  <div class="video-preview">
+                    <h4>Video Preview:</h4>
+                    <video controls [src]="videoPreviewUrl" class="preview-video">
+                      Your browser does not support the video tag.
+                    </video>
+                    <button type="button" class="clear-btn" (click)="clearVideoData()">
+                      <span class="material-symbols-outlined">delete</span> Clear Video
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- URL Input Option -->
+            @if (isVideoFromUrl) {
+              <div class="video-url-box">
+                <div class="url-input-container">
+                  <label for="video-url">Video URL (YouTube, Vimeo, etc.)</label>
+                  <input type="url"
+                         id="video-url"
+                         formControlName="videoUrl"
+                         placeholder="https://www.youtube.com/watch?v=..."
+                         class="url-input"
+                         (input)="onVideoUrlChange(); $event.preventDefault();">
+                  @if (videoUrl) {
+                    <p class="url-info">
+                      ✅ URL: {{ videoUrl }}
+                    </p>
+                  }
+                  <p class="url-help">
+                    Supported platforms: YouTube, Vimeo, Dailymotion, Facebook, Instagram, TikTok
+                  </p>
+                  @if (videoUrl) {
+                    <button type="button" class="clear-btn" (click)="clearVideoData()">
+                      🗑️ Clear URL
+                    </button>
+                  }
+                </div>
+                <!-- Video Preview for URL -->
+                @if (videoPreviewUrl) {
+                  <div class="video-preview">
+                    <h4>Video Preview:</h4>
+                    @if (videoPreviewUrl.includes('youtube.com/embed') || videoPreviewUrl.includes('player.vimeo.com')) {
+                      <iframe [src]="videoPreviewUrl" width="100%" height="315" frameborder="0" allowfullscreen class="preview-video"></iframe>
+                    } @else {
+                      <video controls [src]="videoPreviewUrl" class="preview-video">
+                        Your browser does not support the video tag.
+                      </video>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Summary -->
+          @if (videoFile || videoUrl) {
+            <div class="video-summary">
+              <h4>Video Summary:</h4>
+              <div class="summary-content">
+                @if (videoFile) {
+                  <p>
+                    <strong>File:</strong> {{ videoFile?.name }} ({{ (videoFile?.size || 0) / (1024 * 1024) | number:'1.1-1' }} MB)
+                  </p>
+                }
+                @if (videoUrl) {
+                  <p>
+                    <strong>URL:</strong> {{ videoUrl }}
+                  </p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <div class="prev-btn-wrap">
+           <button mat-button matStepperPrevious class="prev-btn">Previous</button>
+        </div>
+        <div class="step2-delete-post-btn">
+          <button mat-button class="delete-add-recipe" type="button">
+            <span class="material-symbols-outlined">delete</span>Delete
+          </button>
+          <button mat-button class="submit-btn" (click)="onSubmit()">Post</button>
+        </div>
+
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</div>
