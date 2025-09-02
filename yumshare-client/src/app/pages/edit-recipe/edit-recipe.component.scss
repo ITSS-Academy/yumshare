@@ -6,18 +6,41 @@
   padding-bottom: 140px; // Đảm bảo đủ không gian để nhìn thấy các nút ở cuối
 }
 
-.delete-and-save{
+.delete-and-save {
   display: flex;
   flex-direction: row;
-  justify-content: end;
-  background-color: #F8FCF3;
   align-items: center;
-  height: 40px;
-  margin: 10px 20px;
-  gap: 15px;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  margin: 10px auto;
+  position: static;
+  box-sizing: border-box;
 }
 
-.delete{
+.prev-btn-wrap {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 110px;
+  margin: 0;
+  position: static;
+  height: 40px;
+}
+
+.delete-and-next{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 70px;
+}
+
+.prev-btn{
+  margin-left: 0;
+}
+
+.delete {
   width: 110px;
   color: white !important;
   height: 40px;
@@ -30,11 +53,11 @@
   transition: all 0.3s ease;
 }
 
-.delete:hover{
+.delete:hover {
   transform: translateY(-2px);
 }
 
-.post{
+.post {
   width: 110px;
   height: 40px; // giống nút .delete
   background-color: #88C533;
@@ -45,7 +68,6 @@
   font-weight: bold;
   color: white !important;
   margin-left: 20px;
-  border: none;
   transition: all 0.3s ease;
 }
 
@@ -54,7 +76,7 @@
   transform: translateY(-2px);
 }
 
-.material-symbols-outlined{
+.material-symbols-outlined {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -115,6 +137,8 @@
   transition: background 0.2s;
   margin-right: 10px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .prev-btn:hover {
@@ -122,10 +146,14 @@
 }
 
 .prev-btn-wrap {
-  margin-left: 35px;
-  width: 80%;
+  margin-left: 0;
   display: flex;
-  justify-content: left;
+  justify-content: flex-start;
+  position: static;
+  left: 0;
+  top: 0;
+  height: 40px;
+  z-index: 1;
 }
 
 /* Right side: form */
@@ -172,6 +200,16 @@
 .form-options {
   display: flex;
   gap: 12px;
+  width: 100%;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.form-options mat-form-field {
+  flex: 1 1 0;
+  min-width: 100px;
+  max-width: 180px;
+  margin: 0;
 }
 
 /* Ẩn outline mặc định */
@@ -181,11 +219,11 @@
 
 /* Giữ wrapper gọn như button */
 ::ng-deep .mat-mdc-text-field-wrapper {
+  height: 38px !important;
+  min-height: 38px !important;
   border: 1.5px solid #88C533 !important;
   border-radius: 8px !important;
-  background-color: white !important;
-  height: 30px !important;
-  min-height: 30px !important;
+  background: white !important;
   padding: 0 8px !important;
   display: flex;
   align-items: center;
@@ -197,6 +235,11 @@
   color: #88C533 !important;
   font-weight: bold;
   text-align: center;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* Icon mũi tên */
@@ -216,36 +259,48 @@
   color: white !important;
 }
 
-/* chỉnh khung */
-::ng-deep .mat-mdc-text-field-wrapper {
-  height: 30px !important;
-  min-height: 30px !important;
-  border: 1.5px solid #88C533 !important;
-  border-radius: 8px !important;
-  background: white !important;
-  padding: 0 8px !important;
-  display: flex;
-  align-items: center;
-}
-
 /* chỉnh infix để không còn padding dư */
 ::ng-deep .mat-mdc-form-field-infix {
   padding: 0 !important;
   min-height: unset !important;
-  height: 100% !important;
+  height: 38px !important;
   width: 120px !important;
   display: flex !important;
   align-items: center !important;
+  line-height: 1.2 !important;
 }
 
-/* chữ hiển thị khi đã chọn */
-::ng-deep .mat-mdc-select-value {
-  font-size: 14px !important;   /* nhỏ hơn */
-  line-height: 1 !important;    /* thu nhỏ chiều cao dòng */
-  height: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  color: #88C533 !important;
+/* Responsive chỉnh lại cho 3 mục xuống dòng khi thu nhỏ */
+@media (max-width: 900px) {
+  .form-options {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .form-options mat-form-field {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-options {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .form-options mat-form-field {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 .form-bottom .recipe-description-input {
@@ -322,7 +377,7 @@
   justify-content: center;
 }
 
-.add-ingredient-card{
+.add-ingredient-card {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -382,7 +437,7 @@
   margin-bottom: 8px;
 }
 
-.video-icon .material-symbols-outlined{
+.video-icon .material-symbols-outlined {
   font-size: 40px;
 }
 
@@ -459,7 +514,7 @@
   margin-bottom: 8px;
 }
 
-.video-url-box{
+.video-url-box {
   background: none;
   border: none;
   color: #88C533;
@@ -471,7 +526,7 @@
   transition: color 0.2s;
 }
 
-.clear-btn{
+.clear-btn {
   background-color: white;
   border-radius: 12px;
   height: 30px;
@@ -558,8 +613,32 @@
     font-size: 15px;
   }
 
-  .delete-and-save{
+  .delete-and-save {
+    flex-direction: column; // Sửa lại từ column-reverse thành column để prev-btn luôn ở trên cùng
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 10px;
     margin: 10px 0;
+    height: auto;
+    position: static;
+  }
+  .prev-btn-wrap {
+    width: 100% !important;
+    max-width: 100vw;
+    min-width: unset;
+    margin-left: 0;
+    justify-content: flex-start;
+    position: static;
+  }
+  .prev-btn,
+  .delete,
+  .post {
+    width: 100% !important;
+    min-width: unset;
+    max-width: 100vw;
+    height: 40px;
+    margin-left: 0;
+    font-size: 16px;
   }
 }
 
@@ -629,24 +708,34 @@
   }
 
   .delete-and-save {
-    flex-direction: column;
-    color: white !important;
+    flex-direction: column; // Sửa lại từ column-reverse thành column để prev-btn luôn ở trên cùng
+    align-items: stretch;
+    justify-content: space-between;
     gap: 8px;
     margin: 8px 0;
     height: auto;
     padding-bottom: 30px !important;
     padding-top: 10px !important;
+    position: static;
   }
-
+  .prev-btn-wrap {
+    width: 100% !important;
+    max-width: 100vw;
+    min-width: unset;
+    margin-left: 0;
+    justify-content: flex-start;
+    position: static;
+  }
+  .prev-btn,
   .delete,
   .post {
-    width: 100%;
-    min-width: 90px;
+    width: 100% !important;
+    min-width: unset;
+    max-width: 100vw;
     height: 28px;
     font-size: 13px;
-    margin-left: 0;
+    margin: 0;
   }
-
   .post {
     margin-top: 8px;
   }
@@ -666,7 +755,7 @@
   .add-recipe {
     padding: 40px 20vw 80px 20vw;
     font-size: 20px;
-    padding-bottom: 180px; // Đảm bảo đủ không gian ở 4K
+    padding-bottom: 180px;
   }
 
   .new-recipe-card {
@@ -674,73 +763,63 @@
     border-radius: 24px;
   }
 
-  .recipe-image-upload,
-  .recipe-form {
-    padding: 32px;
-    font-size: 20px;
+  .delete-and-save {
+    max-width: 1600px;
+    margin-left: 100px;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .form-top .recipe-name-input,
-  .form-bottom .recipe-description-input {
-    font-size: 22px;
-    padding: 18px;
-  }
-
-  .form-middle .avatar {
-    width: 100px;
-    height: 100px;
-  }
-
-  .author-name {
-    font-size: 22px;
-  }
-
-  .author-mail {
-    font-size: 18px;
-  }
-
-  .form-options {
-    gap: 24px;
-  }
-
-  .ingredient-steps-card {
-    gap: 48px;
-    padding-left: 32px !important;
-    padding-right: 32px !important;
-  }
-
-  .ingredient-box,
-  .steps-box {
-    gap: 24px;
-  }
-
-  .ingredient-input,
-  .step-input,
-  .serving-input,
-  .time-input {
-    font-size: 20px;
-    padding: 14px;
-  }
-
-  .step-number {
-    width: 44px;
-    height: 44px;
-    font-size: 22px;
-  }
-
+  .prev-btn,
   .delete,
   .post {
     width: 180px;
+    min-width: 180px;
+    max-width: 180px;
     height: 48px;
     font-size: 20px;
   }
+}
 
-  .video-upload-box {
-    padding: 64px;
-    font-size: 20px;
+@media (width: 1024px) {
+  .form-options {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
+  .form-options mat-form-field {
+    min-width: 90px;
+    max-width: 140px;
+    flex: 1 1 90px;
+  }
+}
 
-  .video-icon {
-    font-size: 64px;
+@media (min-width: 1200px) and (max-width: 1999px) {
+  .delete-and-save {
+    max-width: 900px;
+    margin-left: 50px;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+  .prev-btn-wrap {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+    width: 110px;
+  }
+  .prev-btn,
+  .delete,
+  .post {
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+    height: 40px;
+    font-size: 15px;
   }
 }

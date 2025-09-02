@@ -49,6 +49,16 @@
                   }
                 </mat-select>
               </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                  <mat-option class="default-option" value="Category">Category</mat-option>
+                  @for (category of categories; track category) {
+                    <mat-option [value]="category.value">{{category.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
             </div>
 
             <!-- Bottom: description -->
@@ -111,9 +121,10 @@
         </div>
       </div>
 
-      <div class="step-actions">
+      <div class="step-actions" style="justify-content: right;">
+        <div></div>
         <button mat-button class="delete-add-recipe" type="button">
-          <span class="material-symbols-outlined">delete</span>Delete
+          Delete
         </button>
         <button mat-button matStepperNext class="next-btn">Next</button>
       </div>
@@ -194,7 +205,7 @@
                   </p>
                   @if (videoUrl) {
                     <button type="button" class="clear-btn" (click)="clearVideoData()">
-                      🗑️ Clear URL
+                      <span class="material-symbols-outlined">delete</span> Clear URL
                     </button>
                   }
                 </div>
@@ -238,11 +249,11 @@
 
       <div class="step-actions">
         <div class="prev-btn-wrap">
-           <button mat-button matStepperPrevious class="prev-btn">Previous</button>
+          <button mat-button matStepperPrevious class="prev-btn">Previous</button>
         </div>
         <div class="step2-delete-post-btn">
           <button mat-button class="delete-add-recipe" type="button">
-            <span class="material-symbols-outlined">delete</span>Delete
+            Delete
           </button>
           <button mat-button class="submit-btn" (click)="onSubmit()">Post</button>
         </div>

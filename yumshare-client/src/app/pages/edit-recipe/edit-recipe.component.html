@@ -49,6 +49,15 @@
                   }
                 </mat-select>
               </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                  <mat-option class="default-option" value="Category">Category</mat-option>
+                  @for (category of categories; track category) {
+                    <mat-option [value]="category.value">{{category.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
             </div>
             <div class="form-bottom">
               <textarea formControlName="description" placeholder="Description" class="recipe-description-input"></textarea>
@@ -119,10 +128,13 @@
         </div>
       </div>
       <div class="delete-and-save">
-        <button mat-button class="delete" type="button">
-          <span class="material-symbols-outlined">delete</span>Delete
-        </button>
-        <button mat-button class="post" type="button" (click)="stepper.next()">Next</button>
+        <div></div>
+        <div class="delete-and-next">
+          <button mat-button class="delete" type="button">
+            Delete
+          </button>
+          <button mat-button class="post" type="button" (click)="stepper.next()">Next</button>
+        </div>
       </div>
     </form>
   </mat-step>
@@ -238,12 +250,13 @@
             Previous
           </button>
         </div>
-        <button mat-button matStepperPrevious class="delete" type="button">
-          <span class="material-symbols-outlined">delete</span>Delete
-        </button>
-        <button mat-button class="post" type="button" (click)="onSubmit()">Save</button>
+        <div class="delete-and-next">
+          <button mat-button matStepperPrevious class="delete" type="button">
+            Delete
+          </button>
+          <button mat-button class="post" type="button" (click)="onSubmit()">Save</button>
+        </div>
       </div>
     </form>
   </mat-step>
 </mat-horizontal-stepper>
-

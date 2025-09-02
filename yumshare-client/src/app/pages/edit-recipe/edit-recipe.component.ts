@@ -50,11 +50,33 @@ export class EditRecipeComponent implements OnInit {
     {value: 'hard', viewValue: 'Hard'}
   ];
 
+  categories = [
+    { value: 'Beef', viewValue: 'Beef' },
+    { value: 'Pork', viewValue: 'Pork' },
+    { value: 'Chicken', viewValue: 'Chicken' },
+    { value: 'Sheep', viewValue: 'Sheep' },
+    { value: 'Fish', viewValue: 'Fish' },
+    { value: 'Octopus', viewValue: 'Octopus' },
+    { value: 'Crab', viewValue: 'Crab' },
+    { value: 'Shrimp', viewValue: 'Shrimp' },
+    { value: 'Salad', viewValue: 'Salad' },
+    { value: 'Potato', viewValue: 'Potato' },
+    { value: 'Carrot', viewValue: 'Carrot' },
+    { value: 'Tomato', viewValue: 'Tomato' },
+    { value: 'Beans', viewValue: 'Beans' },
+    { value: 'Juices', viewValue: 'Juices' },
+    { value: 'Milk', viewValue: 'Milk' },
+    { value: 'Tea', viewValue: 'Tea' },
+    { value: 'Smoothie', viewValue: 'Smoothie' },
+    { value: 'Coffee', viewValue: 'Coffee' }
+  ];
+
   // Dummy data để test, xóa/comment lại khi dùng thật
   recipeData: any = {
     name: 'Bánh mì Việt Nam',
     country: 'vn',
     difficulty: 'easy',
+    category: 'Coffee',
     description: 'Bánh mì Việt Nam là món ăn nổi tiếng với lớp vỏ giòn và nhân đa dạng.',
     serving: '2',
     time: '30 phút',
@@ -79,6 +101,7 @@ export class EditRecipeComponent implements OnInit {
       name: [''],
       country: [''],
       difficulty: [''],
+      category: [''], // thêm category vào form
       description: [''],
       serving: [''],
       time: [''],
@@ -95,6 +118,7 @@ export class EditRecipeComponent implements OnInit {
       name: this.recipeData.name,
       country: this.recipeData.country,
       difficulty: this.recipeData.difficulty,
+      category: this.recipeData.category || '', // patch category nếu có
       description: this.recipeData.description,
       serving: this.recipeData.serving,
       time: this.recipeData.time

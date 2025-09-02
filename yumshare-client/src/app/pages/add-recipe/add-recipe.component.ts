@@ -43,11 +43,33 @@ export class AddRecipeComponent {
     { value: 'hard', viewValue: 'Hard' }
   ];
 
+  categories = [
+    { value: 'Beef', viewValue: 'Beef' },
+    { value: 'Pork', viewValue: 'Pork' },
+    { value: 'Chicken', viewValue: 'Chicken' },
+    { value: 'Sheep', viewValue: 'Sheep' },
+    { value: 'Fish', viewValue: 'Fish' },
+    { value: 'Octopus', viewValue: 'Octopus' },
+    { value: 'Crab', viewValue: 'Crab' },
+    { value: 'Shrimp', viewValue: 'Shrimp' },
+    { value: 'Salad', viewValue: 'Salad' },
+    { value: 'Potato', viewValue: 'Potato' },
+    { value: 'Carrot', viewValue: 'Carrot' },
+    { value: 'Tomato', viewValue: 'Tomato' },
+    { value: 'Beans', viewValue: 'Beans' },
+    { value: 'Juices', viewValue: 'Juices' },
+    { value: 'Milk', viewValue: 'Milk' },
+    { value: 'Tea', viewValue: 'Tea' },
+    { value: 'Smoothie', viewValue: 'Smoothie' },
+    { value: 'Coffee', viewValue: 'Coffee' }
+  ];
+
   constructor(private fb: FormBuilder) {
     this.recipeForm = this.fb.group({
       name: ['', Validators.required],
       country: ['Country', Validators.required],
       difficulty: ['Difficulty', Validators.required],
+      category: ['Category', Validators.required],
       description: ['', Validators.required],
       serving: ['', Validators.required],
       time: ['', Validators.required],
