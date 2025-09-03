@@ -1,32 +1,41 @@
 <div class="comments-section">
   <h1>Comments</h1>
-
-  <!-- Input giống YouTube -->
-  <div class="comment-input">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <input type="text" placeholder="Add your comment..." />
-    <button class="send-btn">➤</button>
-  </div>
-
-  <hr>
-  <!-- Comment giống Facebook -->
-  <div class="comment">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <div class="comment-body">
-      <span class="user-name">User Name</span>
-      <p>Contrary to popular belief, Lorem Ipsum is not simply random text.
-        It has roots in a piece of classical Latin literature from 45 BC, making it over
-        <strong>2000 years old</strong>.
-      </p>
+  <div class="comment-user">
+    <div class="comment-input">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsySfc8vjrF2k0NXJEeR6ytsTxmigCwb8Nw&s" alt="user avatar" class="avatar">
+      <input
+        type="text"
+        [(ngModel)]="newComment"
+        placeholder="Add your comment..."
+        (keyup.enter)="addComment()"
+      />
+      <span class="material-icons" style="cursor:pointer;color:black;" (click)="addComment()">send</span>
     </div>
-  </div>
 
-  <div class="comment">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <div class="comment-body">
-      <span class="user-name">Another User</span>
-      <p>This is another sample comment styled like Facebook.</p>
+    <div class="comment-storage">
+      @for (comment of comments; track comment.id) {
+        <div class="comment-row">
+          <div class="comment">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQMAAADCCAMAAAB6zFdcAAAAFVBMVEUBBQgLDBECAwQ1NjjJysv///8CBgrY6dMRAAAAcElEQVR4nO3QKw6AUAwEwOV7/yNDnsEsEBRmpqbZNhVNAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+sF9S21dfd+/2W54yyqiWP97t43FsIjN+cP5gISvZOADOxBbgD7sSJAAAAABJRU5ErkJggg==" alt="user avatar" class="avatar">
+            <div class="comment-body">
+              <span class="user-name">{{ comment.userName }}</span>
+              @if (!comment.editing) {
+                <p>{{ comment.text }}</p>
+              } @else {
+                <input [(ngModel)]="editingText" />
+                <button mat-flat-button color="primary" id="edit-button-1" (click)="saveEdit(comment)">Save</button>
+                <button mat-flat-button id="edit-button-2" (click)="cancelEdit(comment)">Cancel</button>
+              }
+            </div>
+            @if (!comment.editing && comment.userName === 'You') {
+              <div class="comment-actions">
+                <span class="material-icons" style="cursor:pointer;color:black;" (click)="startEdit(comment)">edit</span>
+                <span class="material-icons" style="cursor:pointer;color:black;" (click)="deleteComment(comment.id)">delete</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>
-
