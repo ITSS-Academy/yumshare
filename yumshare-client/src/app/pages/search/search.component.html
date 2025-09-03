@@ -1,72 +1,82 @@
-<div class="search-container">
-  <h2>Search</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Page</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="search-container" id="search-container">
+  <h2 id="search-title">Discover Your Favorites</h2>
 
-  <div class="search-bar">
-    <input type="text" placeholder="Search by keyword or author..." [(ngModel)]="keyword" (keyup.enter)="onSearch()" />
-    <select [(ngModel)]="selectedCategory">
+  <div class="search-bar" id="search-bar">
+    <input type="text" id="search-input" placeholder="Search by keyword or author..." [(ngModel)]="keyword" (keyup.enter)="onSearch()" />
+    <select id="category-select" [(ngModel)]="selectedCategory">
       <option value="">All Categories</option>
       @for (c of categories; track c) {
         <option [value]="c">{{ c }}</option>
       }
     </select>
-    <button class="search-btn" (click)="onSearch()">
-      <mat-icon>search</mat-icon>
+    <button class="search-btn" id="search-button" (click)="onSearch()">
+      <span class="material-icons">search</span>
     </button>
   </div>
 
   @if (results.length > 0) {
-    <p>Showing results {{ results.length }} for: <b>{{ keyword }}</b></p>
+    <p id="results-info">Showing <b>{{ results.length }}</b> results for: <b>{{ keyword }}</b></p>
   }
 
-  <div class="results-grid">
+  <div class="results-grid" id="results-grid">
     @for (item of displayedResults; track item.title) {
-      <div class="container-card">
-        <mat-card class="dish-card" appearance="outlined">
-          <img mat-card-image [src]="item.image" alt="Dish Image">
+      <div class="container-card" id="card-{{ item.title | lowercase }}-{{ $index }}">
+        <mat-card class="dish-card" appearance="outlined" id="dish-card-{{ item.title | lowercase }}-{{ $index }}">
+          <img mat-card-image [src]="item.image" alt="{{ item.title }} Image" id="dish-image-{{ item.title | lowercase }}-{{ $index }}">
           <mat-card-content>
-            <h2 class="dish-title">{{ item.title }}</h2>
-            <p class="dish-description">
+            <h2 class="dish-title" id="dish-title-{{ item.title | lowercase }}-{{ $index }}">{{ item.title }}</h2>
+            <p class="dish-description" id="dish-description-{{ item.title | lowercase }}-{{ $index }}">
               {{ item.description }}
             </p>
           </mat-card-content>
-          <div class="rating">
+          <div class="rating" id="rating-{{ item.title | lowercase }}-{{ $index }}">
             @for (star of [1,2,3,4,5]; track star) {
-              <mat-icon>
-                {{ star <= item.rating ? 'star' : 'star_border' }}
-              </mat-icon>
+              <span class="material-icons" id="star-{{ item.title | lowercase }}-{{ $index }}-{{ star }}">
+                  {{ star <= item.rating ? 'star' : 'star_border' }}
+                </span>
             }
           </div>
-          <mat-card-actions class="card-footer">
-            <div class="user-info">
-              <img class="avatar" [src]="item.authorAvatar" alt="User avatar">
-              <span class="username">{{ item.author }}</span>
+          <mat-card-actions class="card-footer" id="card-footer-{{ item.title | lowercase }}-{{ $index }}">
+            <div class="user-info" id="user-info-{{ item.title | lowercase }}-{{ $index }}">
+              <img class="avatar" [src]="item.authorAvatar" alt="{{ item.author }} Avatar" id="avatar-{{ item.title | lowercase }}-{{ $index }}">
+              <span class="username" id="username-{{ item.title | lowercase }}-{{ $index }}">{{ item.author }}</span>
             </div>
-            <div class="actions">
-              <mat-icon class="favorite-icon" (click)="toggleFavorite(item)">
-                {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
-              </mat-icon>
-              <mat-icon>share</mat-icon>
+            <div class="actions" id="actions-{{ item.title | lowercase }}-{{ $index }}">
+                <span class="material-icons favorite-icon" id="favorite-icon-{{ item.title | lowercase }}-{{ $index }}" (click)="toggleFavorite(item)">
+                  {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
+                </span>
+              <span class="material-icons" id="share-icon-{{ item.title | lowercase }}-{{ $index }}">share</span>
             </div>
           </mat-card-actions>
         </mat-card>
       </div>
     }
   </div>
-  <div class="pagination">
-    <button (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
-    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
 
+  <div class="pagination" id="pagination">
+    <button id="first-page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+    <button id="prev-page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
     @for (p of visiblePages; track p) {
-      <button (click)="goToPage(p)" [class.active]="p === currentPage">
+      <button id="page-btn-{{ p }}" (click)="goToPage(p)" [class.active]="p === currentPage">
         {{ p }}
       </button>
     }
-
     @if (showEllipsis) {
-      <span>…</span>
+      <span id="ellipsis">…</span>
     }
-
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
-    <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+    <button id="next-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+    <button id="last-page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
   </div>
 </div>
+</body>
+</html>

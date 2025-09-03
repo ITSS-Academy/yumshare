@@ -1,3 +1,4 @@
+
 import { Component, HostBinding, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SideBarComponent } from './components/side-bar/side-bar.component';

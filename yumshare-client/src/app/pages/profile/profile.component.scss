@@ -1,3 +1,11 @@
+/* Prevent text selection globally for all elements */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 .home-root {
   display: flex;
   flex-direction: row;
@@ -38,44 +46,6 @@
   min-width: 0;
 }
 
-/* Responsive cho sidebar */
-@media (max-width: 768px) {
-  .home-body {
-    flex-direction: row;
-  }
-  .main-sidebar {
-    flex: 0 0 120px;
-    min-width: 100px;
-  }
-  .content-area {
-    padding: 8px;
-  }
-}
-
-@media (max-width: 425px) {
-  .main-sidebar {
-    flex: 0 0 80px;
-    min-width: 80px;
-  }
-  .content-area {
-    padding: 4px;
-  }
-}
-
-@media (max-width: 375px) {
-  .main-sidebar {
-    flex: 0 0 60px;
-    min-width: 60px;
-  }
-}
-
-@media (max-width: 320px) {
-  .main-sidebar {
-    flex: 0 0 50px;
-    min-width: 50px;
-  }
-}
-
 /* Profile Edit */
 .profile-edit {
   max-width: 800px;
@@ -91,10 +61,25 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .profile-header h2 {
   font-size: 20px;
   font-weight: bold;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
 .delete-account {
   background: none;
   border: 1px solid red;
@@ -194,10 +179,12 @@
   margin: 15px 0;
   flex-wrap: wrap;
 }
+
 .avatar-container {
   position: relative;
   cursor: pointer;
 }
+
 .avatar {
   width: 60px;
   height: 60px;
@@ -205,9 +192,11 @@
   object-fit: cover;
   transition: opacity 0.2s;
 }
+
 .avatar-container:hover .avatar {
   opacity: 0.7;
 }
+
 .avatar-container:hover::after {
   content: '\f030'; /* FontAwesome camera icon */
   font-family: 'Font Awesome 5 Free';
@@ -220,6 +209,7 @@
   font-size: 20px;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
+
 .avatar-input {
   position: absolute;
   top: 0;
@@ -229,10 +219,12 @@
   opacity: 0;
   cursor: pointer;
 }
+
 .avatar-section h3 {
   margin: 0;
   font-size: 16px;
 }
+
 .edit-icon {
   cursor: pointer;
   font-size: 12px;
@@ -241,21 +233,25 @@
 .profile-form {
   margin-top: 10px;
 }
+
 .form-row {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
 }
+
 .form-group {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
+
 .form-group label {
   font-weight: bold;
   margin-bottom: 4px;
   font-size: 14px;
 }
+
 .form-group input {
   padding: 6px;
   border: 1px solid #ccc;
@@ -269,6 +265,7 @@
   margin: 15px 0;
   flex-wrap: wrap;
 }
+
 .social-links a {
   font-size: 18px;
   color: black;
@@ -280,6 +277,7 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+
 .btn {
   padding: 8px 16px;
   border-radius: 8px;
@@ -287,10 +285,12 @@
   border: none;
   font-size: 14px;
 }
+
 .btn.save {
   background: #8bc34a;
   color: white;
 }
+
 .btn.cancel {
   background: #9e9e9e;
   color: white;
@@ -379,8 +379,18 @@
   color: #65676b;
 }
 
-/* Responsive cho form */
+/* Responsive cho sidebar */
 @media (max-width: 768px) {
+  .home-body {
+    flex-direction: row;
+  }
+  .main-sidebar {
+    flex: 0 0 120px;
+    min-width: 100px;
+  }
+  .content-area {
+    padding: 8px;
+  }
   .form-row {
     flex-direction: column;
     gap: 8px;
@@ -388,6 +398,18 @@
   .profile-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+  .header-actions {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .search-bar {
+    flex: 1;
+    max-width: 60%;
+  }
+  .delete-account {
+    flex: 0 0 auto;
   }
   .avatar-section {
     flex-direction: column;
@@ -409,6 +431,13 @@
 }
 
 @media (max-width: 425px) {
+  .main-sidebar {
+    flex: 0 0 80px;
+    min-width: 80px;
+  }
+  .content-area {
+    padding: 4px;
+  }
   .profile-edit {
     padding: 0 4px;
   }
@@ -422,6 +451,10 @@
 }
 
 @media (max-width: 375px) {
+  .main-sidebar {
+    flex: 0 0 60px;
+    min-width: 60px;
+  }
   .tab-button {
     font-size: 12px;
     padding: 6px 12px;
@@ -429,6 +462,10 @@
 }
 
 @media (max-width: 320px) {
+  .main-sidebar {
+    flex: 0 0 50px;
+    min-width: 50px;
+  }
   .social-links a {
     font-size: 16px;
   }

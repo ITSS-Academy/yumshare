@@ -3,7 +3,7 @@ import {FormsModule} from '@angular/forms';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
-import {NgClass, NgFor, NgIf} from '@angular/common';
+import {LowerCasePipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -19,7 +19,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardImage,
     MatIconModule,
     MatButtonModule,
-    NgClass
+    NgClass,
+    LowerCasePipe
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
@@ -32,6 +33,7 @@ export class SearchComponent {
 
   results = [
     {
+      id: 1,
       title: 'Salad',
       description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
       image: 'assets/salad.jpg',
@@ -41,6 +43,7 @@ export class SearchComponent {
       isFavorite: false
     },
     {
+      id: 2,
       title: 'Salad',
       description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
       image: 'assets/salad.jpg',
@@ -50,6 +53,7 @@ export class SearchComponent {
       isFavorite: false
     },
     {
+      id: 3,
       title: 'Soups',
       description: 'Soups',
       image: 'assets/soup.jpg',
@@ -59,6 +63,87 @@ export class SearchComponent {
       isFavorite: false
     },
     {
+      id: 4,
+      title: 'Soups',
+      description: 'Soups',
+      image: 'assets/soup.jpg',
+      author: 'Quoc Viet',
+      authorAvatar: 'assets/avatar.png',
+      rating: 1,
+      isFavorite: false
+    },
+    {
+      id: 5,
+      title: 'Salad',
+      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
+      image: 'assets/salad.jpg',
+      author: 'Anh Vu',
+      authorAvatar: 'assets/avatar.png',
+      rating: 4.5,
+      isFavorite: false
+    },
+    {
+      id: 6,
+      title: 'Salad',
+      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
+      image: 'assets/salad.jpg',
+      author: 'Van Nghia',
+      authorAvatar: 'assets/avatar.png',
+      rating: 5,
+      isFavorite: false
+    },
+    {
+      id: 7,
+      title: 'Soups',
+      description: 'Soups',
+      image: 'assets/soup.jpg',
+      author: 'Quoc Viet',
+      authorAvatar: 'assets/avatar.png',
+      rating: 1,
+      isFavorite: false
+    },
+    {
+      id: 8,
+      title: 'Soups',
+      description: 'Soups',
+      image: 'assets/soup.jpg',
+      author: 'Quoc Viet',
+      authorAvatar: 'assets/avatar.png',
+      rating: 1,
+      isFavorite: false
+    },
+    {
+      id: 9,
+      title: 'Salad',
+      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
+      image: 'assets/salad.jpg',
+      author: 'Anh Vu',
+      authorAvatar: 'assets/avatar.png',
+      rating: 4,
+      isFavorite: false
+    },
+    {
+      id: 10,
+      title: 'Salad',
+      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
+      image: 'assets/salad.jpg',
+      author: 'Van Nghia',
+      authorAvatar: 'assets/avatar.png',
+      rating: 5,
+      isFavorite: false
+    },
+    {
+      id: 11,
+      title: 'Soups',
+      description: 'Soups',
+      image: 'assets/soup.jpg',
+      author: 'Quoc Viet',
+      authorAvatar: 'assets/avatar.png',
+      rating: 1,
+      isFavorite: false
+    },
+    {
+      id: 12,
       title: 'Soups',
       description: 'Soups',
       image: 'assets/soup.jpg',
