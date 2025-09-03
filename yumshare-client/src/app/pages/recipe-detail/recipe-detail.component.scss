@@ -10,7 +10,7 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .top {
@@ -41,7 +41,7 @@ p {
 }
 
 .lefttt {
-  width: 60%;
+  width: 50%;
   height: 100%;
   display: flex;
   justify-content: space-evenly;
@@ -50,19 +50,20 @@ p {
 }
 
 .food-pic {
-  width: 80%;
+  width: 100%;
   height: auto;
   border-radius: 1.25rem;
   object-fit: contain;
 }
 
 .righttt {
-  width: 40%;
+  width: 50%;
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  padding-left: 1.25rem;
 }
 
 .food-description {
@@ -157,7 +158,30 @@ p {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
 }
+
+/* Chrome, Edge, Safari */
+.ingredient-list::-webkit-scrollbar {
+  width: 3px;   /* độ rộng của thanh dọc */
+}
+
+.ingredient-list::-webkit-scrollbar-track {
+  background: transparent; /* nền */
+}
+
+.ingredient-list::-webkit-scrollbar-thumb {
+  background-color: #888; /* màu thanh kéo */
+  border-radius: 10px;
+}
+
+.ingredient-list::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* đổi màu khi hover */
+}
+
 
 .row {
   display: flex;
@@ -310,7 +334,7 @@ p {
   margin: 0 auto;
 }
 .bottom-under{
-  width: 80%;
+  width: 100%;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -468,8 +492,6 @@ app-comment{
   }
   .bottom-under{
     width: 100%;
-    height: auto;
-    display: flex;
   }
 }
 
