@@ -181,6 +181,40 @@ export class RecipesService {
       // Handle steps separately
       const { steps, ...recipeData } = updateRecipeDto;
       
+      // Check if video_url is being changed and if old video exists on Supabase Storage
+      if (recipeData.video_url !== undefined && recipeData.video_url !== recipe.video_url) {
+        const oldVideoUrl = recipe.video_url;
+        
+        // If old video exists on Supabase Storage and new video is different (could be YouTube URL or new file)
+        if (oldVideoUrl && this.isSupabaseStorageUrl(oldVideoUrl)) {
+          try {
+            // Delete old video from Supabase Storage
+            await this.supabaseStorageService.deleteVideo(oldVideoUrl);
+            console.log(`Deleted old video from Supabase Storage: ${oldVideoUrl}`);
+          } catch (error) {
+            console.error('Failed to delete old video from Supabase Storage:', error);
+            // Continue with update even if deletion fails
+          }
+        }
+      }
+
+      // Check if image_url is being changed and if old image exists on Supabase Storage
+      if (recipeData.image_url !== undefined && recipeData.image_url !== recipe.image_url) {
+        const oldImageUrl = recipe.image_url;
+        
+        // If old image exists on Supabase Storage and new image is different
+        if (oldImageUrl && this.isSupabaseStorageUrl(oldImageUrl)) {
+          try {
+            // Delete old image from Supabase Storage
+            await this.supabaseStorageService.deleteImage(oldImageUrl);
+            console.log(`Deleted old image from Supabase Storage: ${oldImageUrl}`);
+          } catch (error) {
+            console.error('Failed to delete old image from Supabase Storage:', error);
+            // Continue with update even if deletion fails
+          }
+        }
+      }
+      
       Object.assign(recipe, recipeData);
       await queryRunner.manager.save(Recipe, recipe);
 
@@ -224,6 +258,25 @@ export class RecipesService {
       // Remove recipe steps first
       await queryRunner.manager.delete(RecipeStep, { recipe_id: id });
 
+      // Remove image and video from Supabase Storage before deleting recipe
+      if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
+        try {
+          await this.supabaseStorageService.deleteImage(recipe.image_url);
+          console.log(`Deleted image from Supabase Storage: ${recipe.image_url}`);
+        } catch (error) {
+          console.error('Failed to delete image from Supabase Storage:', error);
+        }
+      }
+
+      if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
+        try {
+          await this.supabaseStorageService.deleteVideo(recipe.video_url);
+          console.log(`Deleted video from Supabase Storage: ${recipe.video_url}`);
+        } catch (error) {
+          console.error('Failed to delete video from Supabase Storage:', error);
+        }
+      }
+
       // Remove recipe
       await queryRunner.manager.remove(Recipe, recipe);
       
@@ -244,6 +297,17 @@ export class RecipesService {
       throw new Error('Recipe not found');
     }
 
+    // Check if there's an existing image on Supabase Storage and delete it first
+    if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
+      try {
+        await this.supabaseStorageService.deleteImage(recipe.image_url);
+        console.log(`Deleted existing image from Supabase Storage: ${recipe.image_url}`);
+      } catch (error) {
+        console.error('Failed to delete existing image from Supabase Storage:', error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
     const imageUrl = await this.supabaseStorageService.uploadImage(file, `recipes/${recipeId}`);
     recipe.image_url = imageUrl;
     return this.recipeRepository.save(recipe);
@@ -253,6 +317,17 @@ export class RecipesService {
     const recipe = await this.recipeRepository.findOne({ where: { id: recipeId } });
     if (!recipe) {
       throw new Error('Recipe not found');
+    }
+
+    // Check if there's an existing video on Supabase Storage and delete it first
+    if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
+      try {
+        await this.supabaseStorageService.deleteVideo(recipe.video_url);
+        console.log(`Deleted existing video from Supabase Storage: ${recipe.video_url}`);
+      } catch (error) {
+        console.error('Failed to delete existing video from Supabase Storage:', error);
+        // Continue with upload even if deletion fails
+      }
     }
 
     // Upload video to Supabase Storage
@@ -281,11 +356,42 @@ export class RecipesService {
     return recipe;
   }
 
+  async removeImage(recipeId: string) {
+    const recipe = await this.recipeRepository.findOne({ where: { id: recipeId } });
+    if (!recipe) {
+      throw new Error('Recipe not found');
+    }
+
+    if (recipe.image_url) {
+      // Remove image from Supabase Storage
+      await this.supabaseStorageService.deleteImage(recipe.image_url);
+      
+      // Clear image URL from recipe
+      recipe.image_url = null as any;
+      return this.recipeRepository.save(recipe);
+    }
+
+    return recipe;
+  }
+
   async getRecipeWithSteps(recipeId: string) {
     return this.recipeRepository.findOne({
       where: { id: recipeId },
       relations: ['user', 'steps'],
       order: { steps: { step_number: 'ASC' } }
     });
+  }
+
+  /**
+   * Check if a URL is from Supabase Storage
+   */
+  private isSupabaseStorageUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      // Check if the URL contains supabase.co domain and storage path
+      return urlObj.hostname.includes('supabase.co') && urlObj.pathname.includes('/storage/');
+    } catch {
+      return false;
+    }
   }
 }

@@ -379,22 +379,29 @@ body {
 
 // CSS cho thông báo thành công
 .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
-  background-color: var(--success-color);
-  color: var(--success-on-color);
+  background-color: var(--success);
+  color: var(--success-on);
   border-radius: 8px;
 }
 
 // CSS cho thông báo lỗi
 .mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
-  background-color: var(--error-color);
-  color: var(--error-on-color);
+  background-color: var(--error);
+  color: var(--error-on);
   border-radius: 8px;
 }
 
-// CSS cho thông báo cảnh báo (sử dụng màu cam phổ biến cho cảnh báo)
+// CSS cho thông báo cảnh báo
 .mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
-  background-color: #ff6f00; // Một màu cam tiêu chuẩn cho cảnh báo
-  color: #ffffff;
+  background-color: var(--warning);
+  color: var(--warning-on);
+  border-radius: 8px;
+}
+
+// CSS cho thông báo thông tin
+.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__surface {
+  background-color: var(--info);
+  color: var(--info-on);
   border-radius: 8px;
 }
 
@@ -613,6 +620,12 @@ Global scroll behavior for better UX:
 .bg-success-color { background-color: var(--success) !important; }
 .bg-error-color { background-color: var(--error) !important; }
 .bg-warning-color { background-color: var(--warning) !important; }
+
+// ===== SNACKBAR UTILITY CLASSES =====
+.snackbar-success { @extend .success-snackbar; }
+.snackbar-error { @extend .error-snackbar; }
+.snackbar-warning { @extend .warning-snackbar; }
+.snackbar-info { @extend .info-snackbar; }
 
 // ===== ADVANCED ANIMATIONS =====
 

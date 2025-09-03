@@ -68,7 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (!localStorage.getItem('loginSnackbarShown')) {
           this._snackBar.openFromComponent(SnackbarComponent, {
             duration: 3000,
-            panelClass: ['custom-snackbar', 'success-snackbar'],
+            panelClass: ['success-snackbar'],
             data: {
               message: 'Login successful!',
               icon: 'check_circle'

@@ -16,24 +16,46 @@ export const followReducer = createReducer(
   initialState,
 
   // Follow User
-  on(FollowActions.followUser, (state) => ({
-    ...state,
-    isLoading: true,
-    error: null
-  })),
+  on(FollowActions.followUser, (state) => {
+    console.log('Follow user action dispatched, new state:', {
+      ...state,
+      isLoading: true,
+      error: null
+    });
+    return {
+      ...state,
+      isLoading: true,
+      error: null
+    };
+  }),
 
-  on(FollowActions.followUserSuccess, (state, { follow }) => ({
-    ...state,
-    isLoading: false,
-    error: null,
-    isFollowing: true
-  })),
+  on(FollowActions.followUserSuccess, (state, { follow }) => {
+    console.log('Follow user success, new state:', {
+      ...state,
+      isLoading: false,
+      error: null,
+      isFollowing: true
+    });
+    return {
+      ...state,
+      isLoading: false,
+      error: null,
+      isFollowing: true
+    };
+  }),
 
-  on(FollowActions.followUserFailure, (state, { error }) => ({
-    ...state,
-    isLoading: false,
-    error
-  })),
+  on(FollowActions.followUserFailure, (state, { error }) => {
+    console.error('Follow user failure, new state:', {
+      ...state,
+      isLoading: false,
+      error
+    });
+    return {
+      ...state,
+      isLoading: false,
+      error
+    };
+  }),
 
   // Unfollow User
   on(FollowActions.unfollowUser, (state) => ({

@@ -5,10 +5,11 @@ import { CommentsController } from './comments.controller';
 import { Comment } from './entities/comment.entity/comment.entity';
 import { User } from '../auth/entities/user.entity';
 import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
+import { TimezoneService } from '../common/services/timezone.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Comment, User, Recipe])],
-  providers: [CommentsService],
+  providers: [CommentsService, TimezoneService],
   controllers: [CommentsController]
 })
 export class CommentsModule {}

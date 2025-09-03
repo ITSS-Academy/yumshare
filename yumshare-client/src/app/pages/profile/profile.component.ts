@@ -53,6 +53,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   currentUserId: string | null = null;
   isEditingBio = false;
 
+  // Pagination state
+  currentFollowersPage = 1;
+  currentFollowingPage = 1;
+  hasMoreFollowers = true;
+  hasMoreFollowing = true;
+  isLoadingMore = false;
+
   // Subscriptions management
   private subscriptions: Subscription[] = [];
   
@@ -371,6 +378,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // Method to load followers when tab is clicked
   loadFollowers() {
     if (this.currentUserId) {
+      this.currentFollowersPage = 1;
+      this.hasMoreFollowers = true;
       this.store.dispatch(FollowActions.getFollowers({
         userId: this.currentUserId,
         page: 1,
@@ -382,9 +391,37 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // Method to load following when tab is clicked
   loadFollowing() {
     if (this.currentUserId) {
+      this.currentFollowingPage = 1;
+      this.hasMoreFollowing = true;
       this.store.dispatch(FollowActions.getFollowing({
         userId: this.currentUserId,
         page: 1,
+        limit: 10
+      }));
+    }
+  }
+
+  // Method to load more followers
+  loadMoreFollowers() {
+    if (this.currentUserId && this.hasMoreFollowers && !this.isLoadingMore) {
+      this.isLoadingMore = true;
+      this.currentFollowersPage++;
+      this.store.dispatch(FollowActions.getFollowers({
+        userId: this.currentUserId,
+        page: this.currentFollowersPage,
+        limit: 10
+      }));
+    }
+  }
+
+  // Method to load more following
+  loadMoreFollowing() {
+    if (this.currentUserId && this.hasMoreFollowing && !this.isLoadingMore) {
+      this.isLoadingMore = true;
+      this.currentFollowingPage++;
+      this.store.dispatch(FollowActions.getFollowing({
+        userId: this.currentUserId,
+        page: this.currentFollowingPage,
         limit: 10
       }));
     }

@@ -67,6 +67,35 @@ export class RecipesController {
     return this.recipesService.update(id, updateRecipeDto);
   }
 
+  @Put(':id/with-files')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async updateWithFiles(
+    @Param('id') id: string,
+    @Body() updateRecipeDto: UpdateRecipeDto,
+    @UploadedFiles() files?: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  ) {
+    // Update basic recipe data first
+    await this.recipesService.update(id, updateRecipeDto);
+
+    // Update image if provided
+    if (files?.image?.[0]) {
+      await this.recipesService.uploadImage(id, files.image[0]);
+    }
+
+    // Update video if provided
+    if (files?.video?.[0]) {
+      await this.recipesService.uploadVideo(id, files.video[0]);
+    }
+
+    // Return updated recipe
+    return this.recipesService.findOne(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.recipesService.remove(id);

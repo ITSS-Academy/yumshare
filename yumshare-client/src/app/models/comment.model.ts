@@ -11,5 +11,11 @@ export interface Comment {
   // Relations
   user?: User;
   recipe?: Recipe;
+  
+  // Flattened user fields from backend response
+  username?: string;
+  email?: string;
+  phone?: string;
+  avatar_url?: string;
 }
     

@@ -37,8 +37,13 @@ export class Recipe {
   @Column({ type: 'text', nullable: true })
   difficulty: string;
 
+  @Column({ type: 'text', nullable: true })
+  country: string;
+
   @Column({ nullable: true })
   category_id: string;
+
+
 
   @ManyToOne(() => Category, category => category.recipes, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'category_id' })

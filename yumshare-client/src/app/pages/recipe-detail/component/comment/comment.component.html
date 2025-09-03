@@ -1,33 +1,133 @@
 <div class="comments-section">
   <h1>Comments</h1>
 
-  <!-- Input giống YouTube -->
-  <div class="comment-input">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <input type="text" placeholder="Add your comment..." />
-    <button class="send-btn">➤</button>
-  </div>
+  <!-- Comment Input Section -->
+  @if (currentUser$ | async; as currentUser) {
+    <div class="comment-input">
+      <img [src]="currentUser.photoURL || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
+      <div class="input-container">
+        <input 
+          type="text" 
+          placeholder="Add your comment..." 
+          [(ngModel)]="newCommentContent"
+          (keyup.enter)="onSubmitComment()"
+          [disabled]="operationLoading$ | async" />
+        <div class="input-actions">
+          <button 
+            class="cancel-btn" 
+            (click)="newCommentContent = ''"
+            [disabled]="!newCommentContent?.trim()">
+            Cancel
+          </button>
+          <button 
+            class="comment-btn" 
+            (click)="onSubmitComment()"
+            [disabled]="!newCommentContent?.trim() || (operationLoading$ | async)">
+            Comment
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Show login prompt if not logged in -->
+  @if (!(currentUser$ | async)) {
+    <div class="login-prompt">
+      <p>Please <a href="/login">login</a> to add a comment</p>
+    </div>
+  }
 
   <hr>
 
-  <!-- Comment giống Facebook -->
-  <div class="comment">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <div class="comment-body">
-      <span class="user-name">User Name</span>
-      <p>Contrary to popular belief, Lorem Ipsum is not simply random text.
-        It has roots in a piece of classical Latin literature from 45 BC, making it over
-        <strong>2000 years old</strong>.
-      </p>
+  <!-- Loading State -->
+  @if (commentsLoading$ | async) {
+    <div class="loading-comments">
+      <div class="loading-spinner"></div>
+      <p>Loading comments...</p>
     </div>
-  </div>
+  }
 
-  <div class="comment">
-    <img src="avatar.png" alt="user avatar" class="avatar">
-    <div class="comment-body">
-      <span class="user-name">Another User</span>
-      <p>This is another sample comment styled like Facebook.</p>
+  <!-- Error State -->
+  @if (commentsError$ | async; as error) {
+    <div class="error-comments">
+      <p>Error loading comments: {{ error }}</p>
+      <button (click)="onRetry()" class="retry-btn">Retry</button>
     </div>
-  </div>
+  }
+
+  <!-- Comments List -->
+  @for (comment of comments$ | async; track comment.id) {
+    <div class="comment">
+      <img [src]="comment.user?.avatar_url || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
+      <div class="comment-body">
+        <div class="comment-header">
+          <div class="user-info">
+            <span class="user-name">{{ getUserDisplayName(comment.user) }}</span>
+            <span class="comment-time">{{ getTimeAgo(comment.created_at) }}</span>
+          </div>
+          
+          <!-- YouTube-style more_vert menu -->
+          @if (currentUser$ | async; as currentUser) {
+            @if (canEdit(comment, currentUser) || canDelete(comment, currentUser)) {
+              <div class="comment-menu">
+                <button class="menu-btn" (click)="toggleMenu(comment.id)">
+                  <span class="material-icons">more_vert</span>
+                </button>
+                
+                <!-- Dropdown Menu -->
+                @if (activeMenuId === comment.id) {
+                  <div class="dropdown-menu">
+                    @if (canEdit(comment, currentUser)) {
+                      <button class="menu-item edit-item" (click)="onEditComment(comment)">
+                        <span class="material-icons">edit</span>
+                        Edit
+                      </button>
+                    }
+                    @if (canDelete(comment, currentUser)) {
+                      <button class="menu-item delete-item" (click)="onDeleteComment(comment.id)">
+                        <span class="material-icons">delete</span>
+                        Delete
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+        
+        <!-- Edit Mode -->
+        @if (editingCommentId === comment.id) {
+          <div class="edit-mode">
+            <textarea 
+              [(ngModel)]="editingContent" 
+              rows="3"
+              placeholder="Edit your comment...">
+            </textarea>
+            <div class="edit-actions">
+              <button (click)="onSaveEdit()" class="save-btn">Save</button>
+              <button (click)="onCancelEdit()" class="cancel-btn">Cancel</button>
+            </div>
+          </div>
+        }
+        
+        <!-- Display Mode -->
+        @if (editingCommentId !== comment.id) {
+          <div class="comment-content">
+            <p>{{ comment.content }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- No Comments -->
+  @if (!(commentsLoading$ | async) && !(commentsError$ | async) && (comments$ | async)?.length === 0) {
+    <div class="no-comments">
+      <div class="no-comments-icon">
+        <span class="material-icons">chat_bubble_outline</span>
+      </div>
+      <p>No comments yet. Be the first to comment!</p>
+    </div>
+  }
 </div>
-

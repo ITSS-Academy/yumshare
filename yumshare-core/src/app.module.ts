@@ -31,7 +31,11 @@ import { CommonModule } from './common/common.module';
       password: process.env.DB_PASS || '',
       database: process.env.DB_NAME || '',
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false, // Disable auto-sync to prevent schema conflicts
+      // Add timezone configuration
+      extra: {
+        timezone: 'Asia/Ho_Chi_Minh',
+      },
     }),
     
     CommonModule,

@@ -19,7 +19,7 @@ export const routes: Routes = [
       )
   },
   {
-    path: 'edit-recipe',
+    path: 'edit-recipe/:id',
     loadComponent: () =>
       import('./pages/edit-recipe/edit-recipe.component').then(
         (m) => m.EditRecipeComponent
@@ -40,7 +40,14 @@ export const routes: Routes = [
       )
   },
   {
-    path: 'recipe-detail',
+    path: 'recipe-detail/:id',
+    loadComponent: () =>
+      import('./pages/recipe-detail/recipe-detail.component').then(
+        (m) => m.RecipeDetailComponent
+      )
+  },
+  {
+    path: 'recipe/:id',
     loadComponent: () =>
       import('./pages/recipe-detail/recipe-detail.component').then(
         (m) => m.RecipeDetailComponent

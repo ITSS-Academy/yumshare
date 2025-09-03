@@ -172,6 +172,36 @@ export class SupabaseStorageService {
   }
 
   /**
+   * Delete image file from Supabase Storage
+   */
+  async deleteImage(imageUrl: string): Promise<void> {
+    try {
+      // Extract file path from URL
+      const url = new URL(imageUrl);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part === this.bucketName);
+      
+      if (bucketIndex === -1) {
+        return; // Not a Supabase storage URL, skip deletion
+      }
+
+      const filePath = pathParts.slice(bucketIndex + 1).join('/');
+
+      const { error } = await this.supabase.storage
+        .from(this.bucketName)
+        .remove([filePath]);
+
+      if (error) {
+        console.error('Error deleting image from Supabase:', error.message);
+      } else {
+        console.log(`Successfully deleted image from Supabase: ${imageUrl}`);
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error.message);
+    }
+  }
+
+  /**
    * Get signed URL for private video access
    */
   async getSignedUrl(videoUrl: string, expiresIn: number = 3600): Promise<string> {

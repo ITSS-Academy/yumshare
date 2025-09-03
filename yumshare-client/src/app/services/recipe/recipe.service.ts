@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { Recipe } from '../../models/recipe.model';
 import { Category } from '../../models/category.model';
 import { RecipeStep } from '../../models/recipe-step.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class RecipeService {
   constructor(private http: HttpClient) {}
 
   // Get all categories
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/categories`);
+  getCategories(): Observable<PaginatedResponse<Category>> {
+    return this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`);
   }
 
   // Create recipe with files
@@ -44,13 +45,18 @@ export class RecipeService {
   }
 
   // Get recipe by ID
-  getRecipe(id: string): Observable<Recipe> {
+  getRecipeById(id: string): Observable<Recipe> {
     return this.http.get<Recipe>(`${this.apiUrl}/recipes/${id}`);
   }
 
   // Update recipe
   updateRecipe(id: string, recipe: Partial<Recipe>): Observable<Recipe> {
     return this.http.put<Recipe>(`${this.apiUrl}/recipes/${id}`, recipe);
+  }
+
+  // Update recipe with files
+  updateRecipeWithFiles(id: string, recipeData: FormData): Observable<Recipe> {
+    return this.http.put<Recipe>(`${this.apiUrl}/recipes/${id}/with-files`, recipeData);
   }
 
   // Delete recipe

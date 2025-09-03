@@ -10,12 +10,19 @@ import { provideStore } from '@ngrx/store';
 import { authReducer } from './ngrx/auth/auth.reducer';
 import { followReducer } from './ngrx/follow/follow.reducer';
 import { chatReducer } from './ngrx/chat/chat.reducer';
-import * as authEffects from '../app/ngrx/auth/auth.effect';
+import * as authEffects from './ngrx/auth/auth.effects';
 import * as followEffects from '../app/ngrx/follow/follow.effect';
+import * as recipeEffects from './ngrx/recipe/recipe.effects';
+import * as categoryEffects from './ngrx/category/category.effects';
+import * as commentEffects from './ngrx/comment/comment.effects';
+
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
+import { categoryReducer } from './ngrx/category/category.reducer';
+import { commentReducer } from './ngrx/comment/comment.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,11 +40,14 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
-    provideEffects([authEffects, followEffects]),
+    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects]),
     provideStore({
       auth: authReducer,
       follow: followReducer,
       chat: chatReducer,
+      recipe: recipeReducer,
+      category: categoryReducer,
+      comment: commentReducer,
     }),
     provideFirebaseApp(() =>
       initializeApp({

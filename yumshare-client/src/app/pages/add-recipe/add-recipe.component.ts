@@ -1,7 +1,15 @@
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { Store } from '@ngrx/store';
@@ -13,17 +21,26 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
-import { ShareModule } from '../../shares/share.module';
 
 @Component({
   selector: 'app-add-recipe',
-  standalone: true,
+  templateUrl: './add-recipe.component.html',
   imports: [
-  ShareModule,
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatCardModule,
+    MatDividerModule,
+    MatStepperModule,
     SafePipe
   ],
-  templateUrl: './add-recipe.component.html',
-  styleUrl: './add-recipe.component.scss'
+  styleUrls: ['./add-recipe.component.scss']
 })
 export class AddRecipeComponent implements OnInit, OnDestroy {
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
@@ -41,6 +58,9 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
   countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
   currentUser: AuthModel | null = null;
+  
+  // Grid Multi-step properties
+  currentStep: number = 1;
 
   // Subscriptions management
   private subscriptions: Subscription[] = [];
@@ -58,7 +78,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       total_cooking_time: [90, Validators.required], // Default 1 hour 30 minutes
       difficulty: ['Medium', Validators.required],
       country: ['Vietnam', Validators.required],
-      category_id: ['', Validators.required],
+      category_id: ['', Validators.required], // Will be set after categories are loaded
       ingredients: this.fb.array([
         this.fb.control('', Validators.required)
       ]),
@@ -67,7 +87,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       ])
     });
   }
-  
+
   ngOnDestroy(): void {
     // Unsubscribe from all subscriptions
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
@@ -75,16 +95,13 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Debug: Test API connectivity
+    console.log('API URL:', `${this.recipeService['apiUrl']}/categories`);
     this.loadCategories();
     this.loadCurrentUser();
     
-    // Fallback: ensure categories are loaded after a short delay
-    setTimeout(() => {
-      if (!this.categories || this.categories.length === 0) {
-        console.log('Fallback: Loading mock categories');
-        this.categories = this.getMockCategories();
-      }
-    }, 1000);
+    // Ensure default values are set
+    this.ensureDefaultValues();
   }
 
   private createStepFormGroup(stepNumber: number): FormGroup {
@@ -134,7 +151,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   removeIngredient(index: number) {
     if (this.ingredients.length > 1) {
-      this.ingredients.removeAt(index);
+    this.ingredients.removeAt(index);
     }
   }
 
@@ -145,7 +162,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   removeStep(index: number) {
     if (this.steps.length > 1) {
-      this.steps.removeAt(index);
+    this.steps.removeAt(index);
       // Reorder step numbers
       this.steps.controls.forEach((control, i) => {
         control.patchValue({ step_number: i + 1 });
@@ -162,8 +179,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       reader.readAsDataURL(file);
     }
   }
-
-
 
   onVideoSelected(event: any) {
     const file = event.target.files[0];
@@ -232,68 +247,91 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     return this.extractYoutubeVideoId(url) !== null;
   }
 
-  async loadCategories() {
-    try {
-      // Try to load from API first
-      const categoriesSubscription = this.recipeService.getCategories().subscribe({
-        next: (response) => {
-          // Handle paginated response format
-          let categories: Category[] = [];
-          if (response && typeof response === 'object' && 'data' in response) {
-            const paginatedResponse = response as any;
-            if (Array.isArray(paginatedResponse.data)) {
-              categories = paginatedResponse.data;
-              console.log('Extracted categories from paginated response:', categories.length);
-            }
-          } else if (response && Array.isArray(response)) {
-            categories = response as Category[];
-          }
-          
-          // If API returns valid data, use it
-          if (categories && categories.length > 0) {
-            this.categories = categories;
-          } else {
-            // Use mock data if API returns empty or invalid data
-            this.categories = this.getMockCategories();
-            console.log('Using mock categories:', this.categories.length);
-            this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
-          }
-          
-          // Ensure categories is always an array
-          if (!Array.isArray(this.categories)) {
-            this.categories = this.getMockCategories();
-            console.log('Fallback to mock categories:', this.categories.length);
-          }
-          
-          console.log('Final categories count:', this.categories.length);
-        },
-        error: (error) => {
-          console.error('Error loading categories from API:', error);
-          // Use mock data if API fails
-          this.categories = this.getMockCategories();
-          console.log('Using mock categories due to API error:', this.categories.length);
-          this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
+    loadCategories() {
+    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+      next: (response: any) => {
+        console.log('Full API response:', response);
+        console.log('Response type:', typeof response);
+        console.log('Is array:', Array.isArray(response));
+        
+        let categories: Category[] = [];
+        
+        // Handle different response formats
+        if (Array.isArray(response)) {
+          // Direct array response
+          categories = response;
+          console.log('Direct array response detected');
+        } else if (response && response.data && Array.isArray(response.data)) {
+          // Paginated response with data property
+          categories = response.data;
+          console.log('Paginated response detected');
+        } else if (response && typeof response === 'object') {
+          console.log('Object response keys:', Object.keys(response));
         }
-      });
-      
-      // Add subscription to array
-      this.subscriptions.push(categoriesSubscription);
-      
-    } catch (error) {
-      console.error('Error in loadCategories:', error);
-      // Use mock data if API fails
-      this.categories = this.getMockCategories();
-      console.log('Using mock categories due to error:', this.categories.length);
-      this.snackBar.open('Using mock categories data', 'Close', { duration: 3000 });
-    }
+        
+        if (categories && categories.length > 0) {
+          this.categories = categories;
+          console.log('Categories loaded successfully:', categories.length);
+          console.log('First category:', categories[0]);
+          
+          // Always set the first category as default since form starts empty
+          this.recipeForm.patchValue({ category_id: categories[0].id });
+          console.log('Set default category:', categories[0].id);
+        } else {
+          console.warn('No categories found from API');
+          console.warn('Response was:', response);
+          
+          // Fallback: Use basic categories for testing
+          this.categories = [
+            { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
+            { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
+            { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
+          ];
+          console.log('Using fallback categories');
+          this.snackBar.open('Using fallback categories - Check API connection', 'Close', { duration: 5000 });
+          
+          // Set default category for fallback
+          this.recipeForm.patchValue({ category_id: 'fallback-1' });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading categories from API:', error);
+        console.error('Error details:', error);
+        
+        // Fallback: Use basic categories for testing when API fails
+        this.categories = [
+          { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
+          { id: '2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
+          { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
+        ];
+        console.log('Using fallback categories due to API error');
+        this.snackBar.open('API Error - Using fallback categories', 'Close', { duration: 5000 });
+        
+        // Set default category for error fallback
+        this.recipeForm.patchValue({ category_id: 'fallback-1' });
+      }
+    });
+    
+    // Add subscription to array
+    this.subscriptions.push(categoriesSubscription);
   }
 
   loadCurrentUser() {
     const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
-      if (authState.currentUser && authState.currentUser.uid) {
+      console.log('Auth state received:', authState);
+      console.log('Current user from state:', authState?.currentUser);
+      
+      if (authState && authState.currentUser && authState.currentUser.uid) {
         this.currentUser = authState.currentUser;
+        console.log('User loaded successfully:', {
+          displayName: this.currentUser.displayName,
+          email: this.currentUser.email,
+          uid: this.currentUser.uid,
+          photoURL: this.currentUser.photoURL
+        });
       } else {
         this.currentUser = null;
+        console.log('No user found in auth state');
       }
     });
     
@@ -301,145 +339,15 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     this.subscriptions.push(authSubscription);
   }
 
-  private getMockCategories(): Category[] {
-    return [
-      {
-        id: '1',
-        name: 'Vietnamese Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '2',
-        name: 'Thai Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        id: '3',
-        name: 'Japanese Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '4',
-        name: 'Chinese Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '5',
-        name: 'Korean Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '6',
-        name: 'Italian Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '7',
-        name: 'French Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '8',
-        name: 'Mexican Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '9',
-        name: 'Indian Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '10',
-        name: 'Mediterranean Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '11',
-        name: 'American Cuisine',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '12',
-        name: 'Desserts & Sweets',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '13',
-        name: 'Beverages & Drinks',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '14',
-        name: 'Vegetarian & Vegan',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      },
-      {
-        id: '15',
-        name: 'Quick & Easy',
-        image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
-        is_active: true,
-        sort_order: 1,
-        created_at: new Date(),
-        updated_at: new Date()
-      }
-    ];
+  private ensureDefaultValues() {
+    // Ensure category has a default value after categories are loaded
+    if (this.categories.length > 0 && !this.recipeForm.get('category_id')?.value) {
+      this.recipeForm.patchValue({ category_id: this.categories[0].id });
+      console.log('EnsureDefaultValues: Set category to', this.categories[0].id);
+    }
   }
+
+
 
   formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
@@ -474,6 +382,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         formData.append('servings', recipeData.servings.toString());
         formData.append('total_cooking_time', recipeData.total_cooking_time.toString());
         formData.append('difficulty', recipeData.difficulty);
+        formData.append('country', recipeData.country);
         formData.append('category_id', recipeData.category_id);
         formData.append('user_id', this.currentUser?.uid || 'anonymous-user'); // Get from auth store
         
@@ -483,30 +392,30 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         // Add steps as JSON string
         formData.append('steps', JSON.stringify(recipeData.steps));
         
-                          // Add image (file only)
-         console.log('Selected image:', this.selectedImage);
-         
-         if (this.selectedImage) {
-           formData.append('image', this.selectedImage);
-           console.log('Added image file to FormData');
-         } else {
-           console.log('No image added to FormData');
-         }
-         
-         // Add video (file or YouTube URL)
-         console.log('Video type:', this.videoType);
-         console.log('YouTube URL:', this.youtubeUrl);
-         console.log('Selected video:', this.selectedVideo);
-         
-         if (this.videoType === 'file' && this.selectedVideo) {
-           formData.append('video', this.selectedVideo);
-           console.log('Added video file to FormData');
-         } else if (this.videoType === 'youtube' && this.youtubeUrl) {
-           formData.append('video_url', this.youtubeUrl);
-           console.log('Added video_url to FormData:', this.youtubeUrl);
-         } else {
-           console.log('No video added to FormData');
-         }
+        // Add image (file only)
+        console.log('Selected image:', this.selectedImage);
+        
+        if (this.selectedImage) {
+          formData.append('image', this.selectedImage);
+          console.log('Added image file to FormData');
+        } else {
+          console.log('No image added to FormData');
+        }
+        
+        // Add video (file or YouTube URL)
+        console.log('Video type:', this.videoType);
+        console.log('YouTube URL:', this.youtubeUrl);
+        console.log('Selected video:', this.selectedVideo);
+        
+        if (this.videoType === 'file' && this.selectedVideo) {
+          formData.append('video', this.selectedVideo);
+          console.log('Added video file to FormData');
+        } else if (this.videoType === 'youtube' && this.youtubeUrl) {
+          formData.append('video_url', this.youtubeUrl);
+          console.log('Added video_url to FormData:', this.youtubeUrl);
+        } else {
+          console.log('No video added to FormData');
+        }
 
         console.log("FormData contents:");
         for (let [key, value] of formData.entries()) {
@@ -515,7 +424,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
         // Send to backend
         const response = await this.recipeService.createRecipeWithFiles(formData).toPromise();
-      console.log("Response", response)
+        console.log("Response", response);
         this.snackBar.open('Recipe created successfully!', 'Close', { duration: 3000 });
         this.resetForm();
         
@@ -556,18 +465,68 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     this.ingredients.push(this.fb.control('', Validators.required));
     this.steps.push(this.createStepFormGroup(1));
     
-         // Reset files
-     this.selectedImage = null;
-     this.selectedVideo = null;
-     this.imagePreview = null;
-     this.videoPreview = null;
-     this.youtubeUrl = '';
-     this.videoType = 'file';
+    // Reset files
+    this.selectedImage = null;
+    this.selectedVideo = null;
+    this.imagePreview = null;
+    this.videoPreview = null;
+    this.youtubeUrl = '';
+    this.videoType = 'file';
+    
+    // Reset step
+    this.currentStep = 1;
   }
 
   onDelete() {
     if (confirm('Are you sure you want to delete this recipe? All unsaved changes will be lost.')) {
       this.resetForm();
     }
+  }
+
+  // Grid Multi-step navigation methods
+  nextStep() {
+    if (this.currentStep < 4) {
+      this.currentStep++;
+      this.scrollToTop();
+    }
+  }
+
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.scrollToTop();
+    }
+  }
+
+  private scrollToTop() {
+    // Smooth scroll to top of the page with offset for sticky header
+    const headerHeight = 120; // Approximate height of progress header
+    window.scrollTo({
+      top: headerHeight,
+      behavior: 'smooth'
+    });
+    
+    // Alternative: scroll to the add-recipe container with proper offset
+    setTimeout(() => {
+      const container = document.querySelector('.add-recipe');
+      if (container) {
+        container.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 200);
+  }
+
+  onImageClick() {
+    this.imageInput.nativeElement.click();
+  }
+
+  setVideoType(type: 'file' | 'youtube') {
+    this.videoType = type;
+    // Reset video preview when switching types
+    this.videoPreview = null;
+    this.selectedVideo = null;
+    this.youtubeUrl = '';
   }
 }

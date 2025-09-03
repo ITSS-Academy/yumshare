@@ -1,1 +1,138 @@
-<p>my-recipe works!</p>
+<div class="content-container">
+  <div class="my-recipe-header">
+    <h1>My Recipes</h1>
+    <p>Here, you can manage all the recipes you've posted. Feel free to click on any recipe to edit or delete it. You
+      can also view comments and feedback from others. Don’t forget to keep your recipes updated and share your culinary
+      adventures with the community!</p>
+  </div>
+
+  <div class="sort-and-category">
+    <div class="difficulty">
+      <button mat-button [matMenuTriggerFor]="Difficulty">
+        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <mat-menu #Difficulty="matMenu">
+        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+      </mat-menu>
+    </div>
+
+    <div class="category">
+      <button mat-button [matMenuTriggerFor]="Category">
+        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <mat-menu #Category="matMenu">
+        <button mat-menu-item [matMenuTriggerFor]="Meat" (click)="setCategory('Meat')">Meat</button>
+        <button mat-menu-item [matMenuTriggerFor]="SeaFood" (click)="setCategory('Sea food')">Sea food</button>
+        <button mat-menu-item [matMenuTriggerFor]="Vegetable" (click)="setCategory('Vegetable')">Vegetable</button>
+        <button mat-menu-item [matMenuTriggerFor]="Drinks" (click)="setCategory('Drinks')">Drinks</button>
+      </mat-menu>
+
+      <mat-menu #Meat="matMenu">
+        <button mat-menu-item (click)="setCategory('Beef')">Beef</button>
+        <button mat-menu-item (click)="setCategory('Pork')">Pork</button>
+        <button mat-menu-item (click)="setCategory('Chicken')">Chicken</button>
+        <button mat-menu-item (click)="setCategory('Sheep')">Sheep</button>
+      </mat-menu>
+
+      <mat-menu #SeaFood="matMenu">
+        <button mat-menu-item (click)="setCategory('Fish')">Fish</button>
+        <button mat-menu-item (click)="setCategory('Octopus')">Octopus</button>
+        <button mat-menu-item (click)="setCategory('Crab')">Crab</button>
+        <button mat-menu-item (click)="setCategory('Shrimp')">Shrimp</button>
+      </mat-menu>
+
+      <mat-menu #Vegetable="matMenu">
+        <button mat-menu-item (click)="setCategory('Salad')">Salad</button>
+        <button mat-menu-item (click)="setCategory('Potato')">Potato</button>
+        <button mat-menu-item (click)="setCategory('Carrot')">Carrot</button>
+        <button mat-menu-item (click)="setCategory('Tomato')">Tomato</button>
+        <button mat-menu-item (click)="setCategory('Beans')">Beans</button>
+      </mat-menu>
+
+      <mat-menu #Drinks="matMenu">
+        <button mat-menu-item (click)="setCategory('Juices')">Juices</button>
+        <button mat-menu-item (click)="setCategory('Milk')">Milk</button>
+        <button mat-menu-item (click)="setCategory('Tea')">Tea</button>
+        <button mat-menu-item (click)="setCategory('Smoothie')">Smoothie</button>
+        <button mat-menu-item (click)="setCategory('Coffee')">Coffee</button>
+      </mat-menu>
+
+    </div>
+  </div>
+
+  <div class="container">
+    @for (recipe of displayedRecipes; track recipe) {
+    <div class="recipe-card">
+      <div class="recipe-image">
+        <img src="" alt="Recipe Image">
+      </div>
+      <div class="recipe-content">
+        <div class="recipe-header">
+          <div class="name-and-author">
+            <h3 class="recipe-title">{{ recipe.name }}</h3>
+            <p class="recipe-author">by {{ recipe.author }}</p>
+          </div>
+          <div class="example-button-row">
+            <div class="example-flex-container">
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="More actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="onEditRecipe(recipe)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item class="delete-menu-item" (click)="onDeleteRecipe(recipe)">
+                  <mat-icon class="delete-icon">delete</mat-icon>
+                  <span class="delete-text">Delete</span>
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+        </div>
+        <div class="recipe-description">
+          <p>{{ recipe.description }}</p>
+        </div>
+        <div class="recipe-footer">
+          <span class="recipe-date">{{ recipe.date }}</span>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="pages-navigation">
+    <div class="example-button-row">
+      <div class="example-flex-container">
+        <div class="example-button-container">
+          <button mat-mini-fab aria-label="First page" (click)="goToFirst()"
+            [disabled]="pageIndex === 0">&lt;&lt;</button>
+          <button mat-mini-fab aria-label="Previous page" (click)="goToPrev()"
+            [disabled]="pageIndex === 0">&lt;</button>
+          @if (pageNumbers[0] > 0) {
+          <button mat-mini-fab (click)="goToPage(0)">1</button>
+          @if (pageNumbers[0] > 1) {
+          <span>...</span>
+          }
+          }
+          @for (page of pageNumbers; track page) {
+          <button mat-mini-fab [class.active]="page === pageIndex" (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+          }
+          @if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) { @if (pageNumbers[pageNumbers.length - 1] <
+            totalPages - 2) { <span>...</span>
+            }
+            <button mat-mini-fab (click)="goToPage(totalPages - 1)">{{ totalPages }}</button>
+            }
+            <button mat-mini-fab aria-label="Next page" (click)="goToNext()"
+              [disabled]="pageIndex === totalPages - 1">&gt;</button>
+            <button mat-mini-fab aria-label="Last page" (click)="goToLast()"
+              [disabled]="pageIndex === totalPages - 1">&gt;&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

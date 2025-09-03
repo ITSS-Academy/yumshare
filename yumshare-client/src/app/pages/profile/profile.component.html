@@ -157,6 +157,21 @@
                   <p>No followers yet</p>
                 </li>
               }
+              
+              <!-- Load More Button for Followers -->
+              @if (hasMoreFollowers && (followers$ | async)?.length > 0) {
+                <li class="load-more-container">
+                  <button 
+                    class="load-more-btn"
+                    (click)="loadMoreFollowers()"
+                    [disabled]="isLoadingMore">
+                    @if (isLoadingMore) {
+                      <span class="loading-spinner"></span>
+                    }
+                    Load More Followers
+                  </button>
+                </li>
+              }
             </ul>
           </div>
         }
@@ -185,6 +200,21 @@
               @if (!(following$ | async) || (following$ | async)?.length === 0) {
                 <li class="no-data">
                   <p>Not following anyone yet</p>
+                </li>
+              }
+              
+              <!-- Load More Button for Following -->
+              @if (hasMoreFollowing && (following$ | async)?.length > 0) {
+                <li class="load-more-container">
+                  <button 
+                    class="load-more-btn"
+                    (click)="loadMoreFollowing()"
+                    [disabled]="isLoadingMore">
+                    @if (isLoadingMore) {
+                      <span class="loading-spinner"></span>
+                    }
+                    Load More Following
+                  </button>
                 </li>
               }
             </ul>

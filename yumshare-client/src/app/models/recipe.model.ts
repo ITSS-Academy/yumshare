@@ -13,6 +13,7 @@ export interface Recipe {
   total_cooking_time: number;
   servings: number;
   difficulty?: string;
+  country?: string;
   category_id?: string;
   created_at: Date;
   updated_at: Date;

@@ -63,6 +63,10 @@ export class CreateRecipeDto {
   difficulty?: Difficulty;
 
   @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
   @IsUUID()
   category_id?: string;
   
