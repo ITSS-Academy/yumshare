@@ -61,3 +61,5 @@ yumshare-core/src/config/private-key.json
 **/service-account.json
 **/credentials.json
 **/config/*.json"yumshare-core/src/config/private-key.json" 
+"yumshare-core/src/config/private-key.json" 
+"src/config/*.json" 
