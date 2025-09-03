@@ -21,7 +21,7 @@
   <div class="results-grid">
     @for (item of displayedResults; track item.title) {
       <div class="container-card">
-        <mat-card class="dish-card" appearance="outlined">
+        <mat-card class="dish-card" appearance="outlined" (click)="navigateToDetail(item)">
           <img mat-card-image [src]="item.image" alt="Dish Image">
           <mat-card-content>
             <h2 class="dish-title">{{ item.title }}</h2>

@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, ExtraOptions } from '@angular/router';
 
 export const routes: Routes = [
   {
@@ -47,7 +47,7 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'recipe-detail',
+    path: 'recipe-detail/:id',
     loadComponent: () =>
       import('./pages/recipe-detail/recipe-detail.component').then(
         (m) => m.RecipeDetailComponent
@@ -72,3 +72,4 @@ export const routes: Routes = [
   },
   { path: '**', redirectTo: 'home' },
 ];
+

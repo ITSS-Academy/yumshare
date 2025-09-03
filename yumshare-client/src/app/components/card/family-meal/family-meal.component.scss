@@ -8,6 +8,10 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory; // quan trọng
+  user-select: none;  // không cho select text
+  -webkit-user-select: none; // Safari
+  -ms-user-select: none;
+  cursor: default;
 
   .dish-card {
     max-width: 275px;
@@ -28,9 +32,14 @@
       font-size: 18px;
       font-weight: 600;
       margin: 8px 0 4px;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
     }
 
     .dish-description {
+      cursor: default;
       font-size: 14px;
       color: #555;
       margin: 0 0 12px;
@@ -40,6 +49,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       min-height: 40px;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
     }
 
     .rating {
@@ -63,6 +75,10 @@
       .user-info {
         display: flex;
         gap: 8px;
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        cursor: default;
 
         .avatar {
           width: 30px;
@@ -103,7 +119,7 @@
 
     &:hover,
     &:focus-within {
-      transform: translateY(-6px) scale(1.01); // Slight scale, not too large
+      transform: none; // Slight scale, not too large
       z-index: 2;
     }
   }
@@ -125,7 +141,7 @@
 
 // ===== Actions =====
 .actions mat-icon {
-  cursor: pointer;
+  cursor: default;
   font-size: 22px;
   transition: color 0.2s;
 

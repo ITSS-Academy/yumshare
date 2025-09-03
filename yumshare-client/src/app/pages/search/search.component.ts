@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
@@ -6,6 +6,8 @@ import {MatIconButton} from '@angular/material/button';
 import {NgClass, NgFor, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ShareModule} from '../../shares/share.module';
 
 @Component({
   selector: 'app-search',
@@ -15,20 +17,21 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardContent,
     MatCardActions,
     MatIcon,
-    MatIconButton,
     MatCardImage,
     MatIconModule,
     MatButtonModule,
-    NgClass
+    ShareModule
+
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
   keyword: string = '';
   selectedCategory: string = '';
   categories: string[] = ['Salads', 'Soups', 'Desserts'];
   displayedResults: any[] = [];
+  // category: string = '';
 
   results = [
     {
@@ -120,8 +123,12 @@ export class SearchComponent {
     item.isFavorite = !item.isFavorite;
   }
 
-  constructor() {
+  constructor(private activatedRouter: ActivatedRoute
+  , private router: Router) {
     this.setupPagination();
+  }
+
+  ngOnInit() {
   }
 
   onSearch() {
@@ -141,5 +148,9 @@ export class SearchComponent {
       return matchKeyword && matchCategory;
     });
     this.setupPagination();
+  }
+
+  navigateToDetail(item: any) {
+    this.router.navigate(['../recipe-detail', item.title], { relativeTo: this.activatedRouter }).then();
   }
 }

@@ -1,10 +1,9 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import { Component } from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
-import {ShareModule} from '../../shares/share.module';
-import { Router, ActivatedRoute } from '@angular/router';
+import {ShareModule} from '../../../shares/share.module';
 
 @Component({
-  selector: 'app-card',
+  selector: 'app-nutritious-meals',
     imports: [
         MatCard,
         MatCardActions,
@@ -12,11 +11,10 @@ import { Router, ActivatedRoute } from '@angular/router';
         MatCardImage,
         ShareModule
     ],
-  templateUrl: './card.component.html',
-  styleUrl: './card.component.scss'
+  templateUrl: './nutritious-meals.component.html',
+  styleUrl: './nutritious-meals.component.scss'
 })
-export class CardComponent {
-
+export class NutritiousMealsComponent {
   cardData = [
     {
       id: 1,
@@ -105,14 +103,8 @@ export class CardComponent {
     },
   ];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
-
   // ❤️ toggle tim
   toggleFavorite(item: any) {
     item.isFavorite = !item.isFavorite;
-  }
-
-  goToDetail(item: any) {
-    this.router.navigate(['../recipe-detail', item.id], { relativeTo: this.activatedRoute }).then();
   }
 }

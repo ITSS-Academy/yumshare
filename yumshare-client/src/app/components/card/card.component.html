@@ -1,7 +1,7 @@
 <div class="container-card">
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
-      <mat-card class="dish-card" appearance="outlined">
+      <mat-card class="dish-card" appearance="outlined" (click)="goToDetail(item)">
         <img mat-card-image [src]="item.imageUrl" alt="Dish Image">
         <mat-card-content>
           <h2 class="dish-title">{{ item.title }}</h2>

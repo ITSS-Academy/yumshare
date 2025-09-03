@@ -1,13 +1,20 @@
 import { Component } from '@angular/core';
+import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
 import {ShareModule} from '../../../shares/share.module';
 
 @Component({
-  selector: 'app-appetizers',
-  imports: [ShareModule],
-  templateUrl: './appetizers.component.html',
-  styleUrl: './appetizers.component.scss'
+  selector: 'app-refreshing-dishes',
+    imports: [
+        MatCard,
+        MatCardActions,
+        MatCardContent,
+        MatCardImage,
+        ShareModule
+    ],
+  templateUrl: './refreshing-dishes.component.html',
+  styleUrl: './refreshing-dishes.component.scss'
 })
-export class AppetizersComponent {
+export class RefreshingDishesComponent {
   cardData = [
     {
       id: 1,
@@ -96,7 +103,6 @@ export class AppetizersComponent {
     },
   ];
 
-  // ❤️ toggle tim
   toggleFavorite(item: any) {
     item.isFavorite = !item.isFavorite;
   }

@@ -1,9 +1,9 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import { Component } from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
 import {ShareModule} from '../../../shares/share.module';
 
 @Component({
-  selector: 'app-desserts',
+  selector: 'app-family-meal',
     imports: [
         MatCard,
         MatCardActions,
@@ -11,10 +11,10 @@ import {ShareModule} from '../../../shares/share.module';
         MatCardImage,
         ShareModule
     ],
-  templateUrl: './desserts.component.html',
-  styleUrl: './desserts.component.scss'
+  templateUrl: './family-meal.component.html',
+  styleUrl: './family-meal.component.scss'
 })
-export class DessertsComponent {
+export class FamilyMealComponent {
   cardData = [
     {
       id: 1,
@@ -107,52 +107,4 @@ export class DessertsComponent {
   toggleFavorite(item: any) {
     item.isFavorite = !item.isFavorite;
   }
-
-  // @ViewChild('todayCarousel', {static: false}) todayCarousel!: ElementRef;
-  //
-  // private scrollAnimation: number | null = null;
-  // private scrollTarget: number | null = null;
-  //
-  // smoothScroll(element: HTMLElement, distance: number, duration: number) {
-  //   if (this.scrollAnimation) {
-  //     cancelAnimationFrame(this.scrollAnimation);
-  //     this.scrollAnimation = null;
-  //   }
-  //   const start = element.scrollLeft;
-  //   // Nếu đang cuộn, lấy vị trí hiện tại làm điểm bắt đầu
-  //   const current = element.scrollLeft;
-  //   const target = current + distance;
-  //   this.scrollTarget = target;
-  //   const startTime = performance.now();
-  //
-  //   const animate = (now: number) => {
-  //     const elapsed = now - startTime;
-  //     const progress = Math.min(elapsed / duration, 1);
-  //     // easeOutCubic cho cảm giác mượt hơn
-  //     const ease = 1 - Math.pow(1 - progress, 3);
-  //
-  //     element.scrollLeft = current + (target - current) * ease;
-  //
-  //     // Nếu người dùng cuộn tay, dừng animation
-  //     if (Math.abs(element.scrollLeft - target) < 1 || progress >= 1) {
-  //       element.scrollLeft = target;
-  //       this.scrollAnimation = null;
-  //       this.scrollTarget = null;
-  //     } else {
-  //       this.scrollAnimation = requestAnimationFrame(animate);
-  //     }
-  //   };
-  //
-  //   this.scrollAnimation = requestAnimationFrame(animate);
-  // }
-  //
-  // nextCard(carousel: HTMLElement) {
-  //   const wrapper = carousel.querySelector('.container-card') as HTMLElement;
-  //   this.smoothScroll(wrapper, 300, 600); // tăng thời gian để mượt hơn
-  // }
-  //
-  // prevCard(carousel: HTMLElement) {
-  //   const wrapper = carousel.querySelector('.container-card') as HTMLElement;
-  //   this.smoothScroll(wrapper, -300, 600);
-  // }
 }

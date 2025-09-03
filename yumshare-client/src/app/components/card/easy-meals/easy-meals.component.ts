@@ -1,22 +1,20 @@
 import { Component } from '@angular/core';
-import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
-import {MatIconModule} from '@angular/material/icon';
+import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
 import {ShareModule} from '../../../shares/share.module';
 
 @Component({
-  selector: 'app-vegan-dishes',
-  imports: [
-    MatCard,
-    MatCardActions,
-    MatCardContent,
-    MatCardImage,
-    MatIconModule,
-    ShareModule
-  ],
-  templateUrl: './vegan-dishes.component.html',
-  styleUrl: './vegan-dishes.component.scss'
+  selector: 'app-easy-meals',
+    imports: [
+        MatCard,
+        MatCardActions,
+        MatCardContent,
+        MatCardImage,
+        ShareModule,
+    ],
+  templateUrl: './easy-meals.component.html',
+  styleUrl: './easy-meals.component.scss'
 })
-export class VeganDishesComponent {
+export class EasyMealsComponent {
   cardData = [
     {
       id: 1,

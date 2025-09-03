@@ -1,5 +1,5 @@
-import { Component, HostBinding, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component, HostBinding, HostListener, OnInit} from '@angular/core';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { CommonModule } from '@angular/common';
@@ -21,7 +21,7 @@ import {FooterComponent} from './components/footer/footer.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   @HostBinding('class.sidebar-mini') isMini = false;
   @HostBinding('class.sidebar-closed') isClosed = false;
 
@@ -33,7 +33,8 @@ export class AppComponent {
       auth: AuthState
     }>,
     private dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private router: Router
   ) {
     this.updateSidebarMode();
 
@@ -107,5 +108,7 @@ export class AppComponent {
     if (this.isMobile) {
       this.isClosed = true;
     }
+  }
+  ngOnInit() {
   }
 }

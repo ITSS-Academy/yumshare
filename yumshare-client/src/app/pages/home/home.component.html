@@ -13,14 +13,14 @@
 
   <h3>Recipe Categories</h3>
   <div class="container-image-categories">
-    <h2 class="dish-type-1"><span>Appetizers</span></h2>
-    <h2 class="dish-type-2"><span>Main courses</span></h2>
-    <h2 class="dish-type-3"><span>Side dishes</span></h2>
-    <h2 class="dish-type-4"><span>Soups</span></h2>
-    <h2 class="dish-type-5"><span>Desserts</span></h2>
-    <h2 class="dish-type-6"><span>Beverages</span></h2>
-    <h2 class="dish-type-7"><span>Snacks</span></h2>
-    <h2 class="dish-type-8"><span>Vegan dishes</span></h2>
+    <h2 class="dish-type-1" (click)="categoryClick('Appetizers')"><span>Appetizers</span></h2>
+    <h2 class="dish-type-2" (click)="categoryClick('Main courses')"><span>Main courses</span></h2>
+    <h2 class="dish-type-3" (click)="categoryClick('Side dishes')"><span>Side dishes</span></h2>
+    <h2 class="dish-type-4" (click)="categoryClick('Soups')"><span>Soups</span></h2>
+    <h2 class="dish-type-5" (click)="categoryClick('Desserts')"><span>Desserts</span></h2>
+    <h2 class="dish-type-6" (click)="categoryClick('Beverages')"><span>Beverages</span></h2>
+    <h2 class="dish-type-7" (click)="categoryClick('Snacks')"><span>Snacks</span></h2>
+    <h2 class="dish-type-8" (click)="categoryClick('Vegan dishes')"><span>Vegan dishes</span></h2>
   </div>
 
   <div class="section-header">
@@ -42,7 +42,7 @@
     </button>
   </div>
   <div class="container-card">
-    <app-desserts></app-desserts>
+    <app-family-meal></app-family-meal>
   </div>
 
   <div class="section-header">
@@ -53,7 +53,7 @@
     </button>
   </div>
   <div class="container-card">
-    <app-beverages></app-beverages>
+    <app-refreshing-dishes></app-refreshing-dishes>
   </div>
 
   <div class="section-header">
@@ -64,7 +64,7 @@
     </button>
   </div>
   <div class="container-card">
-    <app-appetizers></app-appetizers>
+    <app-nutritious-meals></app-nutritious-meals>
   </div>
 
   <div class="section-header">
@@ -75,6 +75,6 @@
     </button>
   </div>
   <div class="container-card">
-    <app-vegan-dishes></app-vegan-dishes>
+    <app-easy-meals></app-easy-meals>
   </div>
 </div>
