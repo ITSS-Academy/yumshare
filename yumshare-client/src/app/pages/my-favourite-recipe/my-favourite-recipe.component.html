@@ -1,1 +1,140 @@
-<p>my-favourite-recipe works!</p>
+<div class="content-container">
+  <div class="my-recipe-header">
+    <h1>My Favourite Recipes</h1>
+    <p>Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your
+      favourites. Enjoy exploring and saving your best-loved dishes!</p>
+  </div>
+
+  <div class="sort-and-category">
+    <div class="difficulty">
+      <button mat-button [matMenuTriggerFor]="Difficulty">
+        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <mat-menu #Difficulty="matMenu">
+        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+      </mat-menu>
+    </div>
+
+    <div class="category">
+      <button mat-button [matMenuTriggerFor]="Category">
+        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <mat-menu #Category="matMenu">
+        <button mat-menu-item [matMenuTriggerFor]="Meat" (click)="setCategory('Meat')">Meat</button>
+        <button mat-menu-item [matMenuTriggerFor]="SeaFood" (click)="setCategory('Sea food')">Sea food</button>
+        <button mat-menu-item [matMenuTriggerFor]="Vegetable" (click)="setCategory('Vegetable')">Vegetable</button>
+        <button mat-menu-item [matMenuTriggerFor]="Drinks" (click)="setCategory('Drinks')">Drinks</button>
+      </mat-menu>
+
+      <mat-menu #Meat="matMenu">
+        <button mat-menu-item (click)="setCategory('Beef')">Beef</button>
+        <button mat-menu-item (click)="setCategory('Pork')">Pork</button>
+        <button mat-menu-item (click)="setCategory('Chicken')">Chicken</button>
+        <button mat-menu-item (click)="setCategory('Sheep')">Sheep</button>
+      </mat-menu>
+
+      <mat-menu #SeaFood="matMenu">
+        <button mat-menu-item (click)="setCategory('Fish')">Fish</button>
+        <button mat-menu-item (click)="setCategory('Octopus')">Octopus</button>
+        <button mat-menu-item (click)="setCategory('Crab')">Crab</button>
+        <button mat-menu-item (click)="setCategory('Shrimp')">Shrimp</button>
+      </mat-menu>
+
+      <mat-menu #Vegetable="matMenu">
+        <button mat-menu-item (click)="setCategory('Salad')">Salad</button>
+        <button mat-menu-item (click)="setCategory('Potato')">Potato</button>
+        <button mat-menu-item (click)="setCategory('Carrot')">Carrot</button>
+        <button mat-menu-item (click)="setCategory('Tomato')">Tomato</button>
+        <button mat-menu-item (click)="setCategory('Beans')">Beans</button>
+      </mat-menu>
+
+      <mat-menu #Drinks="matMenu">
+        <button mat-menu-item (click)="setCategory('Juices')">Juices</button>
+        <button mat-menu-item (click)="setCategory('Milk')">Milk</button>
+        <button mat-menu-item (click)="setCategory('Tea')">Tea</button>
+        <button mat-menu-item (click)="setCategory('Smoothie')">Smoothie</button>
+        <button mat-menu-item (click)="setCategory('Coffee')">Coffee</button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <div class="container">
+    @for (recipe of displayedRecipes; track recipe) {
+    <div class="recipe-card">
+      <!-- Bên trái: ảnh món ăn -->
+      <div class="recipe-image">
+        <img src="" alt="Recipe Image">
+      </div>
+
+      <!-- Bên phải: nội dung -->
+      <div class="recipe-content">
+        <!-- Trên: tiêu đề + tác giả -->
+        <div class="recipe-header">
+          <div class="name-and-author">
+            <h3 class="recipe-title">{{ recipe.name }}</h3>
+            <p class="recipe-author">by {{ recipe.author }}</p>
+          </div>
+          <div class="example-button-row">
+            <div class="example-flex-container">
+              <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(recipe)">
+                <mat-icon [ngClass]="{
+                      'filled': recipe.isFavourite,
+                      'outlined': !recipe.isFavourite,
+                      'heartbeat': recipe.heartbeat
+                    }">
+                  {{ recipe.isFavourite ? 'favorite' : 'favorite_border' }}
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giữa: mô tả -->
+        <div class="recipe-description">
+          <p>{{ recipe.description }}</p>
+        </div>
+
+        <!-- Dưới: ngày đăng -->
+        <div class="recipe-footer">
+          <span class="recipe-date">{{ recipe.date }}</span>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="pages-navigation">
+    <div class="example-button-row">
+      <div class="example-flex-container">
+        <div class="example-button-container">
+          <button mat-mini-fab aria-label="First page" (click)="goToFirst()"
+            [disabled]="pageIndex === 0">&lt;&lt;</button>
+          <button mat-mini-fab aria-label="Previous page" (click)="goToPrev()"
+            [disabled]="pageIndex === 0">&lt;</button>
+          @if (pageNumbers[0] > 0) {
+          <button mat-mini-fab (click)="goToPage(0)">1</button>
+          @if (pageNumbers[0] > 1) {
+          <span>...</span>
+          }
+          }
+          @for (page of pageNumbers; track page) {
+          <button mat-mini-fab [class.active]="page === pageIndex" (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+          }
+          @if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) { @if (pageNumbers[pageNumbers.length - 1] <
+            totalPages - 2) { <span>...</span>
+            }
+            <button mat-mini-fab (click)="goToPage(totalPages - 1)">{{ totalPages }}</button>
+            }
+            <button mat-mini-fab aria-label="Next page" (click)="goToNext()"
+              [disabled]="pageIndex === totalPages - 1">&gt;</button>
+            <button mat-mini-fab aria-label="Last page" (click)="goToLast()"
+              [disabled]="pageIndex === totalPages - 1">&gt;&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
