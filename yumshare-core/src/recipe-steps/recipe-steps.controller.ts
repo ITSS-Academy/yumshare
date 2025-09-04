@@ -1,4 +1,6 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UseGuards } from '@nestjs/common';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RecipeStepsService } from './recipe-steps.service';
 import { CreateRecipeStepDto } from './dto/create-recipe-step.dto';
@@ -6,6 +8,7 @@ import { UpdateRecipeStepDto } from './dto/update-recipe-step.dto';
 import { SupabaseStorageService } from '../common/services/supabase-storage.service';
 
 @Controller('recipe-steps')
+@UseGuards(RateLimitGuard)
 export class RecipeStepsController {
   constructor(
     private readonly recipeStepsService: RecipeStepsService,
@@ -69,7 +72,7 @@ export class RecipeStepsController {
     const imageUrl = await this.supabaseStorageService.uploadImage(file, `recipe-steps/${stepId}`);
     
     // Update step with image URL
-    return this.recipeStepsService.uploadStepImage(stepId, imageUrl);
+    return this.recipeStepsService.uploadStepImage(stepId, imageUrl.mainUrl);
   }
 
   @Post(':stepId/video')

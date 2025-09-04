@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity/comment.entity';
@@ -9,6 +9,7 @@ import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
 import { ListResult } from '../common/types/list-result.type';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
 import { TimezoneService } from '../common/services/timezone.service';
+import { OptimizedQueryService } from '../common/services/optimized-query.service';
 
 @Injectable()
 export class CommentsService {
@@ -20,7 +21,10 @@ export class CommentsService {
     @InjectRepository(Recipe)
     private readonly recipeRepository: Repository<Recipe>,
     private readonly timezoneService: TimezoneService,
+    private readonly optimizedQueryService: OptimizedQueryService,
   ) {}
+
+  private readonly logger = new Logger(CommentsService.name);
 
   async create(createCommentDto: CreateCommentDto) {
     const user = await this.userRepository.findOne({ where: { id: createCommentDto.user_id } });
@@ -43,25 +47,32 @@ export class CommentsService {
   }
 
   async findAll(queryOpts: QueryOptsDto = {}): Promise<ListResult<Comment>> {
-    const { page = 1, size = 20, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const { page = 1, size = 20 } = queryOpts;
     
-    const skip = (page - 1) * size;
-    
-    const [comments, total] = await this.commentRepository.findAndCount({
-      relations: ['user', 'recipe'],
-      order: { [orderBy]: order },
-      skip,
-      take: size,
-    });
+    // Use optimized query service for better performance
+    const result = await this.optimizedQueryService.executeOptimizedQuery(
+      this.commentRepository,
+      queryOpts,
+      {
+        relations: ['user', 'recipe'],
+        maxRelations: 2,
+        selectFields: ['id', 'content', 'created_at', 'updated_at'],
+        enableCache: false
+      }
+    );
 
     // Transform timestamps to ensure proper timezone handling
-    const transformedComments = comments.map(comment => ({
+    const transformedComments = result.data.map(comment => ({
       ...comment,
       created_at: this.timezoneService.toVietnamTime(comment.created_at),
       updated_at: this.timezoneService.toVietnamTime(comment.updated_at)
     })) as Comment[];
 
-    return new ListResult(transformedComments, total, page, size);
+    const listResult = new ListResult(transformedComments, result.total, result.page, result.size);
+    
+    this.logger.log(`Comments fetched: ${result.data.length} results, total: ${result.total}, page: ${result.page}`);
+    
+    return listResult;
   }
 
   findOne(id: string) {

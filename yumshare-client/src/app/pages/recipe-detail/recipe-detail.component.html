@@ -1,8 +1,11 @@
 <!-- Loading State -->
 @if (recipeLoading$ | async) {
-  <div class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading recipe...</p>
+  <div class="recipe-loading-container">
+    <app-loading 
+      size="large"
+      message="Loading recipe..."
+      centerType="center-container">
+    </app-loading>
   </div>
 }
 
@@ -16,7 +19,12 @@
         </div>
         <div class="mieu-ta">
           <div class="trai">
-            <img class="hinh-mon-an" [src]="recipe.image_url || 'assets/default-recipe.jpg'" [alt]="recipe.title">
+            <div appLazyImage 
+                 [appLazyImage]="recipe.image_url || 'assets/default-recipe.jpg'"
+                 [appLazyImageOptions]="{ quality: 0.9, maxWidth: 800, maxHeight: 600, generateThumbnail: true, thumbnailSize: 400 }"
+                 [appLazyImagePriority]="true"
+                 class="hinh-mon-an-container">
+            </div>
           </div>
           <div class="phai">
             <p class="mieu-ta-monan">{{ recipe.description }}</p>
@@ -80,7 +88,11 @@
                 <div class="step-detail">
                   <p class="cooking">{{ step.description }}</p>
                   @if (step.image_url) {
-                    <img [src]="step.image_url" [alt]="'Step ' + (i + 1)" class="step-image">
+                    <div appLazyImage 
+                         [appLazyImage]="step.image_url"
+                         [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                         class="step-image-container">
+                    </div>
                   }
                 </div>
               </div>

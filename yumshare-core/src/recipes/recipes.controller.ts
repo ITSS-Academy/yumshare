@@ -1,15 +1,19 @@
-import { Controller, Post, Get, Param, Delete, Body,  UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query, UploadedFiles, Put } from '@nestjs/common';
+import { Controller, Post, Get, Param, Delete, Body,  UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query, UploadedFiles, Put, Req, UseGuards } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto/update-recipe.dto';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 
 @Controller('recipes')
+@UseGuards(RateLimitGuard)
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Post()
+  @RateLimit(RateLimits.STRICT)
   async create(@Body() createRecipeDto: CreateRecipeDto) {
     const created = await this.recipesService.create(createRecipeDto);
     return this.recipesService.findOne(created!.id);
@@ -40,6 +44,7 @@ export class RecipesController {
   }
 
   @Get()
+  @RateLimit(RateLimits.STANDARD)
   findAll(@Query() queryOpts: QueryOptsDto) {
     return this.recipesService.findAll(queryOpts);
   }
@@ -57,14 +62,20 @@ export class RecipesController {
     return this.recipesService.findByCategory(categoryId, queryOpts);
   }
 
+  @Get(':id/check-edit-permission')
+  async checkEditPermission(@Param('id') id: string, @Req() req: any) {
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
+    return this.recipesService.checkEditPermission(id, req.user.uid);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
-    return this.recipesService.update(id, updateRecipeDto);
+  update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto, @Req() req: any) {
+    return this.recipesService.update(id, updateRecipeDto, req.user.uid);
   }
 
   @Put(':id/with-files')
@@ -77,10 +88,11 @@ export class RecipesController {
   async updateWithFiles(
     @Param('id') id: string,
     @Body() updateRecipeDto: UpdateRecipeDto,
-    @UploadedFiles() files?: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @Req() req: any,
+    @UploadedFiles() files?: { image?: Express.Multer.File[]; video?: Express.Multer.File[] }
   ) {
     // Update basic recipe data first
-    await this.recipesService.update(id, updateRecipeDto);
+    await this.recipesService.update(id, updateRecipeDto, req.user.uid);
 
     // Update image if provided
     if (files?.image?.[0]) {
@@ -97,8 +109,8 @@ export class RecipesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recipesService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.recipesService.remove(id, req.user.uid);
   }
 
   @Post(':id/video')

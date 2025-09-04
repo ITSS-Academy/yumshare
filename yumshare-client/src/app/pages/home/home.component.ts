@@ -8,6 +8,7 @@ import {AppetizersComponent} from '../../components/card/appetizers/appetizers.c
 import {VeganDishesComponent} from '../../components/card/vegan-dishes/vegan-dishes.component';
 
 
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -18,8 +19,8 @@ import {VeganDishesComponent} from '../../components/card/vegan-dishes/vegan-dis
     DessertsComponent,
     BeveragesComponent,
     AppetizersComponent,
-    VeganDishesComponent
-
+    VeganDishesComponent,
+  
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

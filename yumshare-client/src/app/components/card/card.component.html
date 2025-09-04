@@ -46,7 +46,11 @@
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
       <mat-card class="dish-card" appearance="outlined">
-        <img mat-card-image [src]="item.imageUrl" alt="Dish Image">
+        <div appLazyImage 
+             [appLazyImage]="item.imageUrl"
+             [appLazyImageOptions]="{ quality: 0.8, maxWidth: 400, maxHeight: 300, generateThumbnail: true, thumbnailSize: 150 }"
+             class="dish-image-container">
+        </div>
         <mat-card-content>
           <h2 class="dish-title">{{ item.title }}</h2>
           <p class="dish-description">
@@ -66,9 +70,11 @@
         <!-- ❤️ Footer -->
         <mat-card-actions class="card-footer">
           <div class="user-info">
-            <img class="avatar"
-                 src="https://images-platform.99static.com//5_oXjjUVqCOk-6snmE7s_cdr-dI=/229x0:1041x812/fit-in/590x590/99designs-contests-attachments/47/47482/attachment_47482097"
-                 alt="User avatar">
+            <div appLazyImage 
+                 [appLazyImage]="'https://images-platform.99static.com//5_oXjjUVqCOk-6snmE7s_cdr-dI=/229x0:1041x812/fit-in/590x590/99designs-contests-attachments/47/47482/attachment_47482097'"
+                 [appLazyImageOptions]="{ quality: 0.7, maxWidth: 40, maxHeight: 40, generateThumbnail: false }"
+                 class="avatar-container">
+            </div>
             <span class="username">AnhVu-1904</span>
           </div>
           <div class="actions">

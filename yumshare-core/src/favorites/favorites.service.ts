@@ -5,6 +5,8 @@ import { Favorite } from './entities/favorite.entity';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { User } from '../auth/entities/user.entity';
 import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
+import { QueryOptsDto } from '../common/dto/query-opts.dto';
+import { ListResult } from '../common/types/list-result.type';
 
 @Injectable()
 export class FavoritesService {
@@ -57,12 +59,20 @@ export class FavoritesService {
     return { message: 'Recipe removed from favorites successfully' };
   }
 
-  async getUserFavorites(userId: string) {
-    return this.favoriteRepository.find({
+  async getUserFavorites(userId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Favorite>> {
+    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    
+    const skip = (page - 1) * size;
+    
+    const [favorites, total] = await this.favoriteRepository.findAndCount({
       where: { user_id: userId },
-      relations: ['recipe'],
-      select: ['id', 'created_at', 'recipe_id']
+      relations: ['recipe', 'recipe.user', 'recipe.category'],
+      order: { [orderBy]: order },
+      skip,
+      take: size,
     });
+    
+    return new ListResult(favorites, total, page, size);
   }
 
   async isInFavorites(userId: string, recipeId: string): Promise<boolean> {
@@ -75,4 +85,5 @@ export class FavoritesService {
   async getFavoriteCount(userId: string): Promise<number> {
     return this.favoriteRepository.count({ where: { user_id: userId } });
   }
+  
 }

@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
+import { LoadingComponent } from '../../components/loading/loading.component';
 
 import { CommentComponent } from './component/comment/comment.component';
 import { Recipe } from '../../models/recipe.model';
@@ -42,7 +44,8 @@ import { selectCommentsByRecipe, selectCommentsByRecipeLoading, selectCommentsBy
     MatProgressSpinnerModule,
     FormsModule,
     SafePipe,
-    MatProgressSpinnerModule
+    LazyImageDirective,
+    LoadingComponent
   ],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'

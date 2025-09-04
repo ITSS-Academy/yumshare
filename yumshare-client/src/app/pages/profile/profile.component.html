@@ -20,9 +20,11 @@
 
   <!-- Loading State -->
   @if (isLoading$ | async) {
-    <div class="loading-state">
-      <p>Loading profile...</p>
-    </div>
+    <app-loading 
+      size="large"
+      message="Loading profile..."
+      centerType="center-viewport">
+    </app-loading>
   }
 
   <!-- Error State -->
@@ -119,9 +121,11 @@
 
       <!-- Loading State -->
       @if (followIsLoading$ | async) {
-        <div class="loading-state">
-          <p>Loading...</p>
-        </div>
+        <app-loading 
+          size="medium"
+          message="Loading followers..."
+          centerType="default">
+        </app-loading>
       }
 
       <!-- Error State -->

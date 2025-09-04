@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Comment } from '../../models/comment.model';
-import { CreateCommentDto, UpdateCommentDto, CommentQueryParams } from '../../services/comment.service';
+import { CreateCommentDto, UpdateCommentDto, CommentQueryParams } from '../../services/comment/comment.service';
 
 // Load Comments
 export const loadComments = createAction(
