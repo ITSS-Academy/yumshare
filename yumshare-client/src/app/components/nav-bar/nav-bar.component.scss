@@ -69,7 +69,7 @@
 
 .actions button[mat-icon-button]:hover mat-icon,
 .actions button[mat-icon-button]:focus mat-icon {
-  color: #8DC63F !important;
+  color: var(--primary) !important;
   transform: scale(1.1);
 }
 
@@ -95,7 +95,7 @@
 
 /* Nút Add new recipe */
 .btn-add {
-  background-color: #8dc63f;
+  background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -106,14 +106,14 @@
   transition: 0.2s ease;
 }
 .btn-add:hover {
-  background-color: #7bb132;
+  background-color: var(--primary-dark);
 }
 
 /* Nút Login */
 .btn-login {
   background-color: white;
-  color: #8dc63f;
-  border: 1.5px solid #8dc63f;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 14px;

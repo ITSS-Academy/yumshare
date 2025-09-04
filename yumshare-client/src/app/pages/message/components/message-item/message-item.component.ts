@@ -24,7 +24,7 @@ export interface Message {
 })
 export class MessageItemComponent {
   @Input() message!: Message;
-  @Input() currentUserId!: string;
+  @Input() currentUserId: string = 'me';
 
   get isOwnMessage(): boolean {
     return this.message.sender.id === this.currentUserId;

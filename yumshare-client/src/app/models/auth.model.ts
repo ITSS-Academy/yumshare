@@ -4,4 +4,5 @@ export interface AuthModel   {
   photoURL: string;
   uid: string;
   phoneNumber?: string | null;
+  bio?: string | null;
 }

@@ -1,59 +1,59 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Message, MessageItemComponent } from '../../../../components/message-item';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {MatButton, MatButtonModule} from '@angular/material/button';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInput} from '@angular/material/input';
+import { Chat } from '../../../../models/chat.model';
+import { User } from '../../../../models/user.model';
+import { ChatMessage } from '../../../../models/chat-message.model';
+import { ChatMessageSkeletonComponent } from '../../../../components/skeleton/chat-message-skeleton.component';
+import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
 
 @Component({
   selector: 'app-chat-window',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe],
   templateUrl: './chat-window.component.html',
-  imports: [
-    MessageItemComponent,
-    FormsModule,
-    MatFormFieldModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInput
-  ],
   styleUrls: ['./chat-window.component.scss']
 })
 export class ChatWindowComponent {
-  @Input() user: any;
+  @Input() chat: Chat | null = null;
+  @Input() messages: ChatMessage[] = [];
+  @Input() currentUser: User | null = null;
+  @Input() otherUser: User | null = null;
+  @Input() messagesLoading: boolean = false;
+
   @Output() back = new EventEmitter<void>();
-  currentUserId = 'me';
+  @Output() sendMessage = new EventEmitter<string>();
+  @Output() typing = new EventEmitter<void>();
 
-  messages: Message[] = [
-    {
-      id: '1',
-      content: 'Xin chào!',
-      sender: { id: 'u1', name: 'Nguyễn Văn A', avatar: '' },
-      timestamp: new Date()
-    },
-    {
-      id: '2',
-      content: 'Chào bạn, khỏe không?',
-      sender: { id: 'me', name: 'Tôi', avatar: '' },
-      timestamp: new Date()
-    }
-  ];
+  newMessage: string = '';
 
-  newMessage = '';
-
-  sendMessage() {
-    if (this.newMessage.trim()) {
-      this.messages.push({
-        id: (this.messages.length + 1).toString(),
-        content: this.newMessage,
-        sender: { id: this.currentUserId, name: 'Tôi', avatar: '' },
-        timestamp: new Date()
-      });
-      this.newMessage = '';
-    }
+  // Helpers to avoid showing "null" avatar/name
+  safeAvatar(url?: string): string {
+    return url && url !== 'null' && url !== 'undefined' && url.trim() !== ''
+      ? url
+      : 'assets/default-avatar.png';
   }
 
   onBack() {
     this.back.emit();
+  }
+
+  onTyping() {
+    this.typing.emit();
+  }
+
+  onKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage.emit(this.newMessage);
+      this.newMessage = '';
+    }
+  }
+
+  sendMessageHandler() {
+    if (this.newMessage.trim()) {
+      this.sendMessage.emit(this.newMessage);
+      this.newMessage = '';
+    }
   }
 }

@@ -9,8 +9,7 @@ import { Router, ActivatedRoute } from '@angular/router';
         MatCard,
         MatCardActions,
         MatCardContent,
-        MatCardImage,
-        ShareModule
+        ShareModule,
     ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss'

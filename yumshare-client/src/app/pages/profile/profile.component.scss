@@ -1,80 +1,3 @@
-.home-root {
-  display: flex;
-  flex-direction: row;
-  min-height: 100vh;
-  background: #fafafa;
-}
-
-.navbar-wrapper {
-  width: 100%;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #fff;
-  border-top-left-radius: 24px;
-  overflow: hidden;
-}
-
-.home-body {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
-}
-
-.main-sidebar {
-  flex: 0 0 200px;
-  min-width: 150px;
-  background: #fff;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
-  z-index: 2;
-}
-
-.content-area {
-  flex: 1 1 auto;
-  padding: 0 16px;
-  min-width: 0;
-}
-
-/* Responsive cho sidebar */
-@media (max-width: 768px) {
-  .home-body {
-    flex-direction: row;
-  }
-  .main-sidebar {
-    flex: 0 0 120px;
-    min-width: 100px;
-  }
-  .content-area {
-    padding: 8px;
-  }
-}
-
-@media (max-width: 425px) {
-  .main-sidebar {
-    flex: 0 0 80px;
-    min-width: 80px;
-  }
-  .content-area {
-    padding: 4px;
-  }
-}
-
-@media (max-width: 375px) {
-  .main-sidebar {
-    flex: 0 0 60px;
-    min-width: 60px;
-  }
-}
-
-@media (max-width: 320px) {
-  .main-sidebar {
-    flex: 0 0 50px;
-    min-width: 50px;
-  }
-}
 
 /* Profile Edit */
 .profile-edit {
@@ -175,6 +98,66 @@
 
 .dialog-actions .cancel:hover {
   background: #ddd;
+}
+
+/* Bio Section Styles */
+.bio-section {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.bio-input {
+  flex: 1;
+  min-height: 60px;
+  max-height: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: text;
+}
+
+.bio-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.bio-input:hover {
+  border-color: #007bff;
+}
+
+.bio-input::placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.edit-icon {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.edit-icon:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.edit-icon img {
+  transition: transform 0.2s;
+}
+
+.edit-icon:hover img {
+  transform: scale(1.1);
 }
 
 @keyframes fadeIn {
@@ -337,46 +320,228 @@
 .followers ul, .following ul {
   list-style: none;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Custom scrollbar cho webkit browsers */
+.followers ul::-webkit-scrollbar,
+.following ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.followers ul::-webkit-scrollbar-track,
+.following ul::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.followers ul::-webkit-scrollbar-thumb,
+.following ul::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.followers ul::-webkit-scrollbar-thumb:hover,
+.following ul::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .social-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  gap: 12px;
+  padding: 16px;
   background: #fff;
-  border-radius: 8px;
-  transition: background 0.2s;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  flex-shrink: 0;
 }
 
 .social-item:hover {
-  background: #f0f2f5;
+  background: #f8f9fa;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  border-color: #e9ecef;
 }
 
 .small-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #f8f9fa;
+  transition: border-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.social-item:hover .small-avatar {
+  border-color: #007bff;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  min-width: 0; /* Cho phép text bị truncate */
 }
 
 .user-name {
   font-weight: 600;
-  color: #333;
-  font-size: 14px;
+  color: #1a1a1a;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-bio {
-  font-size: 12px;
-  color: #65676b;
+  font-size: 13px;
+  color: #6c757d;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-actions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.follow-btn,
+.unfollow-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.follow-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.unfollow-btn {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.unfollow-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+  border-color: #adb5bd;
+}
+
+.follow-btn:disabled,
+.unfollow-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  font-style: italic;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Load More Button */
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.load-more-btn {
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.load-more-btn:hover {
+  background: linear-gradient(135deg, #495057, #343a40);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+  transform: translateY(-1px);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.load-more-btn .loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Responsive cho form */
@@ -404,7 +569,30 @@
     gap: 4px;
   }
   .followers ul, .following ul {
-    grid-template-columns: 1fr;
+    gap: 8px;
+    max-height: 350px;
+  }
+  
+  .social-item {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .small-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .follow-btn,
+  .unfollow-btn {
+    padding: 6px 16px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+  
+  .load-more-btn {
+    padding: 10px 24px;
+    font-size: 13px;
   }
 }
 

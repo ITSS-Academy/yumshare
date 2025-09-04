@@ -3,136 +3,275 @@
 
 @use "@angular/material" as mat;
 
+// ===== Z-INDEX HIERARCHY SYSTEM =====
+/*
+Z-Index Scale:
+1-10: Base elements (headers, nav, footers)
+11-20: Overlays and dropdowns
+21-30: Modals and dialogs
+31-40: Tooltips and popovers
+41-50: Notifications and toasts
+51-60: Mobile overlays
+61-70: Fixed elements (hamburger menu, floating buttons)
+71-80: Critical overlays (loading, error states)
+81-90: Reserved
+91-100: Emergency (errors, alerts)
+*/
+
+// Z-Index Variables
+:root, :host {
+  --z-base: 1;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-modal: 30;
+  --z-tooltip: 40;
+  --z-notification: 50;
+  --z-mobile-overlay: 60;
+  --z-fixed: 70;
+  --z-critical: 80;
+  --z-emergency: 100;
+}
+
+.dark {
+  --z-base: 1;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-modal: 30;
+  --z-tooltip: 40;
+  --z-notification: 50;
+  --z-mobile-overlay: 60;
+  --z-fixed: 70;
+  --z-critical: 80;
+  --z-emergency: 100;
+}
+
 // Global reset and layout styles
 
-
-
-/* Light Theme */
+/* Light Theme - Unified Color System */
 :root, :host {
+  // ===== PRIMARY COLORS =====
+  --primary: #8DC63F;
+  --primary-dark: #7FC520;
+  --primary-light: #92da37;
+  --primary-lighter: #e8f5d8;
+  --primary-lightest: #f0f8e6;
 
-   --success-color: #3f6900;
-  --success-on-color: #ffffff;
+  // ===== SEMANTIC COLORS =====
+  --success: #4CAF50;
+  --success-dark: #388E3C;
+  --success-light: #81C784;
+  --success-on: #ffffff;
 
-  --error-color: #ba1a1a;
-  --error-on-color: #ffffff;
+  --error: #F44336;
+  --error-dark: #D32F2F;
+  --error-light: #EF5350;
+  --error-on: #ffffff;
+
+  --warning: #FF9800;
+  --warning-dark: #F57C00;
+  --warning-light: #FFB74D;
+  --warning-on: #ffffff;
+
+  --info: #2196F3;
+  --info-dark: #1976D2;
+  --info-light: #64B5F6;
+  --info-on: #ffffff;
+
+  // ===== TEXT COLORS =====
+  --text-primary: #1c1c1a;      // Main text
+  --text-secondary: #555;       // Secondary text
+  --text-muted: #666;           // Muted text
+  --text-light: #999;           // Light text
+  --text-disabled: #ccc;        // Disabled text
+
+  // ===== SURFACE COLORS =====
+  --background: #fcf9f6;        // Page background
+  --surface: #ffffff;           // Card/surface background
+  --surface-variant: #f8faf5;   // Alternative surface
+  --surface-hover: #f5f5f5;     // Hover state
+  --surface-active: #eeeeee;    // Active state
+
+  // ===== BORDER COLORS =====
+  --border: #e0e0e0;            // Default border
+  --border-light: #f0f0f0;      // Light border
+  --border-dark: #bdbdbd;       // Dark border
+
+  // ===== SHADOW COLORS =====
+  --shadow-light: rgba(0, 0, 0, 0.04);
+  --shadow-medium: rgba(0, 0, 0, 0.08);
+  --shadow-strong: rgba(0, 0, 0, 0.12);
+  --shadow-heavy: rgba(0, 0, 0, 0.16);
 
   @include mat.theme-overrides((
-    primary: #3f6900,
-    on-primary: #ffffff,
-    primary-container: #adf752,
-    on-primary-container: #102000,
-    inverse-primary: #92da37,
-    primary-fixed: #adf752,
-    primary-fixed-dim: #92da37,
-    on-primary-fixed: #102000,
-    on-primary-fixed-variant: #2e4f00,
-    secondary: #476720,
-    on-secondary: #ffffff,
-    secondary-container: #c8ef98,
-    on-secondary-container: #102000,
-    secondary-fixed: #c8ef98,
-    secondary-fixed-dim: #add27e,
-    on-secondary-fixed: #102000,
-    on-secondary-fixed-variant: #314f08,
-    tertiary: #006d40,
-    on-tertiary: #ffffff,
-    tertiary-container: #9cf6bc,
-    on-tertiary-container: #002110,
-    tertiary-fixed: #9cf6bc,
-    tertiary-fixed-dim: #80d9a2,
-    on-tertiary-fixed: #002110,
-    on-tertiary-fixed-variant: #00522f,
-    background: #fcf9f6,
-    on-background: #1c1c1a,
-    surface: #fcf9f6,
-    surface-dim: #dcd9d7,
-    surface-bright: #fcf9f6,
-    surface-container-lowest: #ffffff,
-    surface-container-low: #f6f3f0,
-    surface-container: #f0edeb,
-    surface-container-high: #ebe8e5,
-    surface-container-highest: #e5e2df,
-    on-surface: #1c1c1a,
-    shadow: #000000,
-    scrim: #000000,
-    surface-tint: #5b6052,
-    inverse-surface: #31302f,
-    inverse-on-surface: #f3f0ee,
-    outline: #767870,
-    outline-variant: #c6c7bd,
-    neutral: #787775,
-    neutral10: #1c1c1a,
-    error: #ba1a1a,
-    error-container: #ffdad6,
-    on-error: #ffffff,
-    on-error-container: #410002,
-    surface-variant: #e2e3d9,
-    on-surface-variant: #454840,
-    neutral-variant: #76786f,
-    neutral-variant20: #2f312a,
-    inverse-secondary: #add27e,
-    inverse-tertiary: #80d9a2,
+    primary: var(--primary),
+    on-primary: var(--text-primary),
+    primary-container: var(--primary-lighter),
+    on-primary-container: var(--text-secondary),
+    inverse-primary: var(--primary-light),
+    primary-fixed: var(--primary-lighter),
+    primary-fixed-dim: var(--primary-light),
+    on-primary-fixed: var(--text-secondary),
+    on-primary-fixed-variant: var(--text-muted),
+    secondary: var(--primary-dark),
+    on-secondary: var(--text-primary),
+    secondary-container: var(--primary-lightest),
+    on-secondary-container: var(--text-secondary),
+    secondary-fixed: var(--primary-lightest),
+    secondary-fixed-dim: var(--primary-lighter),
+    on-secondary-fixed: var(--text-secondary),
+    on-secondary-fixed-variant: var(--text-muted),
+    tertiary: var(--success),
+    on-tertiary: var(--text-primary),
+    tertiary-container: var(--success-light),
+    on-tertiary-container: var(--text-secondary),
+    tertiary-fixed: var(--success-light),
+    tertiary-fixed-dim: var(--success),
+    on-tertiary-fixed: var(--text-secondary),
+    on-tertiary-fixed-variant: var(--text-muted),
+    background: var(--background),
+    on-background: var(--text-primary),
+    surface: var(--surface),
+    surface-dim: var(--border-dark),
+    surface-bright: var(--surface),
+    surface-container-lowest: var(--surface),
+    surface-container-low: var(--border-light),
+    surface-container: var(--surface-variant),
+    surface-container-high: var(--border-light),
+    surface-container-highest: var(--surface-hover),
+    on-surface: var(--text-primary),
+    shadow: rgba(0, 0, 0, 0.2),
+    scrim: rgba(0, 0, 0, 0.32),
+    surface-tint: var(--primary),
+    inverse-surface: var(--text-primary),
+    inverse-on-surface: var(--background),
+    outline: var(--border),
+    outline-variant: var(--border-light),
+    neutral: var(--text-secondary),
+    neutral10: var(--text-primary),
+    error: var(--error),
+    error-container: var(--error-light),
+    on-error: var(--error-on),
+    on-error-container: var(--error-on),
+    surface-variant: var(--surface-variant),
+    on-surface-variant: var(--text-secondary),
+    neutral-variant: var(--border),
+    neutral-variant20: var(--text-muted),
+    inverse-secondary: var(--primary-lighter),
+    inverse-tertiary: var(--success-light),
   ));
 }
 
-/* Dark Theme */
+/* Dark Theme - Unified Color System */
 .dark {
+  // ===== PRIMARY COLORS =====
+  --primary: #92da37;
+  --primary-dark: #8DC63F;
+  --primary-light: #7FC520;
+  --primary-lighter: #2e4f00;
+  --primary-lightest: #1f3700;
+
+  // ===== SEMANTIC COLORS =====
+  --success: #81C784;
+  --success-dark: #4CAF50;
+  --success-light: #A5D6A7;
+  --success-on: #000000;
+
+  --error: #EF5350;
+  --error-dark: #F44336;
+  --error-light: #E57373;
+  --error-on: #000000;
+
+  --warning: #FFB74D;
+  --warning-dark: #FF9800;
+  --warning-light: #FFD54F;
+  --warning-on: #000000;
+
+  --info: #64B5F6;
+  --info-dark: #2196F3;
+  --info-light: #90CAF9;
+  --info-on: #000000;
+
+  // ===== TEXT COLORS =====
+  --text-primary: #e5e2df;       // Main text
+  --text-secondary: #c6c7bd;    // Secondary text
+  --text-muted: #909189;        // Muted text
+  --text-light: #787775;        // Light text
+  --text-disabled: #666;        // Disabled text
+
+  // ===== SURFACE COLORS =====
+  --background: #131312;        // Page background
+  --surface: #20201e;           // Card/surface background
+  --surface-variant: #454840;   // Alternative surface
+  --surface-hover: #2a2a29;     // Hover state
+  --surface-active: #353533;    // Active state
+
+  // ===== BORDER COLORS =====
+  --border: #454840;            // Default border
+  --border-light: #5a5a58;       // Light border
+  --border-dark: #909189;        // Dark border
+
+  // ===== SHADOW COLORS =====
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --shadow-strong: rgba(0, 0, 0, 0.4);
+  --shadow-heavy: rgba(0, 0, 0, 0.5);
+
   @include mat.theme-overrides((
-    primary: #92da37,
-    on-primary: #1f3700,
-    primary-container: #2e4f00,
-    on-primary-container: #adf752,
-    inverse-primary: #3f6900,
-    primary-fixed: #adf752,
-    primary-fixed-dim: #92da37,
-    on-primary-fixed: #102000,
-    on-primary-fixed-variant: #2e4f00,
-    secondary: #add27e,
-    on-secondary: #1f3700,
-    secondary-container: #314f08,
-    on-secondary-container: #c8ef98,
-    secondary-fixed: #c8ef98,
-    secondary-fixed-dim: #add27e,
-    on-secondary-fixed: #102000,
-    on-secondary-fixed-variant: #314f08,
-    tertiary: #80d9a2,
-    on-tertiary: #00391f,
-    tertiary-container: #00522f,
-    on-tertiary-container: #9cf6bc,
-    tertiary-fixed: #9cf6bc,
-    tertiary-fixed-dim: #80d9a2,
-    on-tertiary-fixed: #002110,
-    on-tertiary-fixed-variant: #00522f,
-    background: #131312,
-    on-background: #e5e2df,
-    surface: #131312,
-    surface-dim: #131312,
-    surface-bright: #3a3938,
-    surface-container-lowest: #0e0e0d,
-    surface-container-low: #1c1c1a,
-    surface-container: #20201e,
-    surface-container-high: #2a2a29,
-    surface-container-highest: #353533,
-    on-surface: #e5e2df,
-    shadow: #000000,
-    scrim: #000000,
-    surface-tint: #c4c9b7,
-    inverse-surface: #e5e2df,
-    inverse-on-surface: #31302f,
-    outline: #909189,
-    outline-variant: #454840,
-    neutral: #787775,
-    neutral10: #1c1c1a,
-    error: #ffb4ab,
-    error-container: #93000a,
-    on-error: #690005,
-    on-error-container: #ffdad6,
-    surface-variant: #454840,
-    on-surface-variant: #c6c7bd,
-    neutral-variant: #76786f,
-    neutral-variant20: #2f312a,
-    inverse-secondary: #476720,
-    inverse-tertiary: #006d40,
+    primary: var(--primary),
+    on-primary: var(--text-primary),
+    primary-container: var(--primary-lighter),
+    on-primary-container: var(--text-secondary),
+    inverse-primary: var(--primary-dark),
+    primary-fixed: var(--primary-lighter),
+    primary-fixed-dim: var(--primary),
+    on-primary-fixed: var(--text-secondary),
+    on-primary-fixed-variant: var(--text-muted),
+    secondary: var(--primary-light),
+    on-secondary: var(--text-primary),
+    secondary-container: var(--primary-lightest),
+    on-secondary-container: var(--text-secondary),
+    secondary-fixed: var(--primary-lightest),
+    secondary-fixed-dim: var(--primary-lighter),
+    on-secondary-fixed: var(--text-secondary),
+    on-secondary-fixed-variant: var(--text-muted),
+    tertiary: var(--success),
+    on-tertiary: var(--text-primary),
+    tertiary-container: var(--success-light),
+    on-tertiary-container: var(--text-secondary),
+    tertiary-fixed: var(--success-light),
+    tertiary-fixed-dim: var(--success),
+    on-tertiary-fixed: var(--text-secondary),
+    on-tertiary-fixed-variant: var(--text-muted),
+    background: var(--background),
+    on-background: var(--text-primary),
+    surface: var(--surface),
+    surface-dim: var(--surface),
+    surface-bright: var(--surface-active),
+    surface-container-lowest: var(--background),
+    surface-container-low: var(--surface),
+    surface-container: var(--surface-variant),
+    surface-container-high: var(--surface-hover),
+    surface-container-highest: var(--surface-active),
+    on-surface: var(--text-primary),
+    shadow: rgba(0, 0, 0, 0.4),
+    scrim: rgba(0, 0, 0, 0.6),
+    surface-tint: var(--primary),
+    inverse-surface: var(--background),
+    inverse-on-surface: var(--text-primary),
+    outline: var(--border),
+    outline-variant: var(--border-light),
+    neutral: var(--text-secondary),
+    neutral10: var(--text-primary),
+    error: var(--error),
+    error-container: var(--error-light),
+    on-error: var(--error-on),
+    on-error-container: var(--error-on),
+    surface-variant: var(--surface-variant),
+    on-surface-variant: var(--text-secondary),
+    neutral-variant: var(--border),
+    neutral-variant20: var(--text-muted),
+    inverse-secondary: var(--primary-lighter),
+    inverse-tertiary: var(--success-light),
   ));
 }
 
@@ -200,20 +339,19 @@
     title-large-weight: var(--mat-sys-regular-font-weight),
   ));
 }
-html, body { height: 100%;
-
-
-}
-body { margin: 0; font-family: Noto Sans, sans-serif; }
-* {
-  box-sizing: border-box;
-}
-
-html, body {
+html, body { 
   height: 100vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+body { 
+  font-family: Noto Sans, sans-serif; 
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .custom-dialog .mat-mdc-dialog-container {
@@ -241,22 +379,29 @@ html, body {
 
 // CSS cho thông báo thành công
 .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
-  background-color: var(--success-color);
-  color: var(--success-on-color);
+  background-color: var(--success);
+  color: var(--success-on);
   border-radius: 8px;
 }
 
 // CSS cho thông báo lỗi
 .mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
-  background-color: var(--error-color);
-  color: var(--error-on-color);
+  background-color: var(--error);
+  color: var(--error-on);
   border-radius: 8px;
 }
 
-// CSS cho thông báo cảnh báo (sử dụng màu cam phổ biến cho cảnh báo)
+// CSS cho thông báo cảnh báo
 .mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
-  background-color: #ff6f00; // Một màu cam tiêu chuẩn cho cảnh báo
-  color: #ffffff;
+  background-color: var(--warning);
+  color: var(--warning-on);
+  border-radius: 8px;
+}
+
+// CSS cho thông báo thông tin
+.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__surface {
+  background-color: var(--info);
+  color: var(--info-on);
   border-radius: 8px;
 }
 
@@ -284,4 +429,495 @@ html, body {
   flex-direction: row !important;
   justify-content: flex-start;
   gap: 0;
+}
+
+// ===== UNIFIED COLOR UTILITY CLASSES =====
+
+// ===== TEXT COLORS =====
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-light { color: var(--text-light) !important; }
+.text-disabled { color: var(--text-disabled) !important; }
+
+// ===== PRIMARY COLORS =====
+.text-primary-color { color: var(--primary) !important; }
+.text-primary-dark { color: var(--primary-dark) !important; }
+.text-primary-light { color: var(--primary-light) !important; }
+
+// ===== SEMANTIC COLORS =====
+.text-success { color: var(--success) !important; }
+.text-success-dark { color: var(--success-dark) !important; }
+.text-success-light { color: var(--success-light) !important; }
+.text-success-on { color: var(--success-on) !important; }
+
+.text-error { color: var(--error) !important; }
+.text-error-dark { color: var(--error-dark) !important; }
+.text-error-light { color: var(--error-light) !important; }
+.text-error-on { color: var(--error-on) !important; }
+
+.text-warning { color: var(--warning) !important; }
+.text-warning-dark { color: var(--warning-dark) !important; }
+.text-warning-light { color: var(--warning-light) !important; }
+.text-warning-on { color: var(--warning-on) !important; }
+
+.text-info { color: var(--info) !important; }
+.text-info-dark { color: var(--info-dark) !important; }
+.text-info-light { color: var(--info-light) !important; }
+.text-info-on { color: var(--info-on) !important; }
+
+// ===== BACKGROUND COLORS =====
+.bg-primary { background-color: var(--primary) !important; }
+.bg-primary-dark { background-color: var(--primary-dark) !important; }
+.bg-primary-light { background-color: var(--primary-light) !important; }
+.bg-primary-lighter { background-color: var(--primary-lighter) !important; }
+.bg-primary-lightest { background-color: var(--primary-lightest) !important; }
+
+.bg-success { background-color: var(--success) !important; }
+.bg-error { background-color: var(--error) !important; }
+.bg-warning { background-color: var(--warning) !important; }
+.bg-info { background-color: var(--info) !important; }
+
+.bg-surface { background-color: var(--surface) !important; }
+.bg-surface-variant { background-color: var(--surface-variant) !important; }
+.bg-surface-hover { background-color: var(--surface-hover) !important; }
+.bg-surface-active { background-color: var(--surface-active) !important; }
+
+.bg-background { background-color: var(--background) !important; }
+
+// ===== BORDER COLORS =====
+.border-primary { border-color: var(--primary) !important; }
+.border-primary-dark { border-color: var(--primary-dark) !important; }
+.border-success { border-color: var(--success) !important; }
+.border-error { border-color: var(--error) !important; }
+.border-warning { border-color: var(--warning) !important; }
+.border-info { border-color: var(--info) !important; }
+
+.border-default { border-color: var(--border) !important; }
+.border-light { border-color: var(--border-light) !important; }
+.border-dark { border-color: var(--border-dark) !important; }
+
+// ===== GRADIENT UTILITIES =====
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+}
+.gradient-primary-horizontal {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+}
+.gradient-primary-light {
+  background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-lightest) 100%) !important;
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%) !important;
+}
+.gradient-error {
+  background: linear-gradient(135deg, var(--error) 0%, var(--error-dark) 100%) !important;
+}
+.gradient-warning {
+  background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%) !important;
+}
+
+// ===== SHADOW UTILITIES =====
+.shadow-light { box-shadow: 0 1px 3px var(--shadow-light) !important; }
+.shadow-medium { box-shadow: 0 2px 6px var(--shadow-medium) !important; }
+.shadow-strong { box-shadow: 0 4px 12px var(--shadow-strong) !important; }
+.shadow-heavy { box-shadow: 0 8px 24px var(--shadow-heavy) !important; }
+
+// ===== HOVER EFFECTS =====
+.hover-text-primary:hover {
+  color: var(--primary) !important;
+  transition: color 0.3s ease;
+}
+.hover-bg-primary:hover {
+  background-color: var(--primary-lighter) !important;
+  transition: background-color 0.3s ease;
+}
+.hover-bg-surface:hover {
+  background-color: var(--surface-hover) !important;
+  transition: background-color 0.3s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+// ===== FOCUS STATES =====
+.focus-primary:focus {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px;
+}
+.focus-error:focus {
+  outline: 2px solid var(--error) !important;
+  outline-offset: 2px;
+}
+
+// ===== SCROLL BEHAVIOR OPTIMIZATION =====
+/*
+Global scroll behavior for better UX:
+- Smooth scrolling on desktop
+- Auto-scrolling on mobile for performance
+- Custom scrollbar styling
+- Reduced motion support
+*/
+
+// Global scroll behavior
+* {
+  scroll-behavior: smooth;
+}
+
+// Reduce motion for accessibility
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Custom scrollbar for webkit browsers
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-dark);
+}
+
+// Firefox scrollbar
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--surface-hover);
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  * {
+    scroll-behavior: auto; // Better performance on mobile
+    -webkit-overflow-scrolling: touch; // Smooth iOS scrolling
+  }
+}
+
+// ===== LEGACY SUPPORT =====
+.text-success-color { color: var(--success) !important; }
+.text-error-color { color: var(--error) !important; }
+.text-warning-color { color: var(--warning) !important; }
+.bg-success-color { background-color: var(--success) !important; }
+.bg-error-color { background-color: var(--error) !important; }
+.bg-warning-color { background-color: var(--warning) !important; }
+
+// ===== SNACKBAR UTILITY CLASSES =====
+.snackbar-success { @extend .success-snackbar; }
+.snackbar-error { @extend .error-snackbar; }
+.snackbar-warning { @extend .warning-snackbar; }
+.snackbar-info { @extend .info-snackbar; }
+
+// ===== ADVANCED ANIMATIONS =====
+
+// Animation timing functions
+:root {
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 300ms;
+  --animation-duration-slow: 500ms;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --animation-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Base animation classes
+.animate-fade-in {
+  animation: fadeIn var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-slide-up {
+  animation: slideUp var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-slide-down {
+  animation: slideDown var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-bounce-in {
+  animation: bounceIn 600ms var(--animation-easing-emphasized);
+}
+
+// Keyframe definitions
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Hover animations
+.hover-lift {
+  transition: transform var(--animation-duration-fast) var(--animation-easing),
+              box-shadow var(--animation-duration-fast) var(--animation-easing);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hover-scale {
+  transition: transform var(--animation-duration-fast) var(--animation-easing);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: box-shadow var(--animation-duration-fast) var(--animation-easing);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(141, 198, 63, 0.3);
+}
+
+// Loading animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+// Button animations
+.btn-press {
+  transition: transform var(--animation-duration-fast) var(--animation-easing);
+}
+
+.btn-press:active {
+  transform: scale(0.95);
+}
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+// Page transition animations
+.page-enter {
+  animation: pageEnter var(--animation-duration-slow) var(--animation-easing);
+}
+
+.page-exit {
+  animation: pageExit var(--animation-duration-normal) var(--animation-easing);
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+// Stagger animations for lists
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: staggerIn var(--animation-duration-normal) var(--animation-easing) both;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 100ms; }
+.stagger-item:nth-child(3) { animation-delay: 200ms; }
+.stagger-item:nth-child(4) { animation-delay: 300ms; }
+.stagger-item:nth-child(5) { animation-delay: 400ms; }
+.stagger-item:nth-child(6) { animation-delay: 500ms; }
+.stagger-item:nth-child(7) { animation-delay: 600ms; }
+.stagger-item:nth-child(8) { animation-delay: 700ms; }
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Accessibility: Respect reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-scale-in,
+  .animate-bounce-in,
+  .hover-lift,
+  .hover-scale,
+  .hover-glow,
+  .loading-pulse,
+  .loading-shimmer,
+  .btn-press,
+  .page-enter,
+  .page-exit {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .stagger-item {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+// Performance optimizations
+.will-animate {
+  will-change: transform, opacity;
+}
+
+.will-animate:hover {
+  will-change: auto;
+}
+
+// GPU acceleration for better performance
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
