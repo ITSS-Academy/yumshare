@@ -6,7 +6,6 @@
   position: relative;
 }
 
-
 .sidebar-container {
   width: 17.5rem;
   min-width: 17.5rem;
@@ -15,6 +14,8 @@
   flex-shrink: 0;
   transition: all 0.3s ease;
   border-radius: 0 16px 16px 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 // When app root has .sidebar-mini, shrink the sidebar container as well
@@ -23,57 +24,58 @@
   min-width: 4rem !important;
 }
 
-.sidebar-container.sidebar-closed {
-  width: 0;
-  min-width: 0;
-  overflow: hidden;
+// Desktop sidebar closed state
+@media (min-width: 769px) {
+  .sidebar-container.sidebar-closed {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
 }
 
+/* ---------- Main content ---------- */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
   width: 100%;
-
+  height: 100vh;
+  overflow: hidden;
 }
 
-.content-container{
-  //padding: 0 0 0 16px;
+.navbar-container {
+  flex-shrink: 0;
+  height: 64px;
+  min-height: 64px;
+  // background: var(--surface);
+  // border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
   will-change: scroll-position;
+  min-height: 0;
+  background: var(--background);
+  padding: 1rem;
 }
-// Mobile responsive
-@media (max-width: 768px) {
-  .sidebar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1000;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
 
-    &.sidebar-closed {
-      transform: translateX(-100%);
-      width: 17.5rem;
-      min-width: 17.5rem;
-    }
-  }
-
-  .main-content {
-    width: 100%;
-  }
-.content-container {
-  padding: 0 0 0 0px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* iOS Safari mượt hơn /
-  scroll-behavior: smooth;          / Mượt trên hầu hết browser */
-  overscroll-behavior: contain;
-  will-change: scroll-position;
+// Footer styling - now inside content-container
+app-footer {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  margin-top: auto; // Push footer to bottom of content
 }
+
+// Mobile responsive - gộp chung với 767.98px
 
 // Responsive for common device widths
 @media (max-width: 1199.98px) {
@@ -91,11 +93,10 @@
   .main-content {
     padding-left: 0;
     width: 100%;
-
   }
-  .content-container{
- padding: 0 0 0 16px;
-}
+  .content-container {
+    padding: 0;
+  }
 
   .sidebar-container.sidebar-mini {
     width: 3.5rem !important;
@@ -123,19 +124,15 @@
   }
   .main-content {
     width: 100vw !important;
-
     margin-left: 0 !important;
     min-width: 0;
   }
-  .content-container{
- padding: 0 0 0 16px;
-}
+  .content-container {
+    padding: 0;
+  }
   .navbar-container {
     height: 56px;
     min-height: 56px;
-  }
-  .content-container {
-    padding: 10px;
   }
   // Override when in mini mode: keep sidebar at 4rem and offset content
   :host(.sidebar-mini) .sidebar-container {
@@ -150,16 +147,26 @@
 
 @media (max-width: 480px) {
   .sidebar-container {
-    width: 100vw;
-    max-width: 100vw;
+    width: 85vw;
+    max-width: 85vw;
+    left: 0;
+    
+    &.sidebar-closed {
+      transform: translateX(-100%);
+      width: 85vw;
+    }
   }
+  
   .navbar-container {
     height: 48px;
     min-height: 48px;
   }
+  
   .content-container {
-    padding: 4px;
+    padding: 0;
   }
+  
+
 }
 
 .sidebar-toggle-btn {
@@ -188,4 +195,19 @@
   .sidebar-toggle-btn {
     display: none;
   }
-}}
+}
+
+
+
+// Backdrop cho mobile
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
