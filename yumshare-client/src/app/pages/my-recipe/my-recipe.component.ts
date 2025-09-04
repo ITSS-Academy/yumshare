@@ -27,13 +27,7 @@ import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angu
   standalone: true,
   imports: [
     FormsModule,
-    SideBarComponent,
-    NavBarComponent,
-    MatFormField,
-    MatInput,
-    MatDatepickerInput,
-    MatDatepicker,
-    MatDatepickerToggle,
+    
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,

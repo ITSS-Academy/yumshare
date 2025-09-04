@@ -1,39 +1,74 @@
-<div class="chat-window">
-  <!-- Header -->
+<div class="chat-window-container" #chatWindowContainer>
+  <!-- Chat Header -->
   <div class="chat-header">
-    <button class="back-btn" (click)="onBack()" aria-label="Back"></button>
-    <img [src]="user.avatar" class="avatar" />
-    <div class="name">{{ user.name }}</div>
-   <!-- <div class="options">⋮</div>-->
-  </div>
-
-  <!-- Messages -->
-  <div class="chat-messages">
-    @for (msg of messages; track msg.id) {
-      <app-message-item
-        [message]="msg"
-        [currentUserId]="currentUserId">
-      </app-message-item>
-    } @empty {
-      <div class="no-messages">Chưa có tin nhắn nào</div>
-    }
-  </div>
-
-  <!-- Input -->
-  <div class="chat-input">
-    <div class="chat-input-box">
-      <input
-        matInput
-        placeholder="Write a message..."
-        [(ngModel)]="newMessage"
-        name="messageInput"
-        (keyup.enter)="sendMessage()"
-      />
+    <div class="chat-user-info">
+      <button class="back-btn" (click)="onBack()">←</button>
+      <img
+        [src]="safeAvatar(otherUser?.avatar_url)"
+        [alt]="otherUser?.username"
+        class="chat-user-avatar"
+      >
+      <div class="chat-user-details">
+        <div class="chat-user-name">{{ otherUser?.username || 'Unknown User' }}</div>
+      </div>
     </div>
-
-    <button mat-icon-button color="primary" (click)="sendMessage()">
-      <mat-icon>send</mat-icon>
-    </button>
+    <div class="chat-actions">
+      <button class="action-btn">⋮</button>
+    </div>
   </div>
 
+  <!-- Messages Container -->
+  <div class="messages-container">
+    <div class="messages-list">
+      @if (messagesLoading) {
+        <app-chat-message-skeleton></app-chat-message-skeleton>
+      } @else {
+        @for (message of messages; track message.id) {
+          <div
+            class="message-item"
+            [class.sent]="message.sender_id === currentUser.id"
+            [class.received]="message.sender_id !== currentUser.id"
+          >
+            <div class="message-content">
+              @if (message.sender_id !== currentUser.id) {
+                <div class="message-meta">
+                  <img [src]="safeAvatar(otherUser?.avatar_url)" class="bubble-avatar" alt="avatar">
+                </div>
+              }
+              <div class="message-text">{{ message.content }}</div>
+              <div class="message-time">
+                {{ message.created_at | localTime:'shortTime' }}
+                @if (message.sender_id === currentUser.id) {
+                  <span class="read-status">
+                    {{ message.is_read ? '✓✓' : '✓' }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Message Input -->
+  <div class="message-input-container">
+    <div class="input-wrapper">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        [(ngModel)]="newMessage"
+        (input)="onTyping()"
+        (keypress)="onKeyPress($event)"
+        class="message-input"
+      >
+      <button
+        (click)="sendMessageHandler()"
+        [disabled]="!newMessage.trim()"
+        class="send-btn"
+      >
+        ➤
+      </button>
+    </div>
+  </div>
 </div>

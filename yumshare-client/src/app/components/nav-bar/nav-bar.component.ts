@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ShareModule } from '../../shares/share.module';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
+import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.component';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { AuthModel } from '../../models/auth.model';
@@ -20,7 +21,8 @@ import { Auth } from '@angular/fire/auth';
     ShareModule,
     FormsModule,
     CommonModule,
-    RouterModule
+    RouterModule,
+    // DarkModeToggleComponent
   ],
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']

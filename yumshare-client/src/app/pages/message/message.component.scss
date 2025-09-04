@@ -2,54 +2,82 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100% ;
-  background: #fff;
+  height: 100%;
+  background: var(--background);
   overflow: hidden;
-  //gap: 1rem;
 }
-//.user-list{
-//  width: 25%;
-//  max-height: 100%;
-//  border: 1px solid #dddddd;
-//  border-radius: 1rem;
-//  overflow-y: auto;
-//}
+
+.user {
+  width: 300px;
+  height: 100%;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow-medium);
+  flex-shrink: 0;
+}
+
+.chat-area {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--background);
+}
+
 .empty-chat {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #777;
-  font-size: 1.2rem;
-  padding-top: 20rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  text-align: center;
+  margin: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+
+  .empty-chat-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    opacity: 0.5;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
 }
-.chat-area{
-  width: 100%;
-  height: 100%;
-  //margin-top: 1rem;
-  //border: 1px solid #dddddd;
-  margin: 0;
-}
+
 /* Responsive cho màn nhỏ */
 @media (max-width: 920px) {
   .chat-container {
-    flex-direction: column; /* đổi thành dọc cho dễ kiểm soát */
-    //height: 100%;
-    .user,
+    flex-direction: column;
+    height: 100%;
+
+    .user {
+      width: 100%;
+      height: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    ::ng-deep .chat-window-container {
+      height: auto !important;
+      max-height: 35rem !important;
+    }
+
     .chat-area {
       width: 100%;
       height: 100%;
-    }
-
-    .user-list {
-      width: 100%;
-      height: 100%;
-      max-height: none;
-      border-radius: 1rem;
-    }
-    .sidebar{
-      width: 100%;
-
     }
 
     /* Mặc định chỉ hiện user list */
@@ -57,14 +85,25 @@
       display: none;
     }
 
-    /* Khi có user được chọn thì ẩn user list, hiện chat */
+    /* Khi có chat được chọn thì ẩn user list, hiện chat */
     &.chat-open {
       .user {
         display: none;
       }
       .chat-area {
-        display: block;
+        display: flex;
       }
     }
+  }
+}
+
+@media (min-width: 921px) {
+  .chat-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-heavy);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100%;
   }
 }

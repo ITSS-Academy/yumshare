@@ -1,278 +1,532 @@
-import { Component } from '@angular/core';
-import {FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatButton} from '@angular/material/button';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatOption, MatSelect} from '@angular/material/select';
-import {MatStepperModule} from '@angular/material/stepper';
-import { DecimalPipe } from '@angular/common';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { RecipeService } from '../../services/recipe/recipe.service';
+import { Category } from '../../models/category.model';
+import { RecipeStep } from '../../models/recipe-step.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
+import { SafePipe } from '../../pipes/safe.pipe';
+import { AuthModel } from '../../models/auth.model';
+import { AuthState } from '../../ngrx/auth/auth.state';
 
 @Component({
   selector: 'app-add-recipe',
   templateUrl: './add-recipe.component.html',
   imports: [
+    CommonModule, 
+    FormsModule, 
     ReactiveFormsModule,
-    MatFormField,
-    MatButton,
-    MatLabel,
-    MatSelect,
-    MatOption,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatCardModule,
+    MatDividerModule,
     MatStepperModule,
-    DecimalPipe
+    SafePipe
   ],
   styleUrls: ['./add-recipe.component.scss']
 })
-export class AddRecipeComponent {
+export class AddRecipeComponent implements OnInit, OnDestroy {
+  @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('videoInput') videoInput!: ElementRef<HTMLInputElement>;
+  
   recipeForm: FormGroup;
-  previewUrl: string | ArrayBuffer | null = null;
-  videoUrl: string = '';
-  videoFile: File | null = null;
-  isVideoFromUrl: boolean = false;
-  videoPreviewUrl: string | null = null;
+  categories: Category[] = [];
+  selectedImage: File | null = null;
+  selectedVideo: File | null = null;
+  imagePreview: string | null = null;
+  videoPreview: string | null = null;
+  youtubeUrl: string = '';
+  videoType: 'file' | 'youtube' = 'file';
+  uploading = false;
+  difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
+  countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
+  currentUser: AuthModel | null = null;
+  
+  // Grid Multi-step properties
+  currentStep: number = 1;
 
-  countries = [
-    { value: 'vn', viewValue: 'Vietnam' },
-    { value: 'us', viewValue: 'USA' },
-    { value: 'fr', viewValue: 'France' },
-    { value: 'jp', viewValue: 'Japan' },
-    { value: 'kr', viewValue: 'Korea' },
-  ];
+  // Subscriptions management
+  private subscriptions: Subscription[] = [];
 
-  difficulties = [
-    { value: 'easy', viewValue: 'Easy' },
-    { value: 'medium', viewValue: 'Medium' },
-    { value: 'hard', viewValue: 'Hard' }
-  ];
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private recipeService: RecipeService,
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private store: Store<{auth: AuthState}>
+  ) {
     this.recipeForm = this.fb.group({
-      name: ['', Validators.required],
-      country: ['Country', Validators.required],
-      difficulty: ['Difficulty', Validators.required],
+      title: ['', Validators.required],
       description: ['', Validators.required],
-      serving: ['', Validators.required],
-      time: ['', Validators.required],
-      ingredients: this.fb.array([]),
-      steps: this.fb.array([]),
-      videoUrl: [''],
-      videoFile: [null]
+      servings: [1, [Validators.required, Validators.min(1)]],
+      total_cooking_time: [90, Validators.required], // Default 1 hour 30 minutes
+      difficulty: ['Medium', Validators.required],
+      country: ['Vietnam', Validators.required],
+      category_id: ['', Validators.required], // Will be set after categories are loaded
+      ingredients: this.fb.array([
+        this.fb.control('', Validators.required)
+      ]),
+      steps: this.fb.array([
+        this.createStepFormGroup(1)
+      ])
     });
-
-    // Thêm ingredient và step mặc định
-    this.addIngredient();
-    this.addStep();
-
-    // Debug log
-    console.log('AddRecipeComponent initialized');
-    console.log('Initial isVideoFromUrl:', this.isVideoFromUrl);
   }
 
-  get ingredients(): FormArray {
-    return this.recipeForm.get('ingredients') as FormArray;
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
   }
 
-  get steps(): FormArray {
-    return this.recipeForm.get('steps') as FormArray;
+  ngOnInit() {
+    // Debug: Test API connectivity
+    console.log('API URL:', `${this.recipeService['apiUrl']}/categories`);
+    this.loadCategories();
+    this.loadCurrentUser();
+    
+    // Ensure default values are set
+    this.ensureDefaultValues();
+  }
+
+  private createStepFormGroup(stepNumber: number): FormGroup {
+    return this.fb.group({
+      step_number: [stepNumber],
+      description: ['', Validators.required],
+      cooking_time: [0],
+      tips: ['']
+    });
+  }
+
+  get ingredients() {
+    return this.recipeForm.get('ingredients') as FormArray || this.fb.array([]);
+  }
+
+  get steps() {
+    return this.recipeForm.get('steps') as FormArray || this.fb.array([]);
+  }
+
+  get safeCategories() {
+    return Array.isArray(this.categories) ? this.categories : [];
+  }
+
+  get safeCountries() {
+    return Array.isArray(this.countries) ? this.countries : [];
+  }
+
+  get safeDifficultyLevels() {
+    return Array.isArray(this.difficultyLevels) ? this.difficultyLevels : [];
+  }
+
+  getIngredientControl(index: number): FormControl {
+    return this.ingredients.at(index) as FormControl;
+  }
+
+  getStepControl(index: number): FormGroup {
+    return this.steps.at(index) as FormGroup;
+  }
+
+  getStepDescriptionControl(index: number): FormControl {
+    return this.getStepControl(index).get('description') as FormControl;
   }
 
   addIngredient() {
-    this.ingredients.push(this.fb.group({ name: ['', Validators.required] }));
+    this.ingredients.push(this.fb.control('', Validators.required));
   }
 
   removeIngredient(index: number) {
+    if (this.ingredients.length > 1) {
     this.ingredients.removeAt(index);
+    }
   }
 
   addStep() {
-    this.steps.push(this.fb.group({ detail: ['', Validators.required] }));
+    const stepNumber = this.steps.length + 1;
+    this.steps.push(this.createStepFormGroup(stepNumber));
   }
 
   removeStep(index: number) {
+    if (this.steps.length > 1) {
     this.steps.removeAt(index);
+      // Reorder step numbers
+      this.steps.controls.forEach((control, i) => {
+        control.patchValue({ step_number: i + 1 });
+      });
+    }
   }
 
   onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image file size should be less than 5MB');
-        return;
-      }
-
+      this.selectedImage = file;
       const reader = new FileReader();
-      reader.onload = () => this.previewUrl = reader.result;
+      reader.onload = (e) => this.imagePreview = e.target?.result as string;
       reader.readAsDataURL(file);
     }
   }
 
   onVideoSelected(event: any) {
-    console.log('Video file selected:', event);
     const file = event.target.files[0];
     if (file) {
-      console.log('File details:', file.name, file.type, file.size);
-
-      // Validate file type
-      if (!file.type.startsWith('video/')) {
-        alert('Please select a video file');
-        return;
-      }
-
-      // Validate file size (max 100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        alert('Video file size should be less than 100MB');
-        return;
-      }
-
-      this.videoFile = file;
-      this.isVideoFromUrl = false;
-      this.videoUrl = '';
-      this.videoPreviewUrl = null;
-      this.recipeForm.patchValue({
-        videoFile: file,
-        videoUrl: ''
-      });
-
-      // Create preview URL for video
-      this.videoPreviewUrl = URL.createObjectURL(file);
-      console.log('Video preview URL created:', this.videoPreviewUrl);
+      this.selectedVideo = file;
+      // Create video preview
+      const url = URL.createObjectURL(file);
+      this.videoPreview = url;
     }
   }
 
-  onVideoUrlChange() {
-    const url = this.recipeForm.get('videoUrl')?.value;
-    console.log('Video URL changed:', url);
-    if (url) {
-      // Basic URL validation
-      if (this.isValidVideoUrl(url)) {
-        console.log('Valid video URL:', url);
-        this.videoUrl = url;
-        this.isVideoFromUrl = true;
-        this.videoFile = null;
-        this.videoPreviewUrl = null;
-        this.recipeForm.patchValue({ videoFile: null });
+  onVideoDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onVideoDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('video/')) {
+        this.selectedVideo = file;
+        const url = URL.createObjectURL(file);
+        this.videoPreview = url;
+      }
+    }
+  }
+
+  onVideoClick() {
+    this.videoInput.nativeElement.click();
+  }
+
+  onVideoTypeChange(event: MatButtonToggleChange) {
+    this.videoType = event.value as 'file' | 'youtube';
+    if (this.videoType === 'youtube') {
+      this.selectedVideo = null;
+      this.videoPreview = null;
+    } else {
+      this.youtubeUrl = '';
+    }
+  }
+
+  onYoutubeUrlChange(url: string) {
+    console.log('onYoutubeUrlChange called with:', url);
+    this.youtubeUrl = url;
+    console.log('youtubeUrl updated to:', this.youtubeUrl);
+    // Extract video ID from YouTube URL for preview
+    const videoId = this.extractYoutubeVideoId(url);
+    console.log('Extracted video ID:', videoId);
+    if (videoId) {
+      this.videoPreview = `https://www.youtube.com/embed/${videoId}`;
+      console.log('Video preview set to:', this.videoPreview);
+    }
+  }
+
+  private extractYoutubeVideoId(url: string): string | null {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  }
+
+  isValidYoutubeUrl(url: string): boolean {
+    return this.extractYoutubeVideoId(url) !== null;
+  }
+
+    loadCategories() {
+    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+      next: (response: any) => {
+        console.log('Full API response:', response);
+        console.log('Response type:', typeof response);
+        console.log('Is array:', Array.isArray(response));
+        
+        let categories: Category[] = [];
+        
+        // Handle different response formats
+        if (Array.isArray(response)) {
+          // Direct array response
+          categories = response;
+          console.log('Direct array response detected');
+        } else if (response && response.data && Array.isArray(response.data)) {
+          // Paginated response with data property
+          categories = response.data;
+          console.log('Paginated response detected');
+        } else if (response && typeof response === 'object') {
+          console.log('Object response keys:', Object.keys(response));
+        }
+        
+        if (categories && categories.length > 0) {
+          this.categories = categories;
+          console.log('Categories loaded successfully:', categories.length);
+          console.log('First category:', categories[0]);
+          
+          // Always set the first category as default since form starts empty
+          this.recipeForm.patchValue({ category_id: categories[0].id });
+          console.log('Set default category:', categories[0].id);
+        } else {
+          console.warn('No categories found from API');
+          console.warn('Response was:', response);
+          
+          // Fallback: Use basic categories for testing
+          this.categories = [
+            { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
+            { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
+            { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
+          ];
+          console.log('Using fallback categories');
+          this.snackBar.open('Using fallback categories - Check API connection', 'Close', { duration: 5000 });
+          
+          // Set default category for fallback
+          this.recipeForm.patchValue({ category_id: 'fallback-1' });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading categories from API:', error);
+        console.error('Error details:', error);
+        
+        // Fallback: Use basic categories for testing when API fails
+        this.categories = [
+          { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
+          { id: '2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
+          { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
+        ];
+        console.log('Using fallback categories due to API error');
+        this.snackBar.open('API Error - Using fallback categories', 'Close', { duration: 5000 });
+        
+        // Set default category for error fallback
+        this.recipeForm.patchValue({ category_id: 'fallback-1' });
+      }
+    });
+    
+    // Add subscription to array
+    this.subscriptions.push(categoriesSubscription);
+  }
+
+  loadCurrentUser() {
+    const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
+      console.log('Auth state received:', authState);
+      console.log('Current user from state:', authState?.currentUser);
+      
+      if (authState && authState.currentUser && authState.currentUser.uid) {
+        this.currentUser = authState.currentUser;
+        console.log('User loaded successfully:', {
+          displayName: this.currentUser.displayName,
+          email: this.currentUser.email,
+          uid: this.currentUser.uid,
+          photoURL: this.currentUser.photoURL
+        });
       } else {
-        console.log('Invalid video URL:', url);
-        alert('Please enter a valid video URL (YouTube, Vimeo, etc.)');
-        this.recipeForm.patchValue({ videoUrl: '' });
+        this.currentUser = null;
+        console.log('No user found in auth state');
+      }
+    });
+    
+    // Add subscription to array
+    this.subscriptions.push(authSubscription);
+  }
+
+  private ensureDefaultValues() {
+    // Ensure category has a default value after categories are loaded
+    if (this.categories.length > 0 && !this.recipeForm.get('category_id')?.value) {
+      this.recipeForm.patchValue({ category_id: this.categories[0].id });
+      console.log('EnsureDefaultValues: Set category to', this.categories[0].id);
+    }
+  }
+
+
+
+  formatTime(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours > 0 && mins > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''}`;
+    } else if (hours > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    } else {
+      return `${mins} minute${mins > 1 ? 's' : ''}`;
+    }
+  }
+
+  async onSubmit() {
+    if (!this.currentUser) {
+      this.snackBar.open('Please login to create a recipe', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    if (this.recipeForm.valid) {
+      this.uploading = true;
+      
+      try {
+        // Create recipe with files using the backend endpoint
+        const formData = new FormData();
+        
+        // Add recipe data
+        const recipeData = this.recipeForm.value;
+        formData.append('title', recipeData.title);
+        formData.append('description', recipeData.description);
+        formData.append('servings', recipeData.servings.toString());
+        formData.append('total_cooking_time', recipeData.total_cooking_time.toString());
+        formData.append('difficulty', recipeData.difficulty);
+        formData.append('country', recipeData.country);
+        formData.append('category_id', recipeData.category_id);
+        formData.append('user_id', this.currentUser?.uid || 'anonymous-user'); // Get from auth store
+        
+        // Add ingredients as JSON string
+        formData.append('ingredients', JSON.stringify(recipeData.ingredients));
+        
+        // Add steps as JSON string
+        formData.append('steps', JSON.stringify(recipeData.steps));
+        
+        // Add image (file only)
+        console.log('Selected image:', this.selectedImage);
+        
+        if (this.selectedImage) {
+          formData.append('image', this.selectedImage);
+          console.log('Added image file to FormData');
+        } else {
+          console.log('No image added to FormData');
+        }
+        
+        // Add video (file or YouTube URL)
+        console.log('Video type:', this.videoType);
+        console.log('YouTube URL:', this.youtubeUrl);
+        console.log('Selected video:', this.selectedVideo);
+        
+        if (this.videoType === 'file' && this.selectedVideo) {
+          formData.append('video', this.selectedVideo);
+          console.log('Added video file to FormData');
+        } else if (this.videoType === 'youtube' && this.youtubeUrl) {
+          formData.append('video_url', this.youtubeUrl);
+          console.log('Added video_url to FormData:', this.youtubeUrl);
+        } else {
+          console.log('No video added to FormData');
+        }
+
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}:`, value);
+        }
+
+        // Send to backend
+        const response = await this.recipeService.createRecipeWithFiles(formData).toPromise();
+        console.log("Response", response);
+        this.snackBar.open('Recipe created successfully!', 'Close', { duration: 3000 });
+        this.resetForm();
+        
+      } catch (error) {
+        console.error('Error creating recipe:', error);
+        this.snackBar.open('Error creating recipe. Please try again.', 'Close', { duration: 3000 });
+      } finally {
+        this.uploading = false;
       }
     } else {
-      this.videoUrl = '';
-      this.videoPreviewUrl = null;
+      this.markFormGroupTouched();
+      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
     }
   }
 
-  // Helper: chuyển YouTube URL sang embed
-  getYoutubeEmbedUrl(url: string): string | null {
-    let videoId = '';
-    if (url.includes('youtube.com')) {
-      const match = url.match(/[?&]v=([^&#]*)/);
-      videoId = match ? match[1] : '';
-    } else if (url.includes('youtu.be')) {
-      const match = url.match(/youtu\.be\/([^?&#]*)/);
-      videoId = match ? match[1] : '';
-    }
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-  }
-
-  // Helper: chuyển Vimeo URL sang embed
-  getVimeoEmbedUrl(url: string): string | null {
-    const match = url.match(/vimeo\.com\/(\d+)/);
-    return match ? `https://player.vimeo.com/video/${match[1]}` : null;
-  }
-
-  toggleVideoSource() {
-    console.log('Toggle button clicked! Current state:', this.isVideoFromUrl);
-    this.isVideoFromUrl = !this.isVideoFromUrl;
-    console.log('New state:', this.isVideoFromUrl);
-
-    if (this.isVideoFromUrl) {
-      // Switch to URL mode
-      console.log('Switching to URL mode');
-      this.videoFile = null;
-      this.videoPreviewUrl = null;
-      this.recipeForm.patchValue({
-        videoFile: null,
-        videoUrl: ''
-      });
-    } else {
-      // Switch to file upload mode
-      console.log('Switching to file upload mode');
-      this.videoUrl = '';
-      this.videoPreviewUrl = null;
-      this.recipeForm.patchValue({
-        videoUrl: '',
-        videoFile: null
-      });
-    }
-  }
-
-  // Helper method to trigger file input click
-  triggerFileUpload() {
-    console.log('Trigger file upload clicked!');
-    const fileInput = document.getElementById('video-upload') as HTMLInputElement;
-    if (fileInput) {
-      console.log('File input found, clicking...');
-      fileInput.click();
-    } else {
-      console.log('File input not found!');
-    }
-  }
-
-  // Helper method to clear video data
-  clearVideoData() {
-    this.videoFile = null;
-    this.videoUrl = '';
-    this.videoPreviewUrl = null;
-    this.recipeForm.patchValue({
-      videoFile: null,
-      videoUrl: ''
+  private markFormGroupTouched() {
+    Object.keys(this.recipeForm.controls).forEach(key => {
+      const control = this.recipeForm.get(key);
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched();
+      } else {
+        control?.markAsTouched();
+      }
     });
   }
 
-  // Thêm hàm kiểm tra URL video hợp lệ
-  isValidVideoUrl(url: string): boolean {
-    // Kiểm tra các định dạng phổ biến: YouTube, Vimeo, mp4, mov, avi, wmv
-    const youtube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
-    const vimeo = /^(https?:\/\/)?(www\.)?vimeo\.com\/.+$/;
-    const mp4 = /\.mp4(\?.*)?$/i;
-    const mov = /\.mov(\?.*)?$/i;
-    const avi = /\.avi(\?.*)?$/i;
-    const wmv = /\.wmv(\?.*)?$/i;
-    return youtube.test(url) || vimeo.test(url) || mp4.test(url) || mov.test(url) || avi.test(url) || wmv.test(url);
+  private resetForm() {
+    this.recipeForm.reset({
+      servings: 1,
+      total_cooking_time: 90,
+      difficulty: 'Medium',
+      country: 'Vietnam'
+    });
+    
+    // Reset arrays
+    this.ingredients.clear();
+    this.steps.clear();
+    this.ingredients.push(this.fb.control('', Validators.required));
+    this.steps.push(this.createStepFormGroup(1));
+    
+    // Reset files
+    this.selectedImage = null;
+    this.selectedVideo = null;
+    this.imagePreview = null;
+    this.videoPreview = null;
+    this.youtubeUrl = '';
+    this.videoType = 'file';
+    
+    // Reset step
+    this.currentStep = 1;
   }
 
-  setVideoSource(isUrl: boolean) {
-    this.isVideoFromUrl = isUrl;
-    if (isUrl) {
-      this.videoFile = null;
-      this.videoPreviewUrl = null;
-      this.recipeForm.patchValue({ videoFile: null });
-    } else {
-      this.videoUrl = '';
-      this.recipeForm.patchValue({ videoUrl: '' });
-      this.videoPreviewUrl = this.videoFile ? URL.createObjectURL(this.videoFile) : null;
+  onDelete() {
+    if (confirm('Are you sure you want to delete this recipe? All unsaved changes will be lost.')) {
+      this.resetForm();
     }
   }
 
-  onSubmit() {
-    if (this.recipeForm.valid) {
-      console.log('Recipe Form:', this.recipeForm.value);
-      console.log('Video File:', this.videoFile);
-      console.log('Video URL:', this.videoUrl);
-      console.log('Is Video from URL:', this.isVideoFromUrl);
-      console.log('Video Preview URL:', this.videoPreviewUrl);
-
-      // Here you would typically send the data to your backend
-      alert('Recipe submitted successfully!');
-    } else {
-      alert('Please fill in all required fields');
-      console.log('Form is invalid:', this.recipeForm.errors);
+  // Grid Multi-step navigation methods
+  nextStep() {
+    if (this.currentStep < 4) {
+      this.currentStep++;
+      this.scrollToTop();
     }
+  }
+
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.scrollToTop();
+    }
+  }
+
+  private scrollToTop() {
+    // Smooth scroll to top of the page with offset for sticky header
+    const headerHeight = 120; // Approximate height of progress header
+    window.scrollTo({
+      top: headerHeight,
+      behavior: 'smooth'
+    });
+    
+    // Alternative: scroll to the add-recipe container with proper offset
+    setTimeout(() => {
+      const container = document.querySelector('.add-recipe');
+      if (container) {
+        container.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 200);
+  }
+
+  onImageClick() {
+    this.imageInput.nativeElement.click();
+  }
+
+  setVideoType(type: 'file' | 'youtube') {
+    this.videoType = type;
+    // Reset video preview when switching types
+    this.videoPreview = null;
+    this.selectedVideo = null;
+    this.youtubeUrl = '';
   }
 }

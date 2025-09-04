@@ -1,7 +1,9 @@
 <div class="snackbar-container">
-  <mat-icon class="snackbar-icon">{{ data.icon }}</mat-icon>
-  <span class="snackbar-message">{{ data.message }}</span>
-  <button mat-icon-button class="snackbar-close-button" (click)="close()">
+  <div class="snackbar-content">
+    <mat-icon class="snackbar-icon">{{ data.icon }}</mat-icon>
+    <span class="snackbar-message">{{ data.message }}</span>
+  </div>
+  <button mat-icon-button class="snackbar-close" (click)="close()" aria-label="Close notification">
     <mat-icon>close</mat-icon>
   </button>
 </div>

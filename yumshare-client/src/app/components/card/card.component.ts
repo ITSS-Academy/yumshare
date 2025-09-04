@@ -1,6 +1,11 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
 import {ShareModule} from '../../shares/share.module';
+import {RecipeCardSkeletonComponent} from '../skeleton/recipe-card-skeleton.component';
+import {CommonModule} from '@angular/common';
+// import {ResponsiveImageComponent} from '../responsive-image/responsive-image.component';
+// import {LazyImageDirective} from '../../directives/lazy-image/lazy-image.directive';
+// import {SlideInDirective} from '../../directives/animations/slide-in.directive';
 
 @Component({
   selector: 'app-card',
@@ -8,8 +13,10 @@ import {ShareModule} from '../../shares/share.module';
         MatCard,
         MatCardActions,
         MatCardContent,
-        MatCardImage,
-        ShareModule
+     
+        ShareModule,
+     
+        CommonModule
     ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss'

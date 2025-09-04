@@ -3,9 +3,28 @@
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #ffffff 0%, #f8faf5 100%);
-  overflow: hidden;
+  overflow-y: auto;
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
   border-right: 1px solid rgba(141, 198, 63, 0.1);
+  
+  // Custom scrollbar styles
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(141, 198, 63, 0.05);
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(141, 198, 63, 0.3);
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba(141, 198, 63, 0.5);
+    }
+  }
 }
 
 .logo-section {
@@ -23,7 +42,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, #8DC63F 0%, #7FC520 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 1px;
   }
 
@@ -79,7 +98,7 @@ mat-nav-list {
       }
       
       mat-icon {
-        color: #8DC63F !important;
+        color: var(--primary) !important;
         transform: scale(1.1);
       }
       
@@ -114,7 +133,7 @@ mat-nav-list {
     }
 
     &.active {
-      background: linear-gradient(135deg, #8DC63F 0%, #7FC520 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: #fff;
       box-shadow: 0 8px 25px rgba(141, 198, 63, 0.3);
       transform: translateX(4px);
@@ -166,7 +185,7 @@ mat-nav-list {
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, #8DC63F 0%, #7FC520 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 1px;
   }
 

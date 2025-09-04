@@ -15,11 +15,11 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardContent,
     MatCardActions,
     MatIcon,
-    MatIconButton,
+   
     MatCardImage,
     MatIconModule,
     MatButtonModule,
-    NgClass
+   
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']

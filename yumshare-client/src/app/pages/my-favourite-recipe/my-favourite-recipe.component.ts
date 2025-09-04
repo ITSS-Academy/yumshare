@@ -21,13 +21,6 @@ import {NgClass} from '@angular/common';
   selector: 'app-my-favourite-recipe',
   imports: [
     FormsModule,
-    SideBarComponent,
-    NavBarComponent,
-    MatFormField,
-    MatInput,
-    MatDatepickerInput,
-    MatDatepicker,
-    MatDatepickerToggle,
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,
