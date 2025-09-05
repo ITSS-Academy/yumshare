@@ -1,9 +1,12 @@
-import { Controller, Headers, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Headers, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 
 @Controller('users')
+@UseGuards(RateLimitGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   
@@ -14,6 +17,7 @@ export class AuthController {
   }
 
   @Post()
+  @RateLimit(RateLimits.STRICT)
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       return await this.authService.create(createUserDto);

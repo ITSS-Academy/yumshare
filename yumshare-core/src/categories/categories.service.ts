@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
@@ -6,13 +6,17 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ListResult } from '../common/types/list-result.type';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
+import { OptimizedQueryService } from '../common/services/optimized-query.service';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    private readonly optimizedQueryService: OptimizedQueryService,
   ) {}
+
+  private readonly logger = new Logger(CategoriesService.name);
 
   async create(createCategoryDto: CreateCategoryDto) {
     // Check if category name already exists
@@ -29,18 +33,25 @@ export class CategoriesService {
   }
 
   async findAll(queryOpts: QueryOptsDto = {}): Promise<ListResult<Category>> {
-    const { page = 1, size = 20, orderBy = 'sort_order', order = 'ASC' } = queryOpts;
+    const { page = 1, size = 20 } = queryOpts;
     
-    const skip = (page - 1) * size;
-    
-    const [categories, total] = await this.categoryRepository.findAndCount({
-      where: { is_active: true },
-      order: { [orderBy]: order, name: 'ASC' },
-      skip,
-      take: size,
-    });
+    // Use optimized query service for better performance
+    const result = await this.optimizedQueryService.executeOptimizedQuery(
+      this.categoryRepository,
+      queryOpts,
+      {
+        relations: [],
+        maxRelations: 0,
+        selectFields: ['id', 'name', 'description', 'sort_order', 'is_active'],
+        enableCache: false
+      }
+    );
 
-    return new ListResult(categories, total, page, size);
+    const listResult = new ListResult(result.data, result.total, result.page, result.size);
+    
+    this.logger.log(`Categories fetched: ${result.data.length} results, total: ${result.total}, page: ${result.page}`);
+    
+    return listResult;
   }
 
   findAllWithRecipes() {

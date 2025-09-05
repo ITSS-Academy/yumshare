@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { CommentService } from '../../services/comment.service';
+import { CommentService } from '../../services/comment/comment.service';
 import * as CommentActions from './comment.actions';
 
 // Load Comments Effect

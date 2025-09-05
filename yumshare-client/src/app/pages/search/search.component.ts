@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
-import {MatIconButton} from '@angular/material/button';
-import {NgClass, NgFor, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
 
 @Component({
   selector: 'app-search',
@@ -19,6 +19,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardImage,
     MatIconModule,
     MatButtonModule,
+    CommonModule,
+    LazyImageDirective,
 
   ],
   templateUrl: './search.component.html',
@@ -37,7 +39,8 @@ export class SearchComponent {
       image: 'assets/salad.jpg',
       author: 'Anh Vu',
       authorAvatar: 'assets/avatar.png',
-      rating: 4,
+      difficulty: 'easy',
+      cookTime: 15,
       isFavorite: false
     },
     {
@@ -46,7 +49,8 @@ export class SearchComponent {
       image: 'assets/salad.jpg',
       author: 'Van Nghia',
       authorAvatar: 'assets/avatar.png',
-      rating: 5,
+      difficulty: 'medium',
+      cookTime: 25,
       isFavorite: false
     },
     {
@@ -55,19 +59,12 @@ export class SearchComponent {
       image: 'assets/soup.jpg',
       author: 'Quoc Viet',
       authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
+      difficulty: 'hard',
+      cookTime: 40,
       isFavorite: false
     },
   ];
+
 
   allResults = [...this.results];
   pageSize = 8;

@@ -21,6 +21,7 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-add-recipe',
@@ -69,7 +70,8 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     private recipeService: RecipeService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private store: Store<{auth: AuthState}>
+    private store: Store<{auth: AuthState}>,
+    private categoryService: CategoryService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', Validators.required],
@@ -248,7 +250,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
     loadCategories() {
-    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+    const categoriesSubscription = this.categoryService.getCategories().subscribe({
       next: (response: any) => {
         console.log('Full API response:', response);
         console.log('Response type:', typeof response);

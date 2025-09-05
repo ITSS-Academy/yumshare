@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatProgressSpinnerModule, MatIconModule],
   template: `
-    <div class="loading-container" [ngClass]="size">
+    <div class="loading-container" [ngClass]="[size, centerType]">
       <!-- Spinner -->
       <div class="spinner-wrapper">
         <mat-spinner
@@ -46,6 +46,8 @@ import { MatIconModule } from '@angular/material/icon';
       justify-content: center;
       padding: 24px;
       min-height: 120px;
+      width: 100%;
+      position: relative;
     }
 
     .loading-container.small {
@@ -56,6 +58,47 @@ import { MatIconModule } from '@angular/material/icon';
     .loading-container.large {
       padding: 48px;
       min-height: 200px;
+    }
+
+    /* Full page center positioning */
+    .loading-container.full-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* Center in viewport */
+    .loading-container.center-viewport {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-height: auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Center in container */
+    .loading-container.center-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-height: auto;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
     }
 
     .spinner-wrapper {
@@ -150,6 +193,7 @@ export class LoadingComponent {
   @Input() showDots: boolean = true;
   @Input() showProgress: boolean = false;
   @Input() progressValue: number = 0;
+  @Input() centerType: 'default' | 'full-page' | 'center-viewport' | 'center-container' = 'default';
 
   get spinnerDiameter(): number {
     switch (this.size) {

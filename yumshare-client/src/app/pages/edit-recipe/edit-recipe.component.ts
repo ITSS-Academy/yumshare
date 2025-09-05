@@ -24,6 +24,7 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { SafePipe } from '../../pipes/safe.pipe';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-edit-recipe',
@@ -78,7 +79,8 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<{auth: AuthState}>,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private categoryService: CategoryService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', Validators.required],
@@ -213,7 +215,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
 
   loadCategories() {
-    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+    const categoriesSubscription = this.categoryService.getCategories().subscribe({
       next: (response: any) => {
         let categories: Category[] = [];
         
@@ -266,14 +268,48 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     const recipeSubscription = this.recipeService.getRecipeById(this.recipeId).subscribe({
       next: (recipe: Recipe) => {
         this.originalRecipe = recipe;
-        this.populateForm(recipe);
-        this.loading = false;
+        
+        // Kiểm tra quyền edit bằng endpoint mới
+        if (this.currentUser) {
+          this.recipeService.checkEditPermission(this.recipeId!).subscribe({
+            next: (permissionResponse) => {
+                      if (!permissionResponse.canEdit) {
+          this.snackBar.open(permissionResponse.message, 'Close', { duration: 3000 });
+          this.router.navigate(['/recipe-detail', this.recipeId]);
+          return;
+        }
+              
+              // Có quyền edit, tiếp tục load form
+              this.populateForm(recipe);
+              this.loading = false;
+            },
+            error: (error) => {
+              console.error('Error checking edit permission:', error);
+              this.snackBar.open('Error checking edit permission', 'Close', { duration: 3000 });
+              this.router.navigate(['/recipe-detail', this.recipeId]);
+            }
+          });
+        } else {
+          this.snackBar.open('Please login to edit recipe', 'Close', { duration: 3000 });
+          this.router.navigate(['/home']);
+        }
       },
       error: (error: any) => {
         console.error('Error loading recipe:', error);
-        this.snackBar.open('Failed to load recipe', 'Close', { duration: 3000 });
+        
+        // Xử lý lỗi permission từ backend
+        if (error.status === 401) {
+          this.snackBar.open('Please login to access this recipe', 'Close', { duration: 3000 });
+          this.router.navigate(['/login']);
+        } else if (error.status === 403 || error.error?.message?.includes('permission')) {
+          this.snackBar.open('You do not have permission to edit this recipe', 'Close', { duration: 3000 });
+          this.router.navigate(['/recipe', this.recipeId]);
+        } else {
+          this.snackBar.open('Failed to load recipe', 'Close', { duration: 3000 });
+          this.router.navigate(['/']);
+        }
+        
         this.loading = false;
-        this.router.navigate(['/']);
       }
     });
     
@@ -510,13 +546,35 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
   nextStep() {
     if (this.currentStep < 4) {
       this.currentStep++;
+      this.scrollToTop();
     }
+    
   }
 
   previousStep() {
     if (this.currentStep > 1) {
       this.currentStep--;
+      this.scrollToTop();
     }
+  }
+  private scrollToTop() {
+    // Smooth scroll to top of the page with offset for sticky header
+    const headerHeight = 120; // Approximate height of progress header
+    window.scrollTo({
+      top: headerHeight,
+      behavior: 'smooth'
+    });
+    
+    // Alternative: scroll to the edit-recipe container with proper offset
+    setTimeout(() => {
+      const container = document.querySelector('.edit-recipe');
+      if (container) {
+        container.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 200);
   }
 
   setVideoType(type: 'file' | 'youtube') {
@@ -538,6 +596,12 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
     if (!this.recipeId) {
       this.snackBar.open('Recipe ID not found', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
+    if (this.originalRecipe && this.originalRecipe.user_id !== this.currentUser.uid) {
+      this.snackBar.open('You do not have permission to edit this recipe', 'Close', { duration: 3000 });
       return;
     }
     
@@ -610,6 +674,74 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     }
   }
 
+  private async submitRecipe() {
+    // Sync stepsData with FormArray before validation
+    this.syncStepsWithFormArray();
+    
+    // Debug: Log validation status
+    this.logFormValidationStatus();
+    
+    // Check if stepsData has valid descriptions
+    const hasValidSteps = this.stepsData.length > 0 && 
+                         this.stepsData.every(step => step.description && step.description.trim() !== '');
+    
+    if (this.recipeForm.valid && hasValidSteps) {
+      this.uploading = true;
+      
+      try {
+        // Create FormData for file uploads
+        const formData = new FormData();
+        
+        // Add recipe data
+        const recipeData = this.recipeForm.value;
+        formData.append('title', recipeData.title);
+        formData.append('description', recipeData.description);
+        formData.append('servings', recipeData.servings.toString());
+        formData.append('total_cooking_time', recipeData.total_cooking_time.toString());
+        formData.append('difficulty', recipeData.difficulty);
+        formData.append('country', recipeData.country);
+        formData.append('category_id', recipeData.category_id);
+        
+        // Add ingredients and steps as JSON
+        formData.append('ingredients', JSON.stringify(recipeData.ingredients));
+        formData.append('steps', JSON.stringify(this.stepsData));
+        
+        // Add new image if selected
+        if (this.selectedImage) {
+          formData.append('image', this.selectedImage);
+        }
+        
+        // Add video (file or YouTube URL)
+        if (this.videoType === 'file' && this.selectedVideo) {
+          formData.append('video', this.selectedVideo);
+        } else if (this.videoType === 'youtube' && this.youtubeUrl) {
+          formData.append('video_url', this.youtubeUrl);
+        }
+
+        // Update recipe
+        const response = await this.recipeService.updateRecipeWithFiles(this.recipeId!, formData).toPromise();
+        
+        this.snackBar.open('Recipe updated successfully!', 'Close', { duration: 3000 });
+        this.router.navigate(['/recipe', this.recipeId]);
+        
+      } catch (error) {
+        console.error('Error updating recipe:', error);
+        this.snackBar.open('Error updating recipe. Please try again.', 'Close', { duration: 3000 });
+      } finally {
+        this.uploading = false;
+      }
+    } else {
+      this.markFormGroupTouched();
+      
+      // Check specific validation issues
+      if (!hasValidSteps) {
+        this.snackBar.open('Please fill in all step descriptions', 'Close', { duration: 3000 });
+      } else {
+        this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      }
+    }
+  }
+
   private markFormGroupTouched() {
     Object.keys(this.recipeForm.controls).forEach(key => {
       const control = this.recipeForm.get(key);
@@ -631,9 +763,16 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
       }
     });
   }
+ 
 
   onDelete() {
     if (!this.recipeId) return;
+    
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được delete
+    if (!this.currentUser || (this.originalRecipe && this.originalRecipe.user_id !== this.currentUser.uid)) {
+      this.snackBar.open('You do not have permission to delete this recipe', 'Close', { duration: 3000 });
+      return;
+    }
     
     if (confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
       this.recipeService.deleteRecipe(this.recipeId).subscribe({

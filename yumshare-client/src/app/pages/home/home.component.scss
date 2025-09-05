@@ -1,5 +1,5 @@
 .content-wrapper {
-  padding: 1rem 1rem;
+  // padding: 1rem 1rem;
   box-sizing: border-box;
 
   // ===== Image Title Section =====
@@ -58,7 +58,6 @@
     gap: 1rem;
     width: 100%;
     align-items: center;
-
     .dish-type-1,
     .dish-type-2,
     .dish-type-3,
@@ -129,6 +128,7 @@
 
   // ===== Section Titles =====
   h3 {
+    margin: 0;
     margin-top: 2rem;
     color: var(--mat-sys-primary, #ff9800);
     font-size: var(--mat-sys-body-medium, 1rem);
@@ -401,7 +401,7 @@
 
   // 4K (2560px)
   @media screen and (min-width: 1441px) {
-    padding: 1rem 2rem;
+    // padding: 1rem 2rem;
     max-width: 1920px;
     margin: 0 auto;
 

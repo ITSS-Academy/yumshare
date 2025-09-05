@@ -1,8 +1,11 @@
-import { Controller, Post, Delete, Get, Param, Body, Query } from '@nestjs/common';
+import { Controller, Post, Delete, Get, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 
 @Controller('likes')
+@UseGuards(RateLimitGuard)
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 

@@ -1,22 +1,7 @@
 import { Recipe } from '../../models';
+import { PaginatedResponse } from '../../models/paginated-response.model';
 
 export interface RecipeState {
-  // Recipe State Interface
-  id: string;
-  user_id: string;
-  title: string;
-  description?: string;
-  ingredients?: string[];
-  image_url?: string;
-  video_url?: string;
-  total_cooking_time: number;
-  servings: number;
-  difficulty?: string;
-  country?: string;
-  category_id?: string;
-  created_at: Date;
-  updated_at: Date;
-
   // Current Recipe
   currentRecipe: Recipe | null;
   currentRecipeLoading: boolean;
@@ -26,6 +11,11 @@ export interface RecipeState {
   recipes: Recipe[];
   recipesLoading: boolean;
   recipesError: string | null;
+
+  // Paginated Recipe List
+  paginatedRecipes: PaginatedResponse<Recipe> | null;
+  paginatedRecipesLoading: boolean;
+  paginatedRecipesError: string | null;
 
   // Search
   searchQuery: string;
@@ -53,6 +43,11 @@ export const initialRecipeState: RecipeState = {
   recipes: [],
   recipesLoading: false,
   recipesError: null,
+
+  // Paginated Recipe List
+  paginatedRecipes: null,
+  paginatedRecipesLoading: false,
+  paginatedRecipesError: null,
 
   // Search
   searchQuery: '',

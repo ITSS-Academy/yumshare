@@ -1,9 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 
 import { NotificationsModule } from './notifications/notifications.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
@@ -19,6 +18,8 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { ChatsModule } from './chats/chats.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { MiddlewareAuthMiddleware } from './auth/auth.middleware';
+import { CompressionMiddleware } from './common/middleware/compression.middleware';
 
 @Module({
   imports: [
@@ -56,4 +57,25 @@ import { CommonModule } from './common/common.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply compression middleware globally
+    consumer
+      .apply(CompressionMiddleware)
+      .forRoutes('*');
+
+    // Apply auth middleware for protected routes
+    consumer
+      .apply(MiddlewareAuthMiddleware)
+      .forRoutes(
+        // { path: 'recipes', method: RequestMethod.POST },
+        // { path: 'recipes/:id', method: RequestMethod.GET },  // Không cần auth middleware
+        { path: 'recipes/:id/check-edit-permission', method: RequestMethod.GET },  // Cần auth middleware
+        { path: 'recipes/:id', method: RequestMethod.PUT },
+        { path: 'recipes/:id', method: RequestMethod.DELETE },
+        { path: 'recipes/:id/with-files', method: RequestMethod.PUT },
+        // { path: 'recipes/:id/image', method: RequestMethod.POST },
+        // { path: 'recipes/:id/video', method: RequestMethod.POST }
+      );
+  }
+}

@@ -1,24 +1,75 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { map, shareReplay, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Recipe } from '../../models/recipe.model';
 import { Category } from '../../models/category.model';
 import { RecipeStep } from '../../models/recipe-step.model';
 import { PaginatedResponse } from '../../models/paginated-response.model';
+import { CachingService, CacheOptions } from '../caching/caching.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
   private apiUrl = environment.apiUrl;
+  private readonly CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+  private readonly SEARCH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  constructor(private http: HttpClient) {}
+  // Cache for frequently accessed data
+  private categoriesCache$ = new BehaviorSubject<Category[]>([]);
+  private recipesCache = new Map<string, { data: Recipe[]; timestamp: number }>();
 
-  // Get all categories
-  getCategories(): Observable<PaginatedResponse<Category>> {
-    return this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`);
+  constructor(
+    private http: HttpClient,
+    private cachingService: CachingService
+  ) {
+    // Preload categories
+    // this.preloadCategories();
   }
+
+  /**
+   * Preload categories into cache
+   */
+  // private preloadCategories(): void {
+  //   this.getCategories().subscribe(categories => {
+  //     if (categories.data) {
+  //       this.categoriesCache$.next(categories.data);
+  //       // Cache categories for 1 hour
+  //       this.cachingService.set('categories', categories.data, { ttl: 60 * 60 * 1000 });
+  //     }
+  //   });
+  // }
+
+
+  // // Get all categories with caching
+  // getCategories(): Observable<PaginatedResponse<Category>> {
+  //   // Check cache first
+  //   const cached = this.cachingService.get<Category[]>('categories');
+  //   if (cached) {
+  //     return of({
+  //       data: cached,
+  //       total: cached.length,
+  //       page: 1,
+  //       size: cached.length,
+  //       hasMore: false,
+  //       totalPages: 1,
+  //       current_page: 1,
+  //       end_page: 1,
+  //       has_next: false,
+  //       has_prev: false,
+  //       total_pages: 1
+  //     });
+  //   }
+
+  //   // If not in cache, fetch from API and cache
+  //   return this.cachingService.getOrSet(
+  //     'categories',
+  //     this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`),
+  //     { ttl: this.CACHE_TTL }
+  //   );
+  // }
 
   // Create recipe with files
   createRecipeWithFiles(recipeData: FormData): Observable<Recipe> {
@@ -49,6 +100,11 @@ export class RecipeService {
     return this.http.get<Recipe>(`${this.apiUrl}/recipes/${id}`);
   }
 
+  // Check edit permission for recipe
+  checkEditPermission(id: string): Observable<{canEdit: boolean, message: string, recipe?: Recipe}> {
+    return this.http.get<{canEdit: boolean, message: string, recipe?: Recipe}>(`${this.apiUrl}/recipes/${id}/check-edit-permission`);
+  }
+
   // Update recipe
   updateRecipe(id: string, recipe: Partial<Recipe>): Observable<Recipe> {
     return this.http.put<Recipe>(`${this.apiUrl}/recipes/${id}`, recipe);
@@ -69,7 +125,7 @@ export class RecipeService {
     let params: any = { q: query };
     if (category) params.category = category;
     if (author) params.author = author;
-    
+
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/search`, { params });
   }
 
@@ -77,4 +133,13 @@ export class RecipeService {
   getRecipesByCategory(categoryId: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
   }
+  // Get all recipes
+getAllRecipes(): Observable<PaginatedResponse<Recipe>> {
+  const params = new HttpParams()
+    .set('page', '1')
+    .set('size', '10')
+    .set('orderBy', 'created_at')
+    .set('order', 'DESC');
+  return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
+}
 }

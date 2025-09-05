@@ -31,7 +31,9 @@
     </button>
   </div>
   <div class="container-card">
-    <app-card></app-card>
+    <ng-container *ngIf="paginatedRecipes$ | async as paginated">
+      <app-card [cardData]="paginated?.data"></app-card>
+    </ng-container>
   </div>
 
   <div class="section-header">

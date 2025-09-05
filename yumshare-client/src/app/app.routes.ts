@@ -46,13 +46,7 @@ export const routes: Routes = [
         (m) => m.RecipeDetailComponent
       )
   },
-  {
-    path: 'recipe/:id',
-    loadComponent: () =>
-      import('./pages/recipe-detail/recipe-detail.component').then(
-        (m) => m.RecipeDetailComponent
-      )
-  },
+  
   {
     path:'search',
     loadComponent: () =>
