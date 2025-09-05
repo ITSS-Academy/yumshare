@@ -37,7 +37,7 @@
         </div>
       </div>
     }
-    
+
     @if (recipe$ | async; as recipe) {
       <div class="middle">
         <div class="left">
@@ -50,7 +50,7 @@
               </div>
             }
           </div>
-          
+
           <div class="user-box">
             <span class="label">Up by:</span>
             <div class="user-info">
@@ -67,7 +67,7 @@
               </mat-checkbox>
             }
             @if (recipe.user?.id !== (currentUser$ | async)?.uid && !(currentUser$ | async)) {
-              <button 
+              <button
                 class="login-required-btn"
                 (click)="onLoginRequired()">
                 Đăng nhập để Follow
@@ -75,14 +75,14 @@
             }
           </div>
         </div>
-        
+
         <div class="right">
           <h1 class="title2">Process Steps</h1>
           @for (step of recipe.steps; track step.id; let i = $index) {
             <div class="instruction">
               <div class="instruction-box">
                 <div class="step">
-                 
+
                   <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
                 </div>
                 <div class="step-detail">
@@ -101,29 +101,29 @@
         </div>
       </div>
     }
-    
+
     @if (recipe$ | async; as recipe) {
       <div class="bottom">
         @if (recipe.video_url) {
           <div class="video">
             <h1 class="title3">Video Tutorial</h1>
-            <iframe 
-              class="clip" 
-              width="650" 
-              height="400" 
-              [src]="getYouTubeEmbedUrl(recipe.video_url) | safe" 
-              title="Recipe Video Tutorial" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            <iframe
+              class="clip"
+              width="650"
+              height="400"
+              [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
+              title="Recipe Video Tutorial"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen>
             </iframe>
           </div>
         }
-        
+
         <app-comment style="margin-top: 1rem;"
-          [recipeId]="recipeId"
-          (commentAdded)="onCommentAdded($event)"
-          (commentDeleted)="onCommentDeleted($event)">
+                     [recipeId]="recipeId"
+                     (commentAdded)="onCommentAdded($event)"
+                     (commentDeleted)="onCommentDeleted($event)">
         </app-comment>
       </div>
     }

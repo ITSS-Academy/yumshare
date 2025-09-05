@@ -22,7 +22,7 @@ import { Auth } from '@angular/fire/auth';
     FormsModule,
     CommonModule,
     RouterModule,
-    // DarkModeToggleComponent
+    DarkModeToggleComponent
   ],
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']

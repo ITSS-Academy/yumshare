@@ -136,17 +136,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private updateFooterVisibility() {
     const currentRoute = this.router.url;
-    
+
     // Routes where footer should NOT be shown
     const noFooterRoutes = [
       '/message',
-      '/profile', 
+      '/profile',
       '/add-recipe',
       '/edit-recipe'
     ];
-    
+
     // Check if current route matches any no-footer routes
-    this.showFooter = !noFooterRoutes.some(route => 
+    this.showFooter = !noFooterRoutes.some(route =>
       currentRoute.includes(route)
     );
   }
@@ -189,7 +189,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
-    
+
     window.addEventListener('resize', () => {
       this.isMobile = window.innerWidth <= 768;
     });

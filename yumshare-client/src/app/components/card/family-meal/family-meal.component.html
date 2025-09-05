@@ -1,13 +1,13 @@
 <div class="container-card">
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
-      <mat-card class="dish-card" appearance="outlined">
+      <mat-card class="dish-card" appearance="outlined" (click)="navigationToDetail(item.id)">
         <div appLazyImage 
              [appLazyImage]="item.imageUrl"
              [appLazyImageOptions]="{ quality: 0.8, maxWidth: 400, maxHeight: 300, generateThumbnail: true, thumbnailSize: 150 }"
-             class="dish-image-container" (click)="navigationToDetail(item.id)">
+             class="dish-image-container">
         </div>
-        <mat-card-content (click)="navigationToDetail(item.id)">
+        <mat-card-content>
           <h2 class="dish-title">{{ item.title }}</h2>
           <p class="dish-description">
             {{ item.description }}
@@ -16,7 +16,7 @@
 
 
         <!-- Độ khó & Thời gian nấu -->
-        <div class="dish-info-row" (click)="navigationToDetail(item.id)">
+        <div class="dish-info-row">
           <span class="difficulty-label" [ngClass]="{
             'easy': item.difficulty === 'easy',
             'medium': item.difficulty === 'medium',

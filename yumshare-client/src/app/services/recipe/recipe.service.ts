@@ -16,7 +16,7 @@ export class RecipeService {
   private apiUrl = environment.apiUrl;
   private readonly CACHE_TTL = 10 * 60 * 1000; // 10 minutes
   private readonly SEARCH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  
+
   // Cache for frequently accessed data
   private categoriesCache$ = new BehaviorSubject<Category[]>([]);
   private recipesCache = new Map<string, { data: Recipe[]; timestamp: number }>();
@@ -26,49 +26,50 @@ export class RecipeService {
     private cachingService: CachingService
   ) {
     // Preload categories
-    this.preloadCategories();
+    // this.preloadCategories();
   }
 
   /**
    * Preload categories into cache
    */
-  private preloadCategories(): void {
-    this.getCategories().subscribe(categories => {
-      if (categories.data) {
-        this.categoriesCache$.next(categories.data);
-        // Cache categories for 1 hour
-        this.cachingService.set('categories', categories.data, { ttl: 60 * 60 * 1000 });
-      }
-    });
-  }
+  // private preloadCategories(): void {
+  //   this.getCategories().subscribe(categories => {
+  //     if (categories.data) {
+  //       this.categoriesCache$.next(categories.data);
+  //       // Cache categories for 1 hour
+  //       this.cachingService.set('categories', categories.data, { ttl: 60 * 60 * 1000 });
+  //     }
+  //   });
+  // }
 
-  // Get all categories with caching
-  getCategories(): Observable<PaginatedResponse<Category>> {
-    // Check cache first
-    const cached = this.cachingService.get<Category[]>('categories');
-    if (cached) {
-      return of({
-        data: cached, 
-        total: cached.length, 
-        page: 1, 
-        size: cached.length, 
-        hasMore: false, 
-        totalPages: 1,
-        current_page: 1,
-        end_page: 1,
-        has_next: false,
-        has_prev: false,
-        total_pages: 1
-      });
-    }
 
-    // If not in cache, fetch from API and cache
-    return this.cachingService.getOrSet(
-      'categories',
-      this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`),
-      { ttl: this.CACHE_TTL }
-    );
-  }
+  // // Get all categories with caching
+  // getCategories(): Observable<PaginatedResponse<Category>> {
+  //   // Check cache first
+  //   const cached = this.cachingService.get<Category[]>('categories');
+  //   if (cached) {
+  //     return of({
+  //       data: cached,
+  //       total: cached.length,
+  //       page: 1,
+  //       size: cached.length,
+  //       hasMore: false,
+  //       totalPages: 1,
+  //       current_page: 1,
+  //       end_page: 1,
+  //       has_next: false,
+  //       has_prev: false,
+  //       total_pages: 1
+  //     });
+  //   }
+
+  //   // If not in cache, fetch from API and cache
+  //   return this.cachingService.getOrSet(
+  //     'categories',
+  //     this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`),
+  //     { ttl: this.CACHE_TTL }
+  //   );
+  // }
 
   // Create recipe with files
   createRecipeWithFiles(recipeData: FormData): Observable<Recipe> {
@@ -124,7 +125,7 @@ export class RecipeService {
     let params: any = { q: query };
     if (category) params.category = category;
     if (author) params.author = author;
-    
+
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/search`, { params });
   }
 
@@ -132,4 +133,13 @@ export class RecipeService {
   getRecipesByCategory(categoryId: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
   }
+  // Get all recipes
+getAllRecipes(): Observable<PaginatedResponse<Recipe>> {
+  const params = new HttpParams()
+    .set('page', '1')
+    .set('size', '10')
+    .set('orderBy', 'created_at')
+    .set('order', 'DESC');
+  return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
+}
 }
