@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
 import { SideBarComponent } from '../../components/side-bar/side-bar.component';
+import { LoadingComponent } from '../../components/loading/loading.component';
 import { ShareModule } from '../../shares/share.module';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DeleteConfirmDialogComponent } from '../../components/delete-confirm-dialog/delete-confirm-dialog.component';
@@ -21,7 +22,8 @@ import * as FollowSelectors from '../../ngrx/follow/follow.selectors';
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   imports: [
-    ShareModule
+    ShareModule,
+    LoadingComponent
   ],
   styleUrls: ['./profile.component.scss']
 })
@@ -97,6 +99,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     // Unsubscribe from all subscriptions
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
     this.subscriptions = [];
+
+    //clear auth state
+    // this.store.dispatch(AuthActions.clearAuthState());
     
     // Clear follow state
     this.store.dispatch(FollowActions.clearFollowState());

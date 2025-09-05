@@ -1,8 +1,12 @@
-import { Controller, Post, Delete, Get, Param, Body } from '@nestjs/common';
+import { Controller, Post, Delete, Get, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
+import { QueryOptsDto } from '../common/dto/query-opts.dto';
 
 @Controller('favorites')
+@UseGuards(RateLimitGuard)
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
@@ -20,8 +24,11 @@ export class FavoritesController {
   }
 
   @Get('user/:userId')
-  getUserFavorites(@Param('userId') userId: string) {
-    return this.favoritesService.getUserFavorites(userId);
+  getUserFavorites(
+    @Param('userId') userId: string,
+    @Query() queryOpts: QueryOptsDto,
+  ) {
+    return this.favoritesService.getUserFavorites(userId, queryOpts);
   }
 
   @Get('check/:userId/:recipeId')
@@ -36,4 +43,6 @@ export class FavoritesController {
   getFavoriteCount(@Param('userId') userId: string) {
     return this.favoritesService.getFavoriteCount(userId);
   }
+
+
 }

@@ -33,11 +33,28 @@
     scroll-snap-align: start; // card tự khớp lề khi dừng
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    img {
+    .dish-image-container {
       width: 100%;
       height: 200px;
-      object-fit: cover;
       padding: 16px 16px 0 16px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s ease;
+      }
+      
+      &.lazy-image-loading img {
+        opacity: 0.6;
+      }
+      
+      &.lazy-image-loaded img {
+        opacity: 1;
+      }
     }
 
     .dish-title {
@@ -80,13 +97,21 @@
         display: flex;
         gap: 8px;
 
-        .avatar {
+        .avatar-container {
           width: 30px;
           height: 30px;
           border-radius: 100%;
           padding: 2px;
           display: flex;
           align-items: center;
+          overflow: hidden;
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100%;
+          }
         }
 
         .username {

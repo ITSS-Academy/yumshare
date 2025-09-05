@@ -11,7 +11,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { Comment } from '../../../../models/comment.model';
 import { User } from '../../../../models/user.model';
-import { CreateCommentDto, UpdateCommentDto } from '../../../../services/comment.service';
+import { CreateCommentDto, UpdateCommentDto } from '../../../../../app/services/comment/comment.service';
 
 // NGRX imports
 import * as CommentActions from '../../../../ngrx/comment/comment.actions';

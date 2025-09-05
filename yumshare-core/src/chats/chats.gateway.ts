@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
@@ -21,15 +22,16 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private connectedUsers = new Map<string, string>(); // userId -> socketId
+  private readonly logger = new Logger(ChatsGateway.name);
 
   constructor(private readonly chatsService: ChatsService) {}
 
   handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+    this.logger.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected: ${client.id}`);
     // Remove user from connected users
     for (const [userId, socketId] of this.connectedUsers.entries()) {
       if (socketId === client.id) {
@@ -77,15 +79,17 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
       }
 
-      // Emit to sender for confirmation
-      client.emit('messageSent', message);
+              // Emit to sender for confirmation
+        client.emit('messageSent', message);
 
-      return message;
-    } catch (error) {
-      client.emit('error', { message: 'Failed to send message' });
-      return null;
+        this.logger.log(`Message sent: ${message.id}`);
+
+        return message;
+      } catch (error) {
+        client.emit('error', { message: 'Failed to send message' });
+        return null;
+      }
     }
-  }
 
   @SubscribeMessage('typing')
   async handleTyping(

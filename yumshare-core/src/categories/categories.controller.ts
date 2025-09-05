@@ -1,12 +1,15 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, Query, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, Query, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { SupabaseStorageService } from '../common/services/supabase-storage.service';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
+import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
+import { RateLimitGuard } from '../common/guards/rate-limit.guard';
 
 @Controller('categories')
+@UseGuards(RateLimitGuard)
 export class CategoriesController {
   constructor(
     private readonly categoriesService: CategoriesService,
@@ -14,11 +17,13 @@ export class CategoriesController {
   ) {}
 
   @Post()
+  @RateLimit(RateLimits.STRICT)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
 
   @Get()
+  @RateLimit(RateLimits.STANDARD)
   findAll(@Query() queryOpts: QueryOptsDto, @Query('withRecipes') withRecipes?: string) {
     if (withRecipes === 'true') {
       return this.categoriesService.findAllWithRecipes();
@@ -69,6 +74,6 @@ export class CategoriesController {
     const imageUrl = await this.supabaseStorageService.uploadImage(file, `categories/${id}`);
     
     // Update category with image URL
-    return this.categoriesService.update(id, { image_url: imageUrl });
+    return this.categoriesService.update(id, { image_url: imageUrl.mainUrl });
   }
 }

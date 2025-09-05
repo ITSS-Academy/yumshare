@@ -19,6 +19,16 @@ p {
   margin-top: 1rem;
 }
 
+.recipe-loading-container {
+  width: 100%;
+  min-height: 60vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
 
 .top {
   width: 100%;
@@ -58,11 +68,27 @@ p {
   margin-top: 0.3125rem;
 }
 
-.hinh-mon-an {
+.hinh-mon-an-container {
   width: 80%;
   height: auto;
   border-radius: 1.25rem;
-  object-fit: contain;
+  position: relative;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+  }
+  
+  &.lazy-image-loading img {
+    opacity: 0.6;
+  }
+  
+  &.lazy-image-loaded img {
+    opacity: 1;
+  }
 }
 
 .phai {
@@ -320,6 +346,29 @@ p {
 
 .cooking {
   margin: 0;
+}
+
+.step-image-container {
+  width: 100%;
+  height: auto;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+  
+  &.lazy-image-loading img {
+    opacity: 0.6;
+  }
+  
+  &.lazy-image-loaded img {
+    opacity: 1;
+  }
 }
 
 .bottom {

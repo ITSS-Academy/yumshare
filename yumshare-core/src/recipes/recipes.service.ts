@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Recipe } from './entities/recipe.entity/recipe.entity';
@@ -9,6 +9,7 @@ import { SupabaseStorageService } from '../common/services/supabase-storage.serv
 import { RecipeStep } from '../recipe-steps/entities/recipe-step.entity';
 import { ListResult } from '../common/types/list-result.type';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
+import { OptimizedQueryService } from '../common/services/optimized-query.service';
 
 @Injectable()
 export class RecipesService {
@@ -21,7 +22,10 @@ export class RecipesService {
     private readonly recipeStepRepository: Repository<RecipeStep>,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly dataSource: DataSource,
+    private readonly optimizedQueryService: OptimizedQueryService,
   ) {}
+
+  private readonly logger = new Logger(RecipesService.name);
 
   async create(createRecipeDto: CreateRecipeDto) {
     const user = await this.userRepository.findOne({ where: { id: createRecipeDto.user_id } });
@@ -64,18 +68,25 @@ export class RecipesService {
   }
 
   async findAll(queryOpts: QueryOptsDto = {}): Promise<ListResult<Recipe>> {
-    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const { page = 1, size = 10 } = queryOpts;
     
-    const skip = (page - 1) * size;
-    
-    const [recipes, total] = await this.recipeRepository.findAndCount({
-      relations: ['user', 'category', 'steps'],
-      order: { [orderBy]: order },
-      skip,
-      take: size,
-    });
+    // Use optimized query service for better performance
+    const result = await this.optimizedQueryService.executeOptimizedQuery(
+      this.recipeRepository,
+      queryOpts,
+      {
+        relations: ['user', 'category'],
+        maxRelations: 2,
+        selectFields: ['id', 'title', 'description', 'thumbnail', 'created_at', 'difficulty', 'cooking_time'],
+        enableCache: false
+      }
+    );
 
-    return new ListResult(recipes, total, page, size);
+    const listResult = new ListResult(result.data, result.total, result.page, result.size);
+    
+    this.logger.log(`Recipes fetched: ${result.data.length} results, total: ${result.total}, page: ${result.page}`);
+    
+    return listResult;
   }
 
   findOne(id: string) {
@@ -84,6 +95,30 @@ export class RecipesService {
       relations: ['user', 'category', 'steps'],
       order: { steps: { step_number: 'ASC' } }
     });
+  }
+
+  async checkEditPermission(recipeId: string, currentUserId: string) {
+    const recipe = await this.findOne(recipeId);
+    if (!recipe) {
+      return { 
+        canEdit: false, 
+        message: 'Recipe not found' 
+      };
+    }
+
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
+    if (recipe.user.id !== currentUserId) {
+      return { 
+        canEdit: false, 
+        message: 'You do not have permission to edit this recipe' 
+      };
+    }
+
+    return { 
+      canEdit: true, 
+      message: 'You have permission to edit this recipe',
+      recipe: recipe
+    };
   }
 
   async findByCategory(categoryId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Recipe>> {
@@ -168,9 +203,14 @@ export class RecipesService {
     return new ListResult(recipes, total, page, size);
   }
 
-  async update(id: string, updateRecipeDto: UpdateRecipeDto) {
+  async update(id: string, updateRecipeDto: UpdateRecipeDto, currentUserId: string) {
     const recipe = await this.findOne(id);
     if (!recipe) return null;
+
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được update
+    if (recipe.user.id !== currentUserId) {
+      throw new Error('You do not have permission to update this recipe');
+    }
 
     // Sử dụng transaction để đảm bảo tính nhất quán
     const queryRunner = this.dataSource.createQueryRunner();
@@ -245,9 +285,14 @@ export class RecipesService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, currentUserId: string) {
     const recipe = await this.findOne(id);
     if (!recipe) return null;
+
+    // Kiểm tra quyền: chỉ user tạo ra recipe mới được delete
+    if (recipe.user.id !== currentUserId) {
+      throw new Error('You do not have permission to delete this recipe');
+    }
 
     // Sử dụng transaction để đảm bảo tính nhất quán
     const queryRunner = this.dataSource.createQueryRunner();
@@ -308,8 +353,9 @@ export class RecipesService {
       }
     }
 
-    const imageUrl = await this.supabaseStorageService.uploadImage(file, `recipes/${recipeId}`);
-    recipe.image_url = imageUrl;
+    const imageResult = await this.supabaseStorageService.uploadImage(file, `recipes/${recipeId}`);
+    recipe.image_url = imageResult.mainUrl;
+    // Note: thumbnail URL is available in imageResult.thumbnailUrl if needed
     return this.recipeRepository.save(recipe);
   }
 
