@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
-import {MatIcon} from '@angular/material/icon';
-import {MatIconButton} from '@angular/material/button';
-import {LowerCasePipe, NgClass, NgFor, NgIf} from '@angular/common';
-import {MatIconModule} from '@angular/material/icon';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCard, MatCardActions, MatCardContent, MatCardImage } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -15,150 +15,33 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardContent,
     MatCardActions,
     MatIcon,
-   
     MatCardImage,
     MatIconModule,
     MatButtonModule,
-   
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
   keyword: string = '';
   selectedCategory: string = '';
   categories: string[] = ['Salads', 'Soups', 'Desserts'];
-  displayedResults: any[] = [];
 
-  results = [
-    {
-      id: 1,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Anh Vu',
-      authorAvatar: 'assets/avatar.png',
-      rating: 4,
-      isFavorite: false
-    },
-    {
-      id: 2,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Van Nghia',
-      authorAvatar: 'assets/avatar.png',
-      rating: 5,
-      isFavorite: false
-    },
-    {
-      id: 3,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      id: 4,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      id: 5,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Anh Vu',
-      authorAvatar: 'assets/avatar.png',
-      rating: 4.5,
-      isFavorite: false
-    },
-    {
-      id: 6,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Van Nghia',
-      authorAvatar: 'assets/avatar.png',
-      rating: 5,
-      isFavorite: false
-    },
-    {
-      id: 7,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      id: 8,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      id: 9,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Anh Vu',
-      authorAvatar: 'assets/avatar.png',
-      rating: 4,
-      isFavorite: false
-    },
-    {
-      id: 10,
-      title: 'Salad',
-      description: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-      image: 'assets/salad.jpg',
-      author: 'Van Nghia',
-      authorAvatar: 'assets/avatar.png',
-      rating: 5,
-      isFavorite: false
-    },
-    {
-      id: 11,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-    {
-      id: 12,
-      title: 'Soups',
-      description: 'Soups',
-      image: 'assets/soup.jpg',
-      author: 'Quoc Viet',
-      authorAvatar: 'assets/avatar.png',
-      rating: 1,
-      isFavorite: false
-    },
-  ];
-
-  allResults = [...this.results];
+  results: any[] = []; // Dữ liệu kết quả tìm kiếm
   pageSize = 8;
   currentPage = 1;
   totalPages = 0;
   visiblePages: number[] = [];
   showEllipsis = false;
+  displayedResults: any[] = [];
+
+  ngOnInit() {
+    // Khởi tạo dữ liệu mẫu hoặc lấy từ service
+    this.results = [
+      // ...thêm dữ liệu mẫu ở đây...
+    ];
+    this.setupPagination();
+  }
 
   setupPagination() {
     this.totalPages = Math.ceil(this.results.length / this.pageSize);
@@ -204,26 +87,19 @@ export class SearchComponent {
     item.isFavorite = !item.isFavorite;
   }
 
-  constructor() {
-    this.setupPagination();
-  }
-
   onSearch() {
-    console.log('Search clicked:', this.keyword, this.selectedCategory);
-    this.results = this.allResults.filter(item => {
-      const keywordLower = this.keyword.toLowerCase();
-      const matchKeyword = keywordLower
-        ? item.title.toLowerCase().includes(keywordLower) ||
-        item.description.toLowerCase().includes(keywordLower) ||
-        item.author.toLowerCase().includes(keywordLower)
-        : true;
-
-      const matchCategory = this.selectedCategory
-        ? item.title.toLowerCase() === this.selectedCategory.toLowerCase()
-        : true;
-
-      return matchKeyword && matchCategory;
-    });
+    // Thực hiện tìm kiếm nội bộ
+    let filtered = this.results;
+    if (this.keyword) {
+      filtered = filtered.filter(item =>
+        item.title.toLowerCase().includes(this.keyword.toLowerCase()) ||
+        item.author.toLowerCase().includes(this.keyword.toLowerCase())
+      );
+    }
+    if (this.selectedCategory) {
+      filtered = filtered.filter(item => item.category === this.selectedCategory);
+    }
+    this.results = filtered;
     this.setupPagination();
   }
 }

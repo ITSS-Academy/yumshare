@@ -30,6 +30,9 @@ import { Subscription } from 'rxjs';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
+  title(title: any) {
+      throw new Error('Method not implemented.');
+  }
   @HostBinding('class.sidebar-mini') isMini = false;
   @HostBinding('class.sidebar-closed') isClosed = false;
 
@@ -63,11 +66,11 @@ export class AppComponent implements OnInit, OnDestroy {
           photoURL: auth.photoURL,
           phoneNumber: auth.phoneNumber
         };
-        
+
         console.log('🔐 Storing user and token:', { user, tokenLength: idToken?.length });
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
-        
+
         // Hiển thị snackbar chỉ khi chưa từng hiển thị trong session này
         if (!localStorage.getItem('loginSnackbarShown')) {
           this._snackBar.openFromComponent(SnackbarComponent, {
@@ -80,7 +83,7 @@ export class AppComponent implements OnInit, OnDestroy {
           });
           localStorage.setItem('loginSnackbarShown', 'true');
         }
-        
+
         // Setup token refresh
         this.setupTokenRefresh(auth);
       } else {
@@ -136,17 +139,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private updateFooterVisibility() {
     const currentRoute = this.router.url;
-    
+
     // Routes where footer should NOT be shown
     const noFooterRoutes = [
       '/message',
-      '/profile', 
+      '/profile',
       '/add-recipe',
       '/edit-recipe'
     ];
-    
+
     // Check if current route matches any no-footer routes
-    this.showFooter = !noFooterRoutes.some(route => 
+    this.showFooter = !noFooterRoutes.some(route =>
       currentRoute.includes(route)
     );
   }
@@ -164,7 +167,7 @@ export class AppComponent implements OnInit, OnDestroy {
             email: auth.email,
             photoURL: auth.photoURL,
             phoneNumber: auth.phoneNumber
-          }, 
+          },
           idToken: newToken
         }));
       } catch (error) {
@@ -189,7 +192,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
-    
+
     window.addEventListener('resize', () => {
       this.isMobile = window.innerWidth <= 768;
     });
