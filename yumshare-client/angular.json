@@ -20,9 +20,7 @@
             "outputPath": "dist/yumshare",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -84,10 +82,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -107,14 +102,6 @@
     }
   },
   "cli": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "analytics": "f739db0f-671f-4653-9ec7-382bf8229e3a"
-=======
-    "analytics": "a7249254-2ace-473a-87dd-4b901dba5546"
->>>>>>> 2544ac95387e18f1534dbe84ff4e10cb9ec3db7f
-=======
     "analytics": false
->>>>>>> be7df884bdc79ef42548706419b05f3820ce8751
   }
 }

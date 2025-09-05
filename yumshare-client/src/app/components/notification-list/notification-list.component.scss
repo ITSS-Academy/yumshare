@@ -1,0 +1,245 @@
+.notification-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.loading-container,
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 8px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+
+  small {
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  button {
+    margin-top: 16px;
+  }
+}
+
+// Section titles
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+
+.message-notifications-section {
+  margin-bottom: 24px;
+}
+
+.other-notifications-section {
+  margin-top: 16px;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-strong);
+  }
+
+  &.unread {
+    background: var(--primary-lightest);
+    border-left: 4px solid var(--primary);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+  }
+
+  .notification-icon {
+    flex-shrink: 0;
+    
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .notification-content {
+    flex: 1;
+    min-width: 0;
+
+    .notification-text {
+      margin: 0 0 8px 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: var(--text-primary);
+    }
+
+    .notification-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .notification-time {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+
+      mat-chip {
+        font-size: 0.7rem;
+        height: 20px;
+      }
+    }
+  }
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  align-items: center; // ✅ Thêm center alignment
+  justify-content: center; // ✅ Thêm center alignment
+
+  button {
+    width: 32px;
+    height: 32px;
+    display: flex; // ✅ Thêm flex
+    align-items: center; // ✅ Center icon
+    justify-content: center; // ✅ Center icon
+    line-height: 1; // ✅ Reset line-height
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      line-height: 1; // ✅ Reset line-height
+    }
+  }
+
+// Responsive Design
+@media (max-width: 600px) {
+  .notification-container {
+    padding: 8px;
+  }
+
+  .notification-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+
+    .header-actions {
+      justify-content: center;
+    }
+  }
+
+  .notification-item {
+    padding: 12px;
+    gap: 12px;
+
+    .notification-icon mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-content .notification-text {
+      font-size: 0.9rem;
+    }
+
+    .notification-actions {
+      flex-direction: row;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+}
+
+// Dark theme support
+.dark {
+  .notification-item {
+    background: var(--surface);
+    border-color: var(--border);
+
+    &:hover {
+      background: var(--surface-hover);
+    }
+
+    &.unread {
+      background: var(--primary-lightest);
+    }
+  }
+}
+}
+}

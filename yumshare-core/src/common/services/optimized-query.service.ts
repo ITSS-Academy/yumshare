@@ -95,16 +95,32 @@ export class OptimizedQueryService {
 
     // Add field selection if specified
     if (selectFields && selectFields.length > 0) {
-      const fields = ['entity.id', ...selectFields.map(field => `entity.${field}`)];
-      queryBuilder = queryBuilder.select(fields);
+      // Remove duplicates and ensure entity.id is included
+      const uniqueFields = [...new Set(['id', ...selectFields])].map(field => `entity.${field}`);
+      queryBuilder = queryBuilder.select(uniqueFields);
       
       // Add relation fields if needed
       limitedRelations.forEach(relation => {
-        queryBuilder = queryBuilder.addSelect([
-          `${relation}.id`,
-          `${relation}.name`,
-          `${relation}.username`
-        ]);
+        if (relation === 'user') {
+          queryBuilder = queryBuilder.addSelect([
+            `${relation}.id`,
+            `${relation}.username`,
+            `${relation}.email`,
+            `${relation}.avatar_url`
+          ]);
+        } else if (relation === 'category') {
+          queryBuilder = queryBuilder.addSelect([
+            `${relation}.id`,
+            `${relation}.name`,
+            `${relation}.description`,
+            `${relation}.image_url`
+          ]);
+        } else {
+          // Generic fallback for other relations
+          queryBuilder = queryBuilder.addSelect([
+            `${relation}.id`
+          ]);
+        }
       });
     }
 

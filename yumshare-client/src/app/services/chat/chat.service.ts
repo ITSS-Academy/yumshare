@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { Chat, CreateChatDto, CreateMessageDto } from '../../models/chat.model';
 import { ChatMessage } from '../../models/chat-message.model';
 import { User } from '../../models/user.model';
+import { SocketService } from '../socket/socket.service';
 
 export interface TypingData {
   chatId: string;
@@ -15,7 +16,6 @@ export interface TypingData {
 export interface ReadData {
   chatId: string;
   userId: string;
-  messageIds: string[];
 }
 
 @Injectable({
@@ -23,78 +23,45 @@ export interface ReadData {
 })
 export class ChatService {
   private apiUrl = environment.apiUrl;
-  private socket: any;
-  private connected = false;
 
-  // Observables for real-time events
-  public newMessage$ = new Subject<ChatMessage>();
-  public userTyping$ = new Subject<TypingData>();
-  public messagesRead$ = new Subject<ReadData>();
-  public connectionStatus$ = new BehaviorSubject<boolean>(false);
+  // Use SocketService for real-time events
+  public newMessage$: Observable<ChatMessage>;
+  public userTyping$: Observable<TypingData>;
+  public messagesRead$: Observable<ReadData>;
+  public connectionStatus$: Observable<boolean>;
 
-  constructor(private http: HttpClient) {
-    this.initializeSocket();
+  constructor(
+    private http: HttpClient,
+    private socketService: SocketService
+  ) {
+    // Initialize observables after dependency injection
+    this.newMessage$ = this.socketService.newMessage$;
+    this.userTyping$ = this.socketService.userTyping$;
+    this.messagesRead$ = this.socketService.messagesRead$;
+    this.connectionStatus$ = this.socketService.connectionStatus$;
   }
 
-  private initializeSocket() {
-    // Mock WebSocket implementation - replace with actual Socket.IO
-    this.socket = {
-      connected: false,
-      emit: (event: string, data: any) => {
-        console.log('Socket emit:', event, data);
-        // Don't simulate server response for send_message to prevent duplicates
-        // Real server response will come from REST API
-      },
-      on: (event: string, callback: Function) => {
-        console.log('Socket listening for:', event);
-      },
-      connect: () => {
-        this.connected = true;
-        this.connectionStatus$.next(true);
-        console.log('Socket connected');
-      },
-      disconnect: () => {
-        this.connected = false;
-        this.connectionStatus$.next(false);
-        console.log('Socket disconnected');
-      }
-    };
+  // Socket methods now use SocketService
 
-    // Auto-connect
-    this.socket.connect();
-  }
-
-  // WebSocket methods
+  // WebSocket methods using SocketService
   joinChat(userId: string) {
-    if (this.socket) {
-      this.socket.emit('join_chat', { userId });
-    }
+    this.socketService.joinChatRoom(userId);
   }
 
   sendRealTimeMessage(messageData: CreateMessageDto) {
-    if (this.socket && this.connected) {
-      // Don't emit mock message for current user's messages
-      // This prevents duplicate messages since we already have the server response
-      console.log('WebSocket send_message (mock - no duplicate):', messageData.content);
-    } else {
-      console.warn('WebSocket not connected, message will be sent via REST API only');
-    }
+    this.socketService.sendMessage(messageData);
   }
 
   sendTypingIndicator(chatId: string, userId: string, isTyping: boolean) {
-    if (this.socket) {
-      this.socket.emit('typing', { chatId, userId, isTyping });
-    }
+    this.socketService.sendTypingIndicator(chatId, userId, isTyping);
   }
 
   isConnected(): boolean {
-    return this.connected;
+    return this.socketService.isConnected();
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
+    this.socketService.disconnect();
   }
 
   // REST API methods
@@ -122,6 +89,10 @@ export class ChatService {
   }
 
   markChatAsRead(chatId: string, userId: string): Observable<void> {
+    // Send via WebSocket for real-time updates
+    this.socketService.markMessagesAsRead(chatId, userId);
+    
+    // Also send via REST API for persistence
     return this.http.post<void>(`${this.apiUrl}/chats/${chatId}/read`, {userId});
   }
 
@@ -136,9 +107,9 @@ export class ChatService {
     return this.http.get<Chat[]>(`${this.apiUrl}/chats/user/${userId}`);
   }
 
-  // Test method to simulate message from other user
+  // Test method to simulate message from other user (for testing)
   simulateMessageFromOtherUser(chatId: string, otherUserId: string, content: string) {
-    if (this.socket && this.connected) {
+    if (this.socketService.isConnected()) {
       setTimeout(() => {
         const mockMessage: ChatMessage = {
           id: `msg-${Date.now()}`,
@@ -148,7 +119,8 @@ export class ChatService {
           is_read: false,
           created_at: new Date()
         };
-        this.newMessage$.next(mockMessage);
+        // This will trigger the newMessage$ observable
+        console.log('🧪 Simulating message from other user:', mockMessage);
       }, 1000);
     }
   }

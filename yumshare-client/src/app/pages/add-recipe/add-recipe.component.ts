@@ -95,8 +95,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Debug: Test API connectivity
-    console.log('API URL:', `${this.recipeService['apiUrl']}/categories`);
     this.loadCategories();
     this.loadCurrentUser();
     
@@ -225,15 +223,11 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   onYoutubeUrlChange(url: string) {
-    console.log('onYoutubeUrlChange called with:', url);
     this.youtubeUrl = url;
-    console.log('youtubeUrl updated to:', this.youtubeUrl);
     // Extract video ID from YouTube URL for preview
     const videoId = this.extractYoutubeVideoId(url);
-    console.log('Extracted video ID:', videoId);
     if (videoId) {
       this.videoPreview = `https://www.youtube.com/embed/${videoId}`;
-      console.log('Video preview set to:', this.videoPreview);
     }
   }
 
@@ -250,9 +244,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     loadCategories() {
     const categoriesSubscription = this.recipeService.getCategories().subscribe({
       next: (response: any) => {
-        console.log('Full API response:', response);
-        console.log('Response type:', typeof response);
-        console.log('Is array:', Array.isArray(response));
         
         let categories: Category[] = [];
         
@@ -260,23 +251,17 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         if (Array.isArray(response)) {
           // Direct array response
           categories = response;
-          console.log('Direct array response detected');
         } else if (response && response.data && Array.isArray(response.data)) {
           // Paginated response with data property
           categories = response.data;
-          console.log('Paginated response detected');
         } else if (response && typeof response === 'object') {
-          console.log('Object response keys:', Object.keys(response));
         }
         
         if (categories && categories.length > 0) {
           this.categories = categories;
-          console.log('Categories loaded successfully:', categories.length);
-          console.log('First category:', categories[0]);
           
           // Always set the first category as default since form starts empty
           this.recipeForm.patchValue({ category_id: categories[0].id });
-          console.log('Set default category:', categories[0].id);
         } else {
           console.warn('No categories found from API');
           console.warn('Response was:', response);
@@ -287,7 +272,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
             { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
             { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
           ];
-          console.log('Using fallback categories');
           this.snackBar.open('Using fallback categories - Check API connection', 'Close', { duration: 5000 });
           
           // Set default category for fallback
@@ -304,7 +288,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
           { id: '2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
           { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
         ];
-        console.log('Using fallback categories due to API error');
         this.snackBar.open('API Error - Using fallback categories', 'Close', { duration: 5000 });
         
         // Set default category for error fallback

@@ -211,7 +211,6 @@ export const navigateAfterCommentCreateEffect = createEffect(
     return actions$.pipe(
       ofType(CommentActions.createCommentSuccess),
       tap(({ comment }) => {
-        console.log(`Comment created successfully: ${comment.id}`);
         // You can inject Router here and navigate to comment detail page
         // const router = inject(Router);
         // router.navigate(['/comments', comment.id]);
@@ -227,7 +226,6 @@ export const navigateAfterCommentUpdateEffect = createEffect(
     return actions$.pipe(
       ofType(CommentActions.updateCommentSuccess),
       tap(({ comment }) => {
-        console.log(`Comment updated successfully: ${comment.id}`);
         // You can inject Router here and navigate to comment detail page
         // const router = inject(Router);
         // router.navigate(['/comments', comment.id]);
@@ -249,7 +247,7 @@ export const logCommentActionsEffect = createEffect(
         CommentActions.searchComments
       ),
       tap((action) => {
-        console.log(`Comment Action: ${action.type}`, action);
+        // Debug logging can be enabled here if needed
       })
     );
   },

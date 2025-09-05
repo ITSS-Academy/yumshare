@@ -37,6 +37,8 @@ import { selectCurrentUser } from '../../../../ngrx/auth/auth.selectors';
 })
 export class CommentComponent implements OnInit, OnDestroy {
   @Input() recipeId: string = '';
+  @Input() recipeTitle: string = '';
+  @Input() recipeOwnerId: string = '';
   @Output() commentAdded = new EventEmitter<Comment>();
   @Output() commentDeleted = new EventEmitter<string>();
 
@@ -98,35 +100,29 @@ export class CommentComponent implements OnInit, OnDestroy {
   onSubmitComment(): void {
     if (!this.newCommentContent.trim() || !this.recipeId) return;
     
-    console.log('Comment submit clicked, checking login status...');
-    
-    // Kiểm tra đăng nhập trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      console.log('Current user in comment submit:', currentUser);
-      
-      if (!currentUser || !currentUser.uid) {
-        console.log('User not logged in, showing login required message');
-        // Chưa đăng nhập - chỉ hiển thị thông báo
-        this.snackBar.open('Vui lòng đăng nhập để bình luận!', 'Đăng nhập', { 
-          duration: 4000,
-          panelClass: ['warning-snackbar']
-        });
-        return;
-      }
-      
-      console.log('User is logged in, proceeding with comment creation');
-      
-      // Đã đăng nhập - tiếp tục logic comment
-      const commentData: CreateCommentDto = {
-        user_id: currentUser.uid,
-        recipe_id: this.recipeId,
-        content: this.newCommentContent.trim()
-      };
-      
-      console.log('Dispatching createComment with:', commentData);
-      
-      this.store.dispatch(CommentActions.createComment({ commentData }));
+          // Kiểm tra đăng nhập trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
+      this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
+        if (!currentUser || !currentUser.uid) {
+          // Chưa đăng nhập - chỉ hiển thị thông báo
+          this.snackBar.open('Vui lòng đăng nhập để bình luận!', 'Đăng nhập', { 
+            duration: 4000,
+            panelClass: ['warning-snackbar']
+          });
+          return;
+        }
+        
+        // Đã đăng nhập - tiếp tục logic comment
+        const commentData: CreateCommentDto = {
+          user_id: currentUser.uid,
+          recipe_id: this.recipeId,
+          content: this.newCommentContent.trim()
+        };
+        
+        this.store.dispatch(CommentActions.createComment({ commentData }));
       this.newCommentContent = '';
+      
+      // Note: Notification is automatically created by backend when comment is created
+      // No need to call notification helper from frontend
       
       // Force reload comments after creating
       setTimeout(() => {
@@ -139,14 +135,9 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
   onEditComment(comment: Comment): void {
-    console.log('Edit comment clicked, checking login status...');
-    
     // Kiểm tra đăng nhập trước
     this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      console.log('Current user in edit comment:', currentUser);
-      
       if (!currentUser || !currentUser.uid) {
-        console.log('User not logged in, showing login required message');
         this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -156,7 +147,6 @@ export class CommentComponent implements OnInit, OnDestroy {
       
       // Kiểm tra xem user có phải là người tạo comment không
       if (currentUser.uid !== comment.user_id) {
-        console.log('User not authorized to edit this comment');
         this.snackBar.open('Bạn không có quyền chỉnh sửa bình luận này!', 'Đóng', { 
           duration: 3000,
           panelClass: ['warning-snackbar']
@@ -164,7 +154,6 @@ export class CommentComponent implements OnInit, OnDestroy {
         return;
       }
       
-      console.log('User authorized to edit comment, proceeding...');
       this.editingCommentId = comment.id;
       this.editingContent = comment.content;
       this.activeMenuId = null; // Close menu when starting edit
@@ -174,14 +163,9 @@ export class CommentComponent implements OnInit, OnDestroy {
   onSaveEdit(): void {
     if (!this.editingCommentId || !this.editingContent.trim()) return;
     
-    console.log('Save edit clicked, checking login status...');
-    
     // Kiểm tra đăng nhập trước
     this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      console.log('Current user in save edit:', currentUser);
-      
       if (!currentUser || !currentUser.uid) {
-        console.log('User not logged in, showing login required message');
         this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -189,13 +173,9 @@ export class CommentComponent implements OnInit, OnDestroy {
         return;
       }
       
-      console.log('User is logged in, proceeding with comment update');
-      
       const commentData: UpdateCommentDto = {
         content: this.editingContent.trim()
       };
-      
-      console.log('Dispatching updateComment with:', { id: this.editingCommentId, commentData });
       
       this.store.dispatch(CommentActions.updateComment({ 
         id: this.editingCommentId!, 
@@ -222,14 +202,9 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
   onDeleteComment(commentId: string): void {
-    console.log('Delete comment clicked, checking login status...');
-    
     // Kiểm tra đăng nhập trước
     this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      console.log('Current user in delete comment:', currentUser);
-      
       if (!currentUser || !currentUser.uid) {
-        console.log('User not logged in, showing login required message');
         this.snackBar.open('Vui lòng đăng nhập để xóa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -242,21 +217,17 @@ export class CommentComponent implements OnInit, OnDestroy {
         const comment = comments.find(c => c.id === commentId);
         
         if (!comment) {
-          console.log('Comment not found');
           return;
         }
         
         // Kiểm tra xem user có phải là người tạo comment không
         if (currentUser.uid !== comment.user_id) {
-          console.log('User not authorized to delete this comment');
           this.snackBar.open('Bạn không có quyền xóa bình luận này!', 'Đóng', { 
             duration: 3000,
             panelClass: ['warning-snackbar']
           });
           return;
         }
-        
-        console.log('User authorized to delete comment, proceeding...');
         
         if (confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
           this.store.dispatch(CommentActions.deleteComment({ id: commentId }));

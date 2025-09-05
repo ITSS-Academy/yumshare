@@ -122,6 +122,8 @@
         
         <app-comment style="margin-top: 1rem;"
           [recipeId]="recipeId"
+          [recipeTitle]="recipe.title"
+          [recipeOwnerId]="recipe.user?.id"
           (commentAdded)="onCommentAdded($event)"
           (commentDeleted)="onCommentDeleted($event)">
         </app-comment>
