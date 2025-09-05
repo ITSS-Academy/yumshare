@@ -148,6 +148,26 @@ export const recipeReducer = createReducer(
     searchError: error,
   })),
 
+  // Load All Recipes
+  on(RecipeActions.loadAllRecipes, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.loadAllRecipesSuccess, (state, { recipes }) => ({
+    ...state,
+    recipes,
+    recipesLoading: false,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.loadAllRecipesFailure, (state, { error }) => ({
+    ...state,
+    recipesLoading: false,
+    recipesError: error,
+  })),
+
   // Get Recipes by Category
   on(RecipeActions.getRecipesByCategory, (state) => ({
     ...state,

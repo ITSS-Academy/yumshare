@@ -114,6 +114,19 @@ export const searchRecipesFailure = createAction(
   props<{ error: string }>()
 );
 
+// Get All Recipes
+export const loadAllRecipes = createAction('[Recipe] Load All Recipes');
+
+export const loadAllRecipesSuccess = createAction(
+  '[Recipe] Load All Recipes Success',
+  props<{ recipes: Recipe[] }>()
+);
+
+export const loadAllRecipesFailure = createAction(
+  '[Recipe] Load All Recipes Failure',
+  props<{ error: string }>()
+);
+
 // Get Recipes by Category
 export const getRecipesByCategory = createAction(
   '[Recipe] Get Recipes by Category',

@@ -117,6 +117,22 @@ export const searchRecipesEffect = createEffect(
   { functional: true }
 );
 
+// Load All Recipes Effect
+export const loadAllRecipesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.loadAllRecipes),
+      switchMap(() =>
+        recipeService.getAllRecipes().pipe(
+          map((recipes) => RecipeActions.loadAllRecipesSuccess({ recipes })),
+          catchError((error) => of(RecipeActions.loadAllRecipesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
 // Get Recipes by Category Effect
 export const getRecipesByCategoryEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {

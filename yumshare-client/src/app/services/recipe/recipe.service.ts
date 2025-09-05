@@ -128,6 +128,11 @@ export class RecipeService {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/search`, { params });
   }
 
+  // Get all recipes
+  getAllRecipes(): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes`);
+  }
+
   // Get recipes by category
   getRecipesByCategory(categoryId: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
