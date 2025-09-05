@@ -1,9 +1,12 @@
 
 <!-- Loading State -->
 @if (recipeLoading$ | async) {
-  <div class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading recipe...</p>
+  <div class="recipe-loading-container">
+    <app-loading
+      size="large"
+      message="Loading recipe..."
+      centerType="center-container">
+    </app-loading>
   </div>
 }
 
@@ -17,7 +20,12 @@
         </div>
         <div class="describe">
           <div class="lefttt">
-            <img class="food-pic" [src]="recipe.image_url || 'assets/default-recipe.jpg'" [alt]="recipe.title">
+            <div appLazyImage
+                 [appLazyImage]="recipe.image_url || 'assets/default-recipe.jpg'"
+                 [appLazyImageOptions]="{ quality: 0.9, maxWidth: 800, maxHeight: 600, generateThumbnail: true, thumbnailSize: 400 }"
+                 [appLazyImagePriority]="true"
+                 class="hinh-mon-an-container">
+            </div>
           </div>
           <div class="righttt">
             <p class="food-description">{{ recipe.description }}</p>
@@ -29,7 +37,7 @@
           </div>
         </div>
       </div>
-    }
+          }
 
     @if (recipe$ | async; as recipe) {
       <div class="middle">
@@ -81,7 +89,11 @@
                 <div class="step-detail">
                   <p class="cooking">{{ step.description }}</p>
                   @if (step.image_url) {
-                    <img [src]="step.image_url" [alt]="'Step ' + (i + 1)" class="step-image">
+                    <div appLazyImage
+                         [appLazyImage]="step.image_url"
+                         [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                         class="step-image-container">
+                    </div>
                   }
                 </div>
               </div>
@@ -93,27 +105,46 @@
 
     @if (recipe$ | async; as recipe) {
       <div class="bottom">
-        @if (recipe.video_url) {
+        @if (recipe.video_url || recipe.video) {
           <div class="video">
             <h1 class="title3">Video Tutorial</h1>
-            <iframe
-              class="clip"
-              width="650"
-              height="400"
-              [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
-              title="Recipe Video Tutorial"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen>
-            </iframe>
+            @if (recipe.video_url) {
+              <iframe
+                class="clip"
+                width="650"
+                height="400"
+                [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
+                title="Recipe Video Tutorial"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+              </iframe>
+            }
+            @if (recipe.video) {
+              <video
+                class="clip"
+                width="650"
+                height="400"
+                [src]="recipe.video"
+                controls
+                title="Recipe Video Tutorial">
+              </video>
+            }
+          </div>
+        } @else {
+          <div class="video">
+            <h1 class="title3">Video Tutorial</h1>
+            <div class="no-video-message">
+              We will update soon
+            </div>
           </div>
         }
         <div class="bottom-under">
-            <app-comment style="margin-top: 1rem;"
-                     [recipeId]="recipeId"
-                     (commentAdded)="onCommentAdded($event)"
-                     (commentDeleted)="onCommentDeleted($event)">
-           </app-comment>
+          <app-comment style="margin-top: 1rem;"
+                       [recipeId]="recipeId"
+                       (commentAdded)="onCommentAdded($event)"
+                       (commentDeleted)="onCommentDeleted($event)">
+          </app-comment>
         </div>
       </div>
     }

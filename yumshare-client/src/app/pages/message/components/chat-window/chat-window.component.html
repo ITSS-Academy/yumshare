@@ -26,11 +26,11 @@
         @for (message of messages; track message.id) {
           <div
             class="message-item"
-            [class.sent]="message.sender_id === currentUser.id"
-            [class.received]="message.sender_id !== currentUser.id"
+            [class.sent]="message.sender_id === currentUser!.id"
+            [class.received]="message.sender_id !== currentUser!.id"
           >
             <div class="message-content">
-              @if (message.sender_id !== currentUser.id) {
+              @if (message.sender_id !== currentUser!.id) {
                 <div class="message-meta">
                   <img [src]="safeAvatar(otherUser?.avatar_url)" class="bubble-avatar" alt="avatar">
                 </div>
@@ -38,7 +38,7 @@
               <div class="message-text">{{ message.content }}</div>
               <div class="message-time">
                 {{ message.created_at | localTime:'shortTime' }}
-                @if (message.sender_id === currentUser.id) {
+                @if (message.sender_id === currentUser!.id) {
                   <span class="read-status">
                     {{ message.is_read ? '✓✓' : '✓' }}
                   </span>

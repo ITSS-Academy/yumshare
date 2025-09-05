@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { Comment } from '../models/comment.model';
-import { PaginatedResponse } from '../models/paginated-response.model';
+import { environment } from '../../../environments/environment';
+import { Comment } from '../../models/comment.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
 
 export interface CreateCommentDto {
   user_id: string;

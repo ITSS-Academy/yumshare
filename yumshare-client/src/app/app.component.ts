@@ -16,7 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SnackbarComponent } from './components/snackbar/snackbar.component';
 import { FooterComponent } from './components/footer/footer.component';
-import { DarkModeService } from './services/dark-mode/dark-mode.service';
+// import { DarkModeService } from './services/dark-mode/dark-mode.service';
 import { RouteLoadingService } from './core/route-loading.service';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   isMobile = false;
   showFooter = true; // Default to show footer
-  private darkModeService = inject(DarkModeService);
+  // private darkModeService = inject(DarkModeService);
   routeLoadingService = inject(RouteLoadingService);
   private routerSubscription?: Subscription;
 
@@ -49,12 +49,13 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.updateSidebarMode();
-    this.darkModeService.initSystemThemeListener();
+    // this.darkModeService.initSystemThemeListener();
 
     // Initialization logic can go here if needed
     this.auth.onAuthStateChanged(async (auth: any) => {
       if (auth) {
-        let idToken = await auth.getIdToken();
+        // Lấy token mới nhất
+        let idToken = await auth.getIdToken(true); // force refresh
         const user: AuthModel = {
           uid: auth.uid,
           displayName: auth.displayName,
@@ -62,8 +63,11 @@ export class AppComponent implements OnInit, OnDestroy {
           photoURL: auth.photoURL,
           phoneNumber: auth.phoneNumber
         };
+        
+        console.log('🔐 Storing user and token:', { user, tokenLength: idToken?.length });
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
+        
         // Hiển thị snackbar chỉ khi chưa từng hiển thị trong session này
         if (!localStorage.getItem('loginSnackbarShown')) {
           this._snackBar.openFromComponent(SnackbarComponent, {
@@ -76,9 +80,9 @@ export class AppComponent implements OnInit, OnDestroy {
           });
           localStorage.setItem('loginSnackbarShown', 'true');
         }
-        console.log(user);
-
-        console.log(idToken)
+        
+        // Setup token refresh
+        this.setupTokenRefresh(auth);
       } else {
         console.log('No user is signed in.');
         // Xoá flag khi logout để lần sau login lại sẽ hiện
@@ -145,6 +149,28 @@ export class AppComponent implements OnInit, OnDestroy {
     this.showFooter = !noFooterRoutes.some(route =>
       currentRoute.includes(route)
     );
+  }
+
+  private setupTokenRefresh(auth: any) {
+    // Refresh token trước khi hết hạn (mỗi 50 phút)
+    setInterval(async () => {
+      try {
+        const newToken = await auth.getIdToken(true);
+        console.log('🔐 Token refreshed, new length:', newToken?.length);
+        this.store.dispatch(AuthActions.storeCurrentUser({
+          currentUser: {
+            uid: auth.uid,
+            displayName: auth.displayName,
+            email: auth.email,
+            photoURL: auth.photoURL,
+            phoneNumber: auth.phoneNumber
+          }, 
+          idToken: newToken
+        }));
+      } catch (error) {
+        console.error('❌ Error refreshing token:', error);
+      }
+    }, 50 * 60 * 1000); // 50 phút
   }
 
   toggleSidebar() {

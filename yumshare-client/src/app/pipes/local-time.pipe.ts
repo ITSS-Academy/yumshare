@@ -32,14 +32,14 @@ export class LocalTimePipe implements PipeTransform {
       
       // Check if date is valid
       if (isNaN(date.getTime())) {
-        console.error('Invalid date:', value);
+        // console.error('Invalid date:', value);
         return '';
       }
       
       // Debug: Log the original and converted dates
-      console.log('Original value:', value);
-      console.log('Converted date:', date);
-      console.log('Local time:', date.toLocaleString('vi-VN'));
+      // console.log('Original value:', value);
+      // console.log('Converted date:', date);
+      // console.log('Local time:', date.toLocaleString('vi-VN'));
       
       // Format based on type
       switch (format) {
@@ -76,7 +76,7 @@ export class LocalTimePipe implements PipeTransform {
           });
       }
     } catch (error) {
-      console.error('Error formatting date:', error);
+      // console.error('Error formatting date:', error); 
       return '';
     }
   }

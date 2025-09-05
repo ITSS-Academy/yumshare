@@ -3,6 +3,7 @@ import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/ma
 import {ShareModule} from '../../shares/share.module';
 import {RecipeCardSkeletonComponent} from '../skeleton/recipe-card-skeleton.component';
 import {CommonModule} from '@angular/common';
+import {LazyImageDirective} from '../../directives/lazy-image/lazy-image.directive';
 // import {ResponsiveImageComponent} from '../responsive-image/responsive-image.component';
 // import {LazyImageDirective} from '../../directives/lazy-image/lazy-image.directive';
 // import {SlideInDirective} from '../../directives/animations/slide-in.directive';
@@ -13,10 +14,9 @@ import {CommonModule} from '@angular/common';
         MatCard,
         MatCardActions,
         MatCardContent,
-     
         ShareModule,
-     
-        CommonModule
+        CommonModule,
+        LazyImageDirective
     ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss'
