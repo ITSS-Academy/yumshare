@@ -1,25 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import {FormsModule} from "@angular/forms";
-import {MatButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
-import {
-  MatDatepicker,
-  MatDatepickerInput,
-  MatDatepickerModule,
-  MatDatepickerToggle
-} from "@angular/material/datepicker";
-import {MatInput, MatInputModule, MatSuffix} from "@angular/material/input";
-import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
-import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
-import {MatIcon} from '@angular/material/icon';
-import {SideBarComponent} from '../../components/side-bar/side-bar.component';
-import {NavBarComponent} from '../../components/nav-bar/nav-bar.component';
-import {MatNativeDateModule} from '@angular/material/core';
-import {MatTimepickerModule} from '@angular/material/timepicker';
-import {NgClass} from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from "@angular/forms";
+import { Store } from '@ngrx/store';
+import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
+import { map, filter, startWith } from 'rxjs/operators';
+
+// Material UI imports
+import { MatButton, MatIconButton, MatMiniFabButton } from "@angular/material/button";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatInputModule } from "@angular/material/input";
+import { MatMenu, MatMenuItem, MatMenuTrigger } from "@angular/material/menu";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+
+// NgRx imports
+import * as FavoriteActions from '../../ngrx/favorite/favorite.actions';
+import * as FavoriteSelectors from '../../ngrx/favorite/favorite.selectors';
+import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
+import * as CategorySelectors from '../../ngrx/category/category.selectors';
+
+// Models
+import { Favorite } from '../../models/favorite.model';
+import { Recipe } from '../../models/recipe.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-my-favourite-recipe',
   imports: [
+    CommonModule,
     FormsModule,
     MatNativeDateModule,
     MatDatepickerModule,
@@ -33,125 +46,317 @@ import {NgClass} from '@angular/common';
     MatIcon,
     MatIconButton,
     MatMiniFabButton,
-    NgClass,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    DatePipe,
   ],
   templateUrl: './my-favourite-recipe.component.html',
   styleUrl: './my-favourite-recipe.component.scss'
 })
-export class MyFavouriteRecipeComponent implements OnInit {
-  value: Date | null = null;
+export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
+  private store = inject(Store);
+  private snackBar = inject(MatSnackBar);
+  private destroy$ = new Subject<void>();
+  private filterTrigger$ = new Subject<void>();
 
   // Pagination properties
   pageIndex = 0;
-  pageSize = 6; // Cố định limit là 6
-  totalRecipes = 23; // Số lượng công thức giả lập, thay bằng dữ liệu thực tế nếu có
-  recipes = Array.from({ length: this.totalRecipes }, (_, i) => ({
-    name: `Recipe Name ${i + 1}`,
-    author: `Author ${i + 1}`,
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    date: 'Post date',
-    isFavourite: true, // Ban đầu là yêu thích
-    heartbeat: false   // Hiệu ứng nhịp tim
-  }));
+  pageSize = 6;
 
+  // Filter properties
   selectedCategory: string = 'Category';
   selectedDifficulty: string = 'Difficulty';
+  selectedCategoryId: string | null = null;
+  
+  // Current filter state
+  currentFilters: any = {};
 
-  get totalPages(): number {
-    return Math.ceil(this.totalRecipes / this.pageSize);
+  // Observable properties from NgRx
+  favorites$: Observable<Favorite[]>;
+  paginatedFavorites$: Observable<PaginatedResponse<Favorite> | null>;
+  favoritesLoading$: Observable<boolean>;
+  favoritesError$: Observable<string | null>;
+  favoriteCount$: Observable<number>;
+  currentUserId$: Observable<string | null>;
+  isAuthenticated$: Observable<boolean>;
+  
+  // Category observables
+  activeCategories$: Observable<Category[]>;
+
+  // Computed observables
+  displayedRecipes$: Observable<Favorite[]>;
+  totalPages$: Observable<number>;
+  pageNumbers$: Observable<number[]>;
+  hasFavorites$: Observable<boolean>;
+  isEmpty$: Observable<boolean>;
+
+  constructor() {
+    // Initialize observables
+    this.favorites$ = this.store.select(FavoriteSelectors.selectFavorites);
+    this.paginatedFavorites$ = this.store.select(FavoriteSelectors.selectPaginatedFavorites);
+    this.favoritesLoading$ = this.store.select(FavoriteSelectors.selectFavoritesLoading);
+    this.favoritesError$ = this.store.select(FavoriteSelectors.selectFavoritesError);
+    this.favoriteCount$ = this.store.select(FavoriteSelectors.selectFavoriteCount);
+    this.currentUserId$ = this.store.select(FavoriteSelectors.selectCurrentUserId);
+    this.isAuthenticated$ = this.store.select(AuthSelectors.selectIsAuthenticated);
+    
+    // Category observables
+    this.activeCategories$ = this.store.select(CategorySelectors.selectActiveCategories);
+
+    // Computed observables - now using server-side data
+    this.displayedRecipes$ = this.favorites$;
+
+    this.totalPages$ = this.paginatedFavorites$.pipe(
+      map(paginatedData => paginatedData ? Math.ceil(paginatedData.total / this.pageSize) : 0)
+    );
+
+    this.pageNumbers$ = combineLatest([
+      this.totalPages$,
+      this.paginatedFavorites$
+    ]).pipe(
+      map(([totalPages]) => {
+        const current = this.pageIndex;
+        const delta = 2;
+        const range: number[] = [];
+        let left = Math.max(0, current - delta);
+        let right = Math.min(totalPages - 1, current + delta);
+
+        if (current <= delta) {
+          right = Math.min(totalPages - 1, 2 * delta);
+        }
+        if (current >= totalPages - 1 - delta) {
+          left = Math.max(0, totalPages - 1 - 2 * delta);
+        }
+
+        for (let i = left; i <= right; i++) {
+          range.push(i);
+        }
+        return range;
+      })
+    );
+
+    this.hasFavorites$ = this.store.select(FavoriteSelectors.selectHasFavorites);
+    this.isEmpty$ = combineLatest([
+      this.favoritesLoading$,
+      this.favorites$
+    ]).pipe(
+      map(([loading, favorites]) => !loading && favorites.length === 0)
+    );
   }
 
-  get displayedRecipes() {
-    const start = this.pageIndex * this.pageSize;
-    return this.recipes.slice(start, start + this.pageSize);
-  }
-
-  get pageNumbers(): number[] {
-    const total = this.totalPages;
-    const current = this.pageIndex;
-    const delta = 2;
-    const range: number[] = [];
-    let left = Math.max(0, current - delta);
-    let right = Math.min(total - 1, current + delta);
-
-    if (current <= delta) {
-      right = Math.min(total - 1, 2 * delta);
-    }
-    if (current >= total - 1 - delta) {
-      left = Math.max(0, total - 1 - 2 * delta);
-    }
-
-    for (let i = left; i <= right; i++) {
-      range.push(i);
-    }
-    return range;
-  }
-
-  // Hàm helper để reload trang và scroll lên đầu
-  private reloadPageAndScrollToTop() {
-    // Lưu pageIndex vào sessionStorage để giữ lại sau khi reload
-    sessionStorage.setItem('myFavouriteRecipePageIndex', this.pageIndex.toString());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.location.reload();
-  }
-
-  // Hàm khôi phục pageIndex từ sessionStorage khi component được khởi tạo
   ngOnInit() {
+    // Load active categories
+    this.store.dispatch({ type: '[Category] Load Active Categories' });
+
+    // Debug: Log current user ID
+    this.currentUserId$.subscribe(userId => {
+      console.log('Current User ID:', userId);
+    });
+
+    // Debug: Log auth state
+    this.isAuthenticated$.subscribe(isAuth => {
+      console.log('Is Authenticated:', isAuth);
+    });
+
+    // Get user ID from auth state and set it in favorite state
+    this.store.select(AuthSelectors.selectUserId)
+      .pipe(
+        filter(userId => !!userId),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userId => {
+        console.log('Setting current user ID in favorite state:', userId);
+        this.store.dispatch(FavoriteActions.setCurrentUser({ userId: userId! }));
+      });
+
+    // Load user favorites when component initializes
+    this.currentUserId$
+      .pipe(
+        filter(userId => !!userId),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userId => {
+        console.log('Loading favorites for user:', userId);
+        this.loadUserFavorites(userId!, this.currentFilters);
+      });
+
+    // Debug: Log favorites data
+    this.favorites$.subscribe(favorites => {
+      console.log('Favorites data:', favorites);
+    });
+
+    // Debug: Log loading state
+    this.favoritesLoading$.subscribe(loading => {
+      console.log('Favorites loading:', loading);
+    });
+
+    // Handle errors
+    this.favoritesError$
+      .pipe(
+        filter(error => !!error),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(error => {
+        console.error('Favorites error:', error);
+        this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
+      });
+
+    // Restore page index from session storage
     const savedPageIndex = sessionStorage.getItem('myFavouriteRecipePageIndex');
     if (savedPageIndex !== null) {
       this.pageIndex = parseInt(savedPageIndex);
-      // Xóa sessionStorage sau khi đã khôi phục
       sessionStorage.removeItem('myFavouriteRecipePageIndex');
     }
   }
 
-  setCategory(option: string) {
-    this.selectedCategory = option;
-    // ...nếu cần lọc dữ liệu theo category, thêm logic tại đây...
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.filterTrigger$.complete();
+  }
+
+  private loadUserFavorites(userId: string, filters?: any) {
+    const queryOptions: any = {
+      page: this.pageIndex + 1, // Server-side pagination
+      size: this.pageSize,
+      orderBy: 'created_at',
+      order: 'DESC',
+      ...filters // Include any filters
+    };
+
+    console.log('Dispatching loadUserFavorites action with:', {
+      userId,
+      queryOptions
+    });
+    
+    this.store.dispatch(FavoriteActions.loadUserFavorites({
+      userId,
+      queryOptions
+    }));
+  }
+
+  setCategory(category: Category) {
+    this.selectedCategory = category.name;
+    this.selectedCategoryId = category.id;
+    this.pageIndex = 0; // Reset to first page when filtering
+    
+    // Update current filters
+    this.currentFilters = {
+      ...this.currentFilters,
+      category: category.id
+    };
+    
+    // Reload data with new filters
+    this.reloadWithFilters();
+  }
+
+  clearCategoryFilter() {
+    this.selectedCategory = 'Category';
+    this.selectedCategoryId = null;
+    this.pageIndex = 0; // Reset to first page when clearing filter
+    
+    // Remove category from filters
+    const { category, ...restFilters } = this.currentFilters;
+    this.currentFilters = restFilters;
+    
+    // Reload data with updated filters
+    this.reloadWithFilters();
   }
 
   setDifficulty(option: string) {
     this.selectedDifficulty = option;
-    // ...nếu cần lọc dữ liệu theo difficulty, thêm logic tại đây...
+    this.pageIndex = 0; // Reset to first page when filtering
+    
+    // Update current filters
+    this.currentFilters = {
+      ...this.currentFilters,
+      difficulty: option !== 'Difficulty' ? option : undefined
+    };
+    
+    // Reload data with new filters
+    this.reloadWithFilters();
+  }
+
+  clearDifficultyFilter() {
+    this.selectedDifficulty = 'Difficulty';
+    this.pageIndex = 0; // Reset to first page when clearing filter
+    
+    // Remove difficulty from filters
+    const { difficulty, ...restFilters } = this.currentFilters;
+    this.currentFilters = restFilters;
+    
+    // Reload data with updated filters
+    this.reloadWithFilters();
   }
 
   goToPage(page: number) {
-    if (page >= 0 && page < this.totalPages) {
-      this.pageIndex = page;
-      this.reloadPageAndScrollToTop();
-    }
+    this.totalPages$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(totalPages => {
+        if (page >= 0 && page < totalPages) {
+          this.pageIndex = page;
+          this.reloadWithFilters();
+        }
+      });
   }
 
   goToFirst() {
     this.pageIndex = 0;
-    this.reloadPageAndScrollToTop();
+    this.reloadWithFilters();
   }
 
   goToLast() {
-    this.pageIndex = this.totalPages - 1;
-    this.reloadPageAndScrollToTop();
+    this.totalPages$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(totalPages => {
+        this.pageIndex = totalPages - 1;
+        this.reloadWithFilters();
+      });
   }
 
   goToPrev() {
     if (this.pageIndex > 0) {
       this.pageIndex--;
-      this.reloadPageAndScrollToTop();
+      this.reloadWithFilters();
     }
   }
 
   goToNext() {
-    if (this.pageIndex < this.totalPages - 1) {
-      this.pageIndex++;
-      this.reloadPageAndScrollToTop();
-    }
+    this.totalPages$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(totalPages => {
+        if (this.pageIndex < totalPages - 1) {
+          this.pageIndex++;
+          this.reloadWithFilters();
+        }
+      });
   }
 
-  toggleFavourite(recipe: any) {
-    recipe.isFavourite = !recipe.isFavourite;
-    recipe.heartbeat = false;
-    setTimeout(() => {
-      recipe.heartbeat = true;
-      setTimeout(() => recipe.heartbeat = false, 500);
-    }, 0);
+  toggleFavourite(recipe: Favorite) {
+    this.currentUserId$
+      .pipe(
+        filter(userId => !!userId),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userId => {
+        this.store.dispatch(FavoriteActions.toggleFavorite({
+          userId: userId!,
+          recipeId: recipe.recipe_id
+        }));
+      });
+  }
+
+  private reloadWithFilters() {
+    this.currentUserId$
+      .pipe(
+        filter(userId => !!userId),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userId => {
+        this.loadUserFavorites(userId!, this.currentFilters);
+      });
+    
+    sessionStorage.setItem('myFavouriteRecipePageIndex', this.pageIndex.toString());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
