@@ -157,7 +157,7 @@ export const recipeReducer = createReducer(
 
   on(RecipeActions.searchRecipesSuccess, (state, { recipes }) => ({
     ...state,
-    searchResults: recipes,
+    searchResults: recipes.data,
     searchLoading: false,
     searchError: null,
   })),
@@ -177,7 +177,7 @@ export const recipeReducer = createReducer(
 
   on(RecipeActions.getRecipesByCategorySuccess, (state, { recipes }) => ({
     ...state,
-    recipes,
+    recipes: recipes.data,
     recipesLoading: false,
     recipesError: null,
   })),
