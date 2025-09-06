@@ -1,70 +1,33 @@
-<!-- <cdk-virtual-scroll-viewport class="container-card" itemSize="300" minBufferPx="400" maxBufferPx="800">
-  @if (isLoading()) {
-    @for (item of [1,2,3,4]; track item) {
-      <app-recipe-card-skeleton></app-recipe-card-skeleton>
-    }
-  } @else {
-    @for (item of cardData; track item.id) {
-    <mat-card
-      class="dish-card"
-      appearance="outlined">
-      <img
-        [src]="item.imageUrl"
-        [alt]="item.title + ' image'"
-        class="dish-image">
-      <mat-card-content>
-        <h2 class="dish-title">{{ item.title }}</h2>
-        <p class="dish-description">
-          {{ item.description }}
-        </p>
-      </mat-card-content>
-      <div class="rating">
-        <mat-icon>star_border</mat-icon>
-        <mat-icon>star_border</mat-icon>
-        <mat-icon>star_border</mat-icon>
-        <mat-icon>star_border</mat-icon>
-        <mat-icon>star_border</mat-icon>
-      </div>
-      <mat-card-actions class="card-footer">
-        <div class="user-info">
-          <img
-            class="avatar"
-            src="https://images-platform.99static.com//5_oXjjUVqCOk-6snmE7s_cdr-dI=/229x0:1041x812/fit-in/590x590/99designs-contests-attachments/47/47482/attachment_47482097"
-            alt="User avatar">
-          <span class="username">AnhVu-1904</span>
-        </div>
-        <div class="actions">
-          <mat-icon>favorite_border</mat-icon>
-          <mat-icon>share</mat-icon>
-        </div>
-      </mat-card-actions>
-    </mat-card>
-    }
-  }
-</cdk-virtual-scroll-viewport> -->
 <div class="container-card">
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
       <mat-card class="dish-card" appearance="outlined">
         <div appLazyImage 
-             [appLazyImage]="item.imageUrl"
+             [appLazyImage]="item.image_url"
              [appLazyImageOptions]="{ quality: 0.8, maxWidth: 400, maxHeight: 300, generateThumbnail: true, thumbnailSize: 150 }"
-             class="dish-image-container">
+             class="dish-image-container" (click)="navigationToDetail(item.id)">
         </div>
-        <mat-card-content>
+        <mat-card-content (click)="navigationToDetail(item.id)">
           <h2 class="dish-title">{{ item.title }}</h2>
           <p class="dish-description">
             {{ item.description }}
           </p>
         </mat-card-content>
 
-        <!-- ⭐ Rating (5 icon viết tay) -->
-        <div class="rating">
-          <mat-icon>star_border</mat-icon>
-          <mat-icon>star_border</mat-icon>
-          <mat-icon>star_border</mat-icon>
-          <mat-icon>star_border</mat-icon>
-          <mat-icon>star_border</mat-icon>
+
+        <!-- Độ khó & Thời gian nấu -->
+        <div class="dish-info-row" (click)="navigationToDetail(item.id)">
+          <span class="difficulty-label" [ngClass]="{
+            'easy': item.difficulty === 'easy',
+            'medium': item.difficulty === 'medium',
+            'hard': item.difficulty === 'hard'
+          }">
+            {{ item.difficulty === 'easy' ? 'Easy' : item.difficulty === 'medium' ? 'Medium' : 'Hard' }}
+          </span>
+          <span class="cooktime-label">
+            <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
+            {{ item.total_cooking_time }} minutes
+          </span>
         </div>
 
         <!-- ❤️ Footer -->

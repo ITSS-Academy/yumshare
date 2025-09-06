@@ -1,0 +1,104 @@
+<div class="notification-container">
+  <!-- Header -->
+  <div class="notification-header">
+    <h3>Notifications</h3>
+    <div class="header-actions">
+      <button 
+        mat-button 
+        color="primary" 
+        (click)="markAllAsRead()"
+        [disabled]="getUnreadCount() === 0">
+        Mark all as read
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading notifications...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="error-container">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-button color="primary" (click)="loadNotifications()">
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && !error && notifications.length === 0) {
+    <div class="empty-container">
+      <mat-icon>notifications_none</mat-icon>
+      <p>No notifications yet</p>
+      <small>You'll see notifications here when someone interacts with your content</small>
+    </div>
+  }
+
+  <!-- Message Notifications Section - REMOVED -->
+  <!-- Messages are now handled by MessageListComponent only -->
+
+  <!-- Other Notifications List -->
+  @if (!loading && !error && otherNotifications.length > 0) {
+    <div class="other-notifications-section">
+      <h4 class="section-title">
+        <mat-icon>notifications</mat-icon>
+        Notifications
+      </h4>
+      <div class="notifications-list">
+        @for (notification of otherNotifications; track notification.id) {
+          <div class="notification-item" 
+               [class.unread]="!notification.is_read"
+               (click)="onNotificationClick(notification)">
+            
+            <!-- Notification Icon -->
+            <div class="notification-icon">
+              <mat-icon [color]="getNotificationColor(notification.type)">
+                {{ getNotificationIcon(notification.type) }}
+              </mat-icon>
+            </div>
+
+            <!-- Notification Content -->
+            <div class="notification-content">
+              <p class="notification-text">{{ notification.content }}</p>
+              <div class="notification-meta">
+                <span class="notification-time">
+                  {{ notification.created_at | date:'short' }}
+                </span>
+                @if (!notification.is_read) {
+                  <mat-chip color="primary" selected>New</mat-chip>
+                }
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="notification-actions">
+              @if (!notification.is_read) {
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="markAsRead(notification); $event.stopPropagation()"
+                  matTooltip="Mark as read">
+                  <mat-icon>check</mat-icon>
+                </button>
+              }
+              <button 
+                mat-icon-button 
+                color="warn"
+                (click)="deleteNotification(notification.id); $event.stopPropagation()"
+                matTooltip="Delete notification">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

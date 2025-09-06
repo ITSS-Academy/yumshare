@@ -6,6 +6,8 @@ import { Router, RouterModule } from '@angular/router';
 import { ShareModule } from '../../shares/share.module';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
+import { NotificationListComponent } from '../notification-list/notification-list.component';
+import { MessageListComponent } from '../message-list/message-list.component';
 import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.component';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
@@ -13,6 +15,7 @@ import { AuthModel } from '../../models/auth.model';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import { Subscription } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
+import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -22,7 +25,7 @@ import { Auth } from '@angular/fire/auth';
     FormsModule,
     CommonModule,
     RouterModule,
-    // DarkModeToggleComponent
+    DarkModeToggleComponent
   ],
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']
@@ -40,12 +43,14 @@ export class NavBarComponent implements OnInit, OnDestroy {
   notificationCount = 0;
 
   private authSubscription: Subscription | null = null;
+  private notificationCountSubscription: Subscription | null = null;
 
   constructor(
     private router: Router, 
     private dialog: MatDialog,
     private store: Store<{auth: AuthState}>,
-    private auth: Auth
+    private auth: Auth,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -58,11 +63,24 @@ export class NavBarComponent implements OnInit, OnDestroy {
         
         // Tự động đóng dialog login nếu đăng nhập thành công
         this.dialog.closeAll();
+        
+        // Load notification count
+        this.loadNotificationCount();
+        
+        // Subscribe to notification count changes
+        this.subscribeToNotificationCount();
       } else {
         this.isLoggedIn = false;
         this.currentUser = null;
         this.userName = '';
         this.userAvatar = '';
+        this.notificationCount = 0;
+        
+        // Unsubscribe from notification count changes
+        if (this.notificationCountSubscription) {
+          this.notificationCountSubscription.unsubscribe();
+          this.notificationCountSubscription = null;
+        }
       }
     });
   }
@@ -70,6 +88,9 @@ export class NavBarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
+    }
+    if (this.notificationCountSubscription) {
+      this.notificationCountSubscription.unsubscribe();
     }
   }
 
@@ -83,8 +104,36 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   onSearchInput() { /* realtime suggestions */ }
 
-  onMessage() { /* open messages */ }
-  onNotification() { /* open notifications */ }
+  onMessage() {
+    if (this.isLoggedIn && this.currentUser?.uid) {
+      const dialogRef = this.dialog.open(MessageListComponent, {
+        width: '600px',
+        maxWidth: '90vw',
+        maxHeight: '80vh',
+        panelClass: 'message-dialog'
+      });
+    } else {
+      this.openLogin();
+    }
+  }
+  
+  onNotification() {
+    if (this.isLoggedIn && this.currentUser?.uid) {
+      const dialogRef = this.dialog.open(NotificationListComponent, {
+        width: '600px',
+        maxWidth: '90vw',
+        maxHeight: '80vh',
+        panelClass: 'notification-dialog'
+      });
+      
+      // Reload notification count when dialog closes
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadNotificationCount();
+      });
+    } else {
+      this.openLogin();
+    }
+  }
 
   // Click behavior: if logged in go to profile, else open login dialog
   openLogin() {
@@ -118,19 +167,47 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   onLogin() {
-    console.log('Open login dialog');
     // Open login dialog or navigate to login page
   }
 
   onProfile() {
-    console.log('Open profile');
     this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });
+  }
 
-    // Navigate to profile page
+  private loadNotificationCount(): void {
+    if (this.currentUser?.uid) {
+      this.notificationService.getUserNotifications().subscribe({
+        next: (notifications) => {
+          // Total notifications (excluding messages)
+          this.notificationCount = notifications.filter(n => !n.is_read && n.type !== 'message').length;
+          // Message notifications only
+          this.messageCount = notifications.filter(n => !n.is_read && n.type === 'message').length;
+        },
+        error: (err) => {
+          console.error('Error loading notification count:', err);
+          this.notificationCount = 0;
+          this.messageCount = 0;
+        }
+      });
+    }
+  }
+
+  private subscribeToNotificationCount(): void {
+    this.notificationCountSubscription = this.notificationService.notificationCount$.subscribe(
+      count => {
+        this.notificationCount = count;
+      }
+    );
+    
+    // Subscribe to message count changes
+    this.notificationService.messageCount$.subscribe(
+      count => {
+        this.messageCount = count;
+      }
+    );
   }
 
   onSettings() {
-    console.log('Open settings');
     // Navigate to settings page
   }
 

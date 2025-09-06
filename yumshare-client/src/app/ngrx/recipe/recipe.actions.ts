@@ -119,7 +119,7 @@ export const loadAllRecipes = createAction('[Recipe] Load All Recipes');
 
 export const loadAllRecipesSuccess = createAction(
   '[Recipe] Load All Recipes Success',
-  props<{ recipes: Recipe[] }>()
+  props<{ recipes: PaginatedResponse<Recipe> }>()
 );
 
 export const loadAllRecipesFailure = createAction(
@@ -183,3 +183,22 @@ export const clearCurrentRecipe = createAction('[Recipe] Clear Current Recipe');
 
 // Clear Search Results
 export const clearSearchResults = createAction('[Recipe] Clear Search Results');
+
+// Load Paginated Recipes
+import { PaginatedResponse } from '../../models/paginated-response.model';
+
+export const loadPaginatedRecipes = createAction(
+  '[Recipe] Load Paginated Recipes',
+  props<{ page?: number; size?: number }>()
+);
+
+export const loadPaginatedRecipesSuccess = createAction(
+  '[Recipe] Load Paginated Recipes Success',
+  props<{ response: PaginatedResponse<Recipe> }>()
+);
+
+export const loadPaginatedRecipesFailure = createAction(
+  '[Recipe] Load Paginated Recipes Failure',
+  props<{ error: string }>()
+);
+

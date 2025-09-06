@@ -627,6 +627,59 @@ Global scroll behavior for better UX:
 .snackbar-warning { @extend .warning-snackbar; }
 .snackbar-info { @extend .info-snackbar; }
 
+// ===== NOTIFICATION TOAST STYLES =====
+.notification-toast {
+  z-index: var(--z-notification) !important;
+  
+  .mdc-snackbar__surface {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    max-width: 400px !important;
+    min-width: 300px !important;
+  }
+  
+  .mdc-snackbar__label {
+    padding: 16px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+  
+  .mdc-snackbar__actions {
+    padding: 8px 16px 16px !important;
+  }
+  
+  .mat-mdc-button {
+    color: var(--primary) !important;
+    font-weight: 500 !important;
+  }
+}
+
+.unread-notification {
+  .mdc-snackbar__surface {
+    border-left: 4px solid var(--primary) !important;
+    background: var(--primary-lightest) !important;
+  }
+}
+
+// Animation for notification toast
+.notification-toast {
+  animation: slideInFromRight 0.3s var(--animation-easing) !important;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 // ===== ADVANCED ANIMATIONS =====
 
 // Animation timing functions

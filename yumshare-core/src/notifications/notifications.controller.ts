@@ -11,7 +11,7 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  @RateLimit(RateLimits.STRICT)
+  @RateLimit(RateLimits.STANDARD)
   create(@Body() createDto: CreateNotificationDto) {
     return this.notificationsService.create(createDto);
   }
@@ -20,6 +20,17 @@ export class NotificationsController {
   @RateLimit(RateLimits.STANDARD)
   findAll() {
     return this.notificationsService.findAll();
+  }
+
+  @Put('mark-all-read')
+  markAllAsRead() {
+    return this.notificationsService.markAllAsRead();
+  }
+
+  @Get('user/:userId')
+  @RateLimit(RateLimits.STANDARD)
+  getUserNotifications(@Param('userId') userId: string) {
+    return this.notificationsService.getUserNotifications(userId);
   }
 
   @Get(':id')
@@ -31,6 +42,12 @@ export class NotificationsController {
   update(@Param('id') id: string, @Body() updateDto: UpdateNotificationDto) {
     return this.notificationsService.update(id, updateDto);
   }
+
+  @Put(':id/read')
+  markAsRead(@Param('id') id: string) {
+    return this.notificationsService.update(id, { is_read: true });
+  }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

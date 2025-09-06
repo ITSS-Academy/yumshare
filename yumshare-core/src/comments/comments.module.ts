@@ -6,11 +6,13 @@ import { Comment } from './entities/comment.entity/comment.entity';
 import { User } from '../auth/entities/user.entity';
 import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
 import { CommonModule } from '../common/common.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment, User, Recipe]),
-    CommonModule
+    CommonModule,
+    NotificationsModule
   ],
   providers: [CommentsService],
   controllers: [CommentsController]

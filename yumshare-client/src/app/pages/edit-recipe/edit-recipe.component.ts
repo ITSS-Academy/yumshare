@@ -24,6 +24,7 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { SafePipe } from '../../pipes/safe.pipe';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-edit-recipe',
@@ -78,7 +79,8 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<{auth: AuthState}>,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private categoryService: CategoryService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', Validators.required],
@@ -213,7 +215,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
 
   loadCategories() {
-    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+    const categoriesSubscription = this.categoryService.getCategories().subscribe({
       next: (response: any) => {
         let categories: Category[] = [];
         

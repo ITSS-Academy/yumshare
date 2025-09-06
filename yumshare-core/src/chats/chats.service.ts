@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { Chat } from './entities/chat.entity';
@@ -6,6 +6,8 @@ import { ChatMessage } from './entities/chat-message.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { User } from '../auth/entities/user.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Injectable()
 export class ChatsService {
@@ -16,6 +18,8 @@ export class ChatsService {
     private readonly messageRepository: Repository<ChatMessage>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async createChat(createChatDto: CreateChatDto) {
@@ -90,6 +94,29 @@ export class ChatsService {
 
     // Update chat's updated_at timestamp
     await this.chatRepository.update(createMessageDto.chat_id, { updated_at: new Date() });
+
+    // Create notification for recipient
+    const recipientId = chat.user1_id === createMessageDto.sender_id ? chat.user2_id : chat.user1_id;
+    const sender = await this.userRepository.findOne({ where: { id: createMessageDto.sender_id } });
+    
+    if (sender) {
+      const notificationContent = `${sender.username || sender.email} sent you a message: ${createMessageDto.content.substring(0, 50)}${createMessageDto.content.length > 50 ? '...' : ''}`;
+      
+      try {
+        await this.notificationsService.create({
+          user_id: recipientId,
+          type: NotificationType.MESSAGE,
+          content: notificationContent,
+          metadata: { 
+            chat_id: createMessageDto.chat_id,
+            sender_id: createMessageDto.sender_id,
+            message_id: savedMessage.id
+          }
+        });
+      } catch (error) {
+        console.error('Error creating message notification:', error);
+      }
+    }
 
     return savedMessage;
   }

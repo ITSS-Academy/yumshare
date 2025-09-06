@@ -232,3 +232,20 @@ export const logRecipeActionsEffect = createEffect(
 );
 
 
+// Load Paginated Recipes Effect
+export const loadPaginatedRecipesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.loadPaginatedRecipes),
+      switchMap(({ page, size }) =>
+        recipeService.getAllRecipes().pipe(
+          map((response) => RecipeActions.loadPaginatedRecipesSuccess({ response })),
+          catchError((error) => of(RecipeActions.loadPaginatedRecipesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat/chat.service';
 import { Chat, CreateMessageDto } from '../../models/chat.model';
 import { User } from '../../models/user.model';
@@ -120,7 +121,12 @@ export class MessageComponent implements OnInit, OnDestroy {
     });
   }
 
-  constructor(private chatService: ChatService, private auth: Auth) {
+  constructor(
+    private chatService: ChatService, 
+    private auth: Auth,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     const uid = this.auth.currentUser?.uid;
     if (uid) {
       this.currentUser.id = uid as any;
@@ -142,6 +148,13 @@ export class MessageComponent implements OnInit, OnDestroy {
       this.loadChats();
       this.joinChat();
     }
+    
+    // Check for chat ID in route parameters
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.selectChatById(params['id']);
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -266,6 +279,18 @@ export class MessageComponent implements OnInit, OnDestroy {
     
     // Start polling for new messages
     this.startPolling();
+  }
+
+  selectChatById(chatId: string) {
+    // Find chat by ID in the loaded chats
+    const chat = this.chats.find(c => c.id === chatId);
+    if (chat) {
+      this.selectChat(chat);
+    } else {
+      // If chat not found in current list, try to load it
+      console.log('Chat not found in current list, loading...');
+      // You might want to add a method to load a specific chat by ID
+    }
   }
 
   private loadMessages(chatId: string) {

@@ -13,6 +13,7 @@ import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError } from '../../ngrx/recipe/recipe.selectors';
 import { AsyncPipe, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-search',
@@ -61,7 +62,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private router: Router,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private categoryService: CategoryService,
   ) {
     this.searchResults$ = this.store.select(selectSearchResults);
     this.searchLoading$ = this.store.select(selectSearchLoading);
@@ -97,7 +99,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.store.dispatch(RecipeActions.loadAllRecipes());
 
     // Load categories from RecipeService
-    this.recipeService.getCategories().subscribe({
+    this.categoryService.getCategories().subscribe({
       next: (response) => {
         this.categories = response.data;
       },

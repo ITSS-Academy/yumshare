@@ -2,16 +2,16 @@ import { inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { RecipeService } from '../../services/recipe/recipe.service';
 import * as CategoryActions from './category.actions';
+import { CategoryService } from '../../services/category/category.service';
 
 // Load Categories Effect
 export const loadCategories = createEffect(
-  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+  (actions$ = inject(Actions), categoryService = inject(CategoryService)) => {
     return actions$.pipe(
       ofType(CategoryActions.loadCategories),
       switchMap(() =>
-        recipeService.getCategories().pipe(
+        categoryService.getCategories().pipe(
           map((response) => {
             const categories = response.data || response;
             return CategoryActions.loadCategoriesSuccess({ categories });
@@ -26,11 +26,11 @@ export const loadCategories = createEffect(
 
 // Load Category by ID Effect
 export const loadCategoryById = createEffect(
-  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+  (actions$ = inject(Actions), categoryService = inject(CategoryService)) => {
     return actions$.pipe(
       ofType(CategoryActions.loadCategoryById),
       switchMap(({ id }) =>
-        recipeService.getCategories().pipe(
+        categoryService.getCategories().pipe(
           map((response) => {
             const categories = response.data || response;
             const category = categories.find(cat => cat.id === id);
@@ -50,11 +50,11 @@ export const loadCategoryById = createEffect(
 
 // Load Active Categories Effect
 export const loadActiveCategories = createEffect(
-  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+  (actions$ = inject(Actions), categoryService = inject(CategoryService)) => {
     return actions$.pipe(
       ofType(CategoryActions.loadActiveCategories),
       switchMap(() =>
-        recipeService.getCategories().pipe(
+        categoryService.getCategories().pipe(
           map((response) => {
             const categories = response.data || response;
             const activeCategories = categories.filter(cat => cat.is_active);
@@ -174,4 +174,4 @@ export const logCategoryActions = createEffect(
   { functional: true, dispatch: false }
 );
 
-
+// export const
