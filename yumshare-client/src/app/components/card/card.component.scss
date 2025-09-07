@@ -67,9 +67,13 @@
       margin: 8px 0 4px;
       cursor: default;
       user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      line-clamp: 2;
+      // -webkit-user-select: none;
+      // -ms-user-select: none;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+      display: -webkit-box;
+      overflow: hidden;
     }
 
     .dish-description {
@@ -151,6 +155,7 @@
 
       .user-info {
         display: flex;
+        align-items: center;
         gap: 8px;
         user-select: none;
         -webkit-user-select: none;

@@ -585,3 +585,83 @@ mat-form-field {
 .favourite-btn .mat-icon.heartbeat {
   animation: heartbeat 1.5s;
 }
+
+// Loading state styles
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+  
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+    text-align: center;
+  }
+}
+
+// Empty state styles
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  gap: 16px;
+  
+  .empty-icon {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    color: #333;
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+  }
+  
+  p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+}
+
+// Responsive adjustments for loading and empty states
+@media (max-width: 600px) {
+  .loading-container {
+    padding: 40px 16px;
+    
+    p {
+      font-size: 14px;
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 16px;
+    
+    .empty-icon {
+      font-size: 48px;
+    }
+    
+    h3 {
+      font-size: 20px;
+    }
+    
+    p {
+      font-size: 14px;
+    }
+  }
+}

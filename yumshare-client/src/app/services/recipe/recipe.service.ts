@@ -13,6 +13,7 @@ import { CachingService, CacheOptions } from '../caching/caching.service';
   providedIn: 'root'
 })
 export class RecipeService {
+  [x: string]: any;
   private apiUrl = environment.apiUrl;
   private readonly CACHE_TTL = 10 * 60 * 1000; // 10 minutes
   private readonly SEARCH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -121,25 +122,95 @@ export class RecipeService {
   }
 
   // Search recipes
-  searchRecipes(query: string, category?: string, author?: string): Observable<Recipe[]> {
-    let params: any = { q: query };
+  searchRecipes(
+    query: string, 
+    category?: string, 
+    author?: string, 
+    difficulty?: string,
+    rating?: number,
+    page: number = 1,
+    size: number = 10,
+    orderBy: string = 'created_at',
+    order: 'ASC' | 'DESC' = 'DESC'
+  ): Observable<PaginatedResponse<Recipe>> {
+    let params: any = { 
+      query: query,
+      page: page.toString(),
+      size: size.toString(),
+      orderBy: orderBy,
+      order: order
+    };
+    
     if (category) params.category = category;
     if (author) params.author = author;
+    if (difficulty) params.difficulty = difficulty;
+    if (rating) params.rating = rating.toString();
 
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/search`, { params });
+    return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes/search`, { params });
+  }
+
+  // Get all categories
+  getCategories(): Observable<PaginatedResponse<Category>> {
+    return this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`);
   }
 
   // Get recipes by category
-  getRecipesByCategory(categoryId: string): Observable<Recipe[]> {
+  getRecipesByCategory(
+    categoryId: string,
+    page: number = 1,
+    size: number = 10,
+    orderBy: string = 'created_at',
+    order: 'ASC' | 'DESC' = 'DESC'
+  ): Observable<PaginatedResponse<Recipe>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('orderBy', orderBy)
+      .set('order', order);
+    
+    return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes/category/${categoryId}`, { params });
+  }
+  getAllRecipes(
+    page: number = 1,
+    size: number = 10,
+    orderBy: string = 'created_at',
+    order: 'ASC' | 'DESC' = 'DESC'
+  ): Observable<PaginatedResponse<Recipe>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('orderBy', orderBy)
+      .set('order', order);
+    return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
+  }
+
+  // Get recipes by category main courses
+  getRecipesByCategoryMainCourses(categoryId: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
   }
+
+  // Get recipes by category beverages
+  getRecipesByCategoryBeverages(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+  
+  // Get recipes by category desserts
+  getRecipesByCategoryDesserts(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+
+  // Get recipes by category snacks
+  getRecipesByCategorySnacks(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+
   // Get all recipes
-getAllRecipes(): Observable<PaginatedResponse<Recipe>> {
-  const params = new HttpParams()
-    .set('page', '1')
-    .set('size', '10')
-    .set('orderBy', 'created_at')
-    .set('order', 'DESC');
-  return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
-}
+// getAllRecipes(): Observable<PaginatedResponse<Recipe>> {
+//   const params = new HttpParams()
+//     .set('page', '1')
+//     .set('size', '10')
+//     .set('orderBy', 'created_at')
+//     .set('order', 'DESC');
+//   return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
+// }
 }

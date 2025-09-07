@@ -25,7 +25,7 @@
       <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="notificationCount === 0" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>notifications</mat-icon>
       </button>
-      <app-dark-mode-toggle></app-dark-mode-toggle>
+      <!-- <app-dark-mode-toggle></app-dark-mode-toggle> -->
       <button class="avatar-btn" mat-icon-button matTooltip="Profile" aria-label="Profile" (click)="onProfile()">
         @if (userAvatar) {
           <img class="avatar" [src]="userAvatar" alt="avatar" />

@@ -106,8 +106,18 @@ export const searchRecipesEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
     return actions$.pipe(
       ofType(RecipeActions.searchRecipes),
-      switchMap(({ query, category, author }) =>
-        recipeService.searchRecipes(query, category, author).pipe(
+      switchMap(({ query, category, author, difficulty, rating, page, size, orderBy, order }) =>
+        recipeService.searchRecipes(
+          query, 
+          category, 
+          author, 
+          difficulty, 
+          rating, 
+          page, 
+          size, 
+          orderBy, 
+          order
+        ).pipe(
           map((recipes) => RecipeActions.searchRecipesSuccess({ recipes })),
           catchError((error) => of(RecipeActions.searchRecipesFailure({ error: error.message })))
         )
@@ -117,19 +127,99 @@ export const searchRecipesEffect = createEffect(
   { functional: true }
 );
 
+// Load All Recipes Effect
+// export const loadAllRecipesEffect = createEffect(
+//   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+//     return actions$.pipe(
+//       ofType(RecipeActions.loadAllRecipes),
+//       switchMap(() =>
+//         recipeService.getAllRecipes().pipe(
+//           map((recipes) => RecipeActions.loadAllRecipesSuccess({ recipes })),
+//           catchError((error) => of(RecipeActions.loadAllRecipesFailure({ error: error.message })))
+//         )
+//       )
+//     );
+//   },
+//   { functional: true }
+// );
+
 // Get Recipes by Category Effect
 export const getRecipesByCategoryEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
     return actions$.pipe(
       ofType(RecipeActions.getRecipesByCategory),
-      switchMap(({ categoryId }) =>
-        recipeService.getRecipesByCategory(categoryId).pipe(
+      switchMap(({ categoryId, page, size, orderBy, order }) =>
+        recipeService.getRecipesByCategory(categoryId, page, size, orderBy, order).pipe(
           map((recipes) => RecipeActions.getRecipesByCategorySuccess({ recipes })),
           catchError((error) => of(RecipeActions.getRecipesByCategoryFailure({ error: error.message })))
         )
       )
     );
   },
+  { functional: true }
+);
+
+// Get recipes by category main courses Effect
+export const getRecipesByCategoryMainCoursesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategoryMainCourses),
+      switchMap(({ categoryId }) =>
+        recipeService.getRecipesByCategoryMainCourses(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategoryMainCoursesSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategoryMainCoursesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+// Get Recipes by Category Beverages Effect
+export const getRecipesByCategoryBeveragesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategoryBeverages),
+      switchMap(({ categoryId }) =>
+        recipeService.getRecipesByCategoryBeverages(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategoryBeveragesSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategoryBeveragesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+// Get Recipes by Category Desserts Effect
+export const getRecipesByCategoryDessertsEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategoryDesserts),
+      switchMap(({ categoryId }) =>
+        recipeService.getRecipesByCategoryDesserts(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategoryDessertsSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategoryDessertsFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+// Get Recipes by Category Snacks Effect
+export const getRecipesByCategorySnacksEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategorySnacks),
+      switchMap(({ categoryId }) => 
+        recipeService.getRecipesByCategorySnacks(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategorySnacksSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategorySnacksFailure({ error: error.message })))
+        )
+      )
+    );
+  },  
   { functional: true }
 );
 
@@ -221,8 +311,8 @@ export const loadPaginatedRecipesEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
     return actions$.pipe(
       ofType(RecipeActions.loadPaginatedRecipes),
-      switchMap(({ page, size }) =>
-        recipeService.getAllRecipes().pipe(
+      switchMap(({ page, size, orderBy, order }) =>
+        recipeService.getAllRecipes(page, size, orderBy, order).pipe(
           map((response) => RecipeActions.loadPaginatedRecipesSuccess({ response })),
           catchError((error) => of(RecipeActions.loadPaginatedRecipesFailure({ error: error.message })))
         )

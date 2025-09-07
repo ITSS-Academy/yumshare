@@ -1,14 +1,15 @@
 <div class="container-card">
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
-      <mat-card class="dish-card" appearance="outlined" (click)="navigationToDetail(item.id)">
+      <mat-card class="dish-card" appearance="outlined">
         <div appLazyImage 
-             [appLazyImage]="item.imageUrl"
+             [appLazyImage]="item.image_url"
              [appLazyImageOptions]="{ quality: 0.8, maxWidth: 400, maxHeight: 300, generateThumbnail: true, thumbnailSize: 150 }"
-             class="dish-image-container">
+             class="dish-image-container" (click)="navigationToDetail(item.id)">
         </div>
-        <mat-card-content>
+        <mat-card-content (click)="navigationToDetail(item.id)">
           <h2 class="dish-title">{{ item.title }}</h2>
+
           <p class="dish-description">
             {{ item.description }}
           </p>
@@ -16,35 +17,29 @@
 
 
         <!-- Độ khó & Thời gian nấu -->
-        <div class="dish-info-row">
-          <span class="difficulty-label" [ngClass]="{
-            'easy': item.difficulty === 'easy',
-            'medium': item.difficulty === 'medium',
-            'hard': item.difficulty === 'hard'
-          }">
-            {{ item.difficulty === 'easy' ? 'Easy' : item.difficulty === 'medium' ? 'Medium' : 'Hard' }}
+        <div class="dish-info-row" (click)="navigationToDetail(item.id)">
+          <span class="difficulty-label" [ngClass]="getDifficultyClass(item.difficulty)">
+            {{ getDifficultyLabel(item.difficulty) }}
           </span>
           <span class="cooktime-label">
             <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
-            {{ item.cookTime }} minutes
+            {{ item.total_cooking_time }} minutes
           </span>
         </div>
 
         <!-- ❤️ Footer -->
         <mat-card-actions class="card-footer">
           <div class="user-info">
-            <div appLazyImage 
-                 [appLazyImage]="'https://images-platform.99static.com//5_oXjjUVqCOk-6snmE7s_cdr-dI=/229x0:1041x812/fit-in/590x590/99designs-contests-attachments/47/47482/attachment_47482097'"
-                 [appLazyImageOptions]="{ quality: 0.7, maxWidth: 40, maxHeight: 40, generateThumbnail: false }"
-                 class="avatar-container">
+            <div class="avatar-container">
+              <img [src]="item.user?.avatar_url" alt="{{ item.user?.username }}" />
             </div>
-            <span class="username">AnhVu-1904</span>
+            <span class="username">{{ item.user?.username }}</span>
           </div>
           <div class="actions">
             <mat-icon (click)="toggleFavorite(item)" [style.color]="item.isFavorite ? 'red' : '#666'">
               {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
             </mat-icon>
-            <mat-icon>share</mat-icon>
+            <mat-icon (click)="shareRecipe(item)" style="cursor:pointer">share</mat-icon>
           </div>
         </mat-card-actions>
       </mat-card>

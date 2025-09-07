@@ -84,6 +84,5 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/faq/faq.component').then((m) => m.FaqComponent),
   },
- 
 ];
 
