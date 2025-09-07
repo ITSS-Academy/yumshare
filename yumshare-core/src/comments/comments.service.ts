@@ -74,7 +74,7 @@ export class CommentsService {
   async findAll(queryOpts: QueryOptsDto = {}): Promise<ListResult<Comment>> {
     const { page = 1, size = 20 } = queryOpts;
     
-    // Use optimized query service for better performance
+    // Use optimized query service with limited relations
     const result = await this.optimizedQueryService.executeOptimizedQuery(
       this.commentRepository,
       queryOpts,
@@ -101,7 +101,26 @@ export class CommentsService {
   }
 
   findOne(id: string) {
-    return this.commentRepository.findOne({ where: { id }, relations: ['user', 'recipe'] });
+    return this.commentRepository.findOne({ 
+      where: { id }, 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        content: true,
+        created_at: true,
+        updated_at: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   async findByRecipe(recipeId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Comment>> {
@@ -109,10 +128,22 @@ export class CommentsService {
     
     const skip = (page - 1) * size;
     
-    // Use query builder with relations to get comments with user data
+    // Use query builder with limited relations to reduce Cached Egress
     const queryBuilder = this.commentRepository.createQueryBuilder('comment')
       .leftJoinAndSelect('comment.user', 'user')
       .leftJoinAndSelect('comment.recipe', 'recipe')
+      .select([
+        'comment.id',
+        'comment.content',
+        'comment.created_at',
+        'comment.updated_at',
+        'user.id',
+        'user.username',
+        'user.avatar_url',
+        'recipe.id',
+        'recipe.title',
+        'recipe.image_url'
+      ])
       .where('comment.recipe_id = :recipeId', { recipeId })
       .orderBy(`comment.${orderBy}`, order as 'ASC' | 'DESC')
       .skip(skip)

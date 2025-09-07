@@ -46,6 +46,16 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
+  @Get(':id/recipes')
+  getCategoryRecipes(@Param('id') id: string, @Query() queryOpts: QueryOptsDto) {
+    return this.categoriesService.getCategoryRecipes(id, queryOpts);
+  }
+
+  @Get(':id/recipe-count')
+  getCategoryRecipeCount(@Param('id') id: string) {
+    return this.categoriesService.getCategoryRecipeCount(id);
+  }
+
   @Put(':id')
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.update(id, updateCategoryDto);

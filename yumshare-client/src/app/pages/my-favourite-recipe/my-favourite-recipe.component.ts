@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from "@angular/forms";
 import { Store } from '@ngrx/store';
-import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
+import { Observable, Subscription, combineLatest, Subject } from 'rxjs';
 import { map, filter, startWith } from 'rxjs/operators';
 
 // Material UI imports
@@ -16,6 +16,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 // NgRx imports
 import * as FavoriteActions from '../../ngrx/favorite/favorite.actions';
@@ -49,6 +50,7 @@ import { Category } from '../../models/category.model';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     DatePipe,
+    ScrollingModule,
   ],
   templateUrl: './my-favourite-recipe.component.html',
   styleUrl: './my-favourite-recipe.component.scss'
@@ -56,12 +58,15 @@ import { Category } from '../../models/category.model';
 export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private snackBar = inject(MatSnackBar);
-  private destroy$ = new Subject<void>();
+  private subscriptions: Subscription[] = [];
   private filterTrigger$ = new Subject<void>();
 
   // Pagination properties
   pageIndex = 0;
   pageSize = 6;
+  
+  // Virtual scrolling properties
+  itemSize = 200; // Height of each favorite card
 
   // Filter properties
   selectedCategory: string = 'Category';
@@ -149,57 +154,62 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.store.dispatch({ type: '[Category] Load Active Categories' });
 
     // Debug: Log current user ID
-    this.currentUserId$.subscribe(userId => {
-      console.log('Current User ID:', userId);
-    });
+    this.subscriptions.push(
+      this.currentUserId$.subscribe(userId => {
+        console.log('Current User ID:', userId);
+      })
+    );
 
     // Debug: Log auth state
-    this.isAuthenticated$.subscribe(isAuth => {
-      console.log('Is Authenticated:', isAuth);
-    });
+    this.subscriptions.push(
+      this.isAuthenticated$.subscribe(isAuth => {
+        console.log('Is Authenticated:', isAuth);
+      })
+    );
 
     // Get user ID from auth state and set it in favorite state
-    this.store.select(AuthSelectors.selectUserId)
-      .pipe(
-        filter(userId => !!userId),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(userId => {
-        console.log('Setting current user ID in favorite state:', userId);
-        this.store.dispatch(FavoriteActions.setCurrentUser({ userId: userId! }));
-      });
+    this.subscriptions.push(
+      this.store.select(AuthSelectors.selectUserId)
+        .pipe(filter(userId => !!userId))
+        .subscribe(userId => {
+          console.log('Setting current user ID in favorite state:', userId);
+          this.store.dispatch(FavoriteActions.setCurrentUser({ userId: userId! }));
+        })
+    );
 
     // Load user favorites when component initializes
-    this.currentUserId$
-      .pipe(
-        filter(userId => !!userId),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(userId => {
-        console.log('Loading favorites for user:', userId);
-        this.loadUserFavorites(userId!, this.currentFilters);
-      });
+    this.subscriptions.push(
+      this.currentUserId$
+        .pipe(filter(userId => !!userId))
+        .subscribe(userId => {
+          console.log('Loading favorites for user:', userId);
+          this.loadUserFavorites(userId!, this.currentFilters);
+        })
+    );
 
     // Debug: Log favorites data
-    this.favorites$.subscribe(favorites => {
-      console.log('Favorites data:', favorites);
-    });
+    this.subscriptions.push(
+      this.favorites$.subscribe(favorites => {
+        console.log('Favorites data:', favorites);
+      })
+    );
 
     // Debug: Log loading state
-    this.favoritesLoading$.subscribe(loading => {
-      console.log('Favorites loading:', loading);
-    });
+    this.subscriptions.push(
+      this.favoritesLoading$.subscribe(loading => {
+        console.log('Favorites loading:', loading);
+      })
+    );
 
     // Handle errors
-    this.favoritesError$
-      .pipe(
-        filter(error => !!error),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(error => {
-        console.error('Favorites error:', error);
-        this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
-      });
+    this.subscriptions.push(
+      this.favoritesError$
+        .pipe(filter(error => !!error))
+        .subscribe(error => {
+          console.error('Favorites error:', error);
+          this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
+        })
+    );
 
     // Restore page index from session storage
     const savedPageIndex = sessionStorage.getItem('myFavouriteRecipePageIndex');
@@ -210,8 +220,8 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
     this.filterTrigger$.complete();
   }
 
@@ -290,14 +300,14 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   }
 
   goToPage(page: number) {
-    this.totalPages$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(totalPages => {
+    this.subscriptions.push(
+      this.totalPages$.subscribe(totalPages => {
         if (page >= 0 && page < totalPages) {
           this.pageIndex = page;
           this.reloadWithFilters();
         }
-      });
+      })
+    );
   }
 
   goToFirst() {
@@ -306,12 +316,12 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   }
 
   goToLast() {
-    this.totalPages$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(totalPages => {
+    this.subscriptions.push(
+      this.totalPages$.subscribe(totalPages => {
         this.pageIndex = totalPages - 1;
         this.reloadWithFilters();
-      });
+      })
+    );
   }
 
   goToPrev() {
@@ -322,41 +332,44 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   }
 
   goToNext() {
-    this.totalPages$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(totalPages => {
+    this.subscriptions.push(
+      this.totalPages$.subscribe(totalPages => {
         if (this.pageIndex < totalPages - 1) {
           this.pageIndex++;
           this.reloadWithFilters();
         }
-      });
+      })
+    );
   }
 
   toggleFavourite(recipe: Favorite) {
-    this.currentUserId$
-      .pipe(
-        filter(userId => !!userId),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(userId => {
-        this.store.dispatch(FavoriteActions.toggleFavorite({
-          userId: userId!,
-          recipeId: recipe.recipe_id
-        }));
-      });
+    this.subscriptions.push(
+      this.currentUserId$
+        .pipe(filter(userId => !!userId))
+        .subscribe(userId => {
+          this.store.dispatch(FavoriteActions.toggleFavorite({
+            userId: userId!,
+            recipeId: recipe.recipe_id
+          }));
+        })
+    );
   }
 
   private reloadWithFilters() {
-    this.currentUserId$
-      .pipe(
-        filter(userId => !!userId),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(userId => {
-        this.loadUserFavorites(userId!, this.currentFilters);
-      });
+    this.subscriptions.push(
+      this.currentUserId$
+        .pipe(filter(userId => !!userId))
+        .subscribe(userId => {
+          this.loadUserFavorites(userId!, this.currentFilters);
+        })
+    );
     
     sessionStorage.setItem('myFavouriteRecipePageIndex', this.pageIndex.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // TrackBy function for virtual scrolling performance
+  trackByFavoriteId(index: number, favorite: Favorite): string {
+    return favorite.id;
   }
 }

@@ -3,19 +3,19 @@
   // height: 100%;
   // width: 100%;
 
-  // // Virtual scrolling specific styles
-  // .cdk-virtual-scroll-content-wrapper {
-  //   display: flex;
-  //   flex-wrap: wrap;
-  //   justify-content: flex-start;
-  //   align-items: center;
-  //   gap: 20px;
-  //   padding: 20px;
-  // }
+  // Virtual scrolling specific styles
+  .cdk-virtual-scroll-content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
 
-  // .cdk-virtual-scroll-viewport {
-  //   height: 100%;
-  // }
+  .cdk-virtual-scroll-viewport {
+    height: 100%;
+  }
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;

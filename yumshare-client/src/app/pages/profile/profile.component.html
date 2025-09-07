@@ -138,90 +138,122 @@
                      <!-- Followers Tab -->
         @if (activeTab === 'followers' && !(followIsLoading$ | async)) {
           <div class="followers">
-            <ul>
-              @for (follow of (followers$ | async) || []; track follow.id) {
-                <li class="social-item">
-                  <img [src]="follow.follower?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
-                  <div class="user-info">
-                    <span class="user-name">{{ follow.follower?.username || 'Unknown User' }}</span>
-                    <span class="user-bio">{{ follow.follower?.bio || 'No bio available' }}</span>
+            @if ((followers$ | async)?.length > 10) {
+              <!-- Use Virtual Scrolling for large follower lists -->
+              <div class="virtual-scroll-container">
+                <cdk-virtual-scroll-viewport [itemSize]="followItemSize" class="follow-viewport">
+                  @for (follow of (followers$ | async) || []; track trackByFollowId($index, follow)) {
+                  <div class="social-item">
+                    <img [src]="follow.follower?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.follower?.username || 'Unknown User' }}</span>
+                      <span class="user-bio">{{ follow.follower?.bio || 'No bio available' }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="follow-btn"
+                        (click)="followUser(follow.follower?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        Follow
+                      </button>
+                    </div>
                   </div>
-                  <div class="user-actions">
-                    <button 
-                      class="follow-btn"
-                      (click)="followUser(follow.follower?.id || '')"
-                      [disabled]="followIsLoading$ | async">
-                      Follow
-                    </button>
+                  }
+                  @if (!(followers$ | async) || (followers$ | async)?.length === 0) {
+                    <div class="no-data">
+                      <p>No followers yet</p>
+                    </div>
+                  }
+                </cdk-virtual-scroll-viewport>
+              </div>
+            } @else {
+              <!-- Regular scroll for small follower lists -->
+              <div class="regular-follow-list">
+                @for (follow of (followers$ | async) || []; track trackByFollowId($index, follow)) {
+                  <div class="social-item">
+                    <img [src]="follow.follower?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.follower?.username || 'Unknown User' }}</span>
+                      <span class="user-bio">{{ follow.follower?.bio || 'No bio available' }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="follow-btn"
+                        (click)="followUser(follow.follower?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        Follow
+                      </button>
+                    </div>
                   </div>
-                </li>
-              }
-              @if (!(followers$ | async) || (followers$ | async)?.length === 0) {
-                <li class="no-data">
-                  <p>No followers yet</p>
-                </li>
-              }
-              
-              <!-- Load More Button for Followers -->
-              @if (hasMoreFollowers && (followers$ | async)?.length > 0) {
-                <li class="load-more-container">
-                  <button 
-                    class="load-more-btn"
-                    (click)="loadMoreFollowers()"
-                    [disabled]="isLoadingMore">
-                    @if (isLoadingMore) {
-                      <span class="loading-spinner"></span>
-                    }
-                    Load More Followers
-                  </button>
-                </li>
-              }
-            </ul>
+                }
+                @if (!(followers$ | async) || (followers$ | async)?.length === 0) {
+                  <div class="no-data">
+                    <p>No followers yet</p>
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
 
                      <!-- Following Tab -->
         @if (activeTab === 'following' && !(followIsLoading$ | async)) {
           <div class="following">
-            <ul>
-              @for (follow of (following$ | async) || []; track follow.id) {
-                <li class="social-item">
-                  <img [src]="follow.following?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
-                  <div class="user-info">
-                    <span class="user-name">{{ follow.following?.username || 'Unknown User' }}</span>
-                    <span class="user-bio">{{ follow.following?.bio || 'No bio available' }}</span>
+            @if ((following$ | async)?.length > 10) {
+              <!-- Use Virtual Scrolling for large following lists -->
+              <div class="virtual-scroll-container">
+                <cdk-virtual-scroll-viewport [itemSize]="followItemSize" class="follow-viewport">
+                  @for (follow of (following$ | async) || []; track trackByFollowId($index, follow)) {
+                  <div class="social-item">
+                    <img [src]="follow.following?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.following?.username || 'Unknown User' }}</span>
+                      <span class="user-bio">{{ follow.following?.bio || 'No bio available' }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="unfollow-btn"
+                        (click)="unfollowUser(follow.following?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        Unfollow
+                      </button>
+                    </div>
                   </div>
-                  <div class="user-actions">
-                    <button 
-                      class="unfollow-btn"
-                      (click)="unfollowUser(follow.following?.id || '')"
-                      [disabled]="followIsLoading$ | async">
-                      Unfollow
-                    </button>
+                }
+                @if (!(following$ | async) || (following$ | async)?.length === 0) {
+                    <div class="no-data">
+                      <p>Not following anyone yet</p>
+                    </div>
+                  }
+                </cdk-virtual-scroll-viewport>
+              </div>
+            } @else {
+              <!-- Regular scroll for small following lists -->
+              <div class="regular-follow-list">
+                @for (follow of (following$ | async) || []; track trackByFollowId($index, follow)) {
+                  <div class="social-item">
+                    <img [src]="follow.following?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.following?.username || 'Unknown User' }}</span>
+                      <span class="user-bio">{{ follow.following?.bio || 'No bio available' }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="unfollow-btn"
+                        (click)="unfollowUser(follow.following?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        Unfollow
+                      </button>
+                    </div>
                   </div>
-                </li>
-              }
-              @if (!(following$ | async) || (following$ | async)?.length === 0) {
-                <li class="no-data">
-                  <p>Not following anyone yet</p>
-                </li>
-              }
-              
-              <!-- Load More Button for Following -->
-              @if (hasMoreFollowing && (following$ | async)?.length > 0) {
-                <li class="load-more-container">
-                  <button 
-                    class="load-more-btn"
-                    (click)="loadMoreFollowing()"
-                    [disabled]="isLoadingMore">
-                    @if (isLoadingMore) {
-                      <span class="loading-spinner"></span>
-                    }
-                    Load More Following
-                  </button>
-                </li>
-              }
-            </ul>
+                }
+                @if (!(following$ | async) || (following$ | async)?.length === 0) {
+                  <div class="no-data">
+                    <p>Not following anyone yet</p>
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
     </div>

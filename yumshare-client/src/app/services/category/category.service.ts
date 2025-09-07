@@ -75,6 +75,19 @@ export class CategoryService {
     return this.http.get<Category>(`${this.apiUrl}/categories/${id}`);
   }
 
+  // Lấy recipes của category
+  getCategoryRecipes(categoryId: string, page: number = 1, size: number = 10): Observable<any> {
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    params.set('size', size.toString());
+    return this.http.get<any>(`${this.apiUrl}/categories/${categoryId}/recipes?${params}`);
+  }
+
+  // Lấy số lượng recipes của category
+  getCategoryRecipeCount(categoryId: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/categories/${categoryId}/recipe-count`);
+  }
+
   // Tạo mới category
   createCategory(category: Partial<Category>): Observable<Category> {
     return this.http.post<Category>(`${this.apiUrl}/categories`, category);

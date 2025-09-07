@@ -9,7 +9,7 @@
         class="chat-user-avatar"
       >
       <div class="chat-user-details">
-        <div class="chat-user-name">{{ otherUser?.username || 'Unknown User' }}</div>
+        <div class="chat-user-name">{{ otherUser?.username || getFallbackUserName() }}</div>
         <!-- <div class="chat-user-status">Online</div> -->
       </div>
     </div>
@@ -20,38 +20,80 @@
     </div>
   </div>
 
-  <!-- Messages Container -->
+  <!-- Messages Container with Virtual Scrolling -->
   <div class="messages-container">
-    <div class="messages-list">
-      @if (messagesLoading) {
+    
+    @if (messagesLoading) {
+      <div class="loading-container">
         <app-chat-message-skeleton></app-chat-message-skeleton>
-      } @else {
-        @for (message of messages; track message.id) {
-          <div 
-            class="message-item"
-            [class.sent]="message.sender_id === currentUser.id"
-            [class.received]="message.sender_id !== currentUser.id"
-          >
-            <div class="message-content">
-              @if (message.sender_id !== currentUser.id) {
-                <div class="message-meta">
-                  <img [src]="safeAvatar(otherUser?.avatar_url)" class="bubble-avatar" alt="avatar">
+      </div>
+    } @else if (messages && messages.length > 0) {
+      <!-- Use Virtual Scrolling for large message lists -->
+      @if (messages.length > 50) {
+        <div class="virtual-scroll-container">
+          <cdk-virtual-scroll-viewport [itemSize]="itemSize" class="messages-viewport">
+            @for (message of messages; track trackByMessageId($index, message)) {
+              <div 
+                class="message-item"
+                [class.sent]="message.sender_id === currentUser?.id"
+                [class.received]="message.sender_id !== currentUser?.id"
+              >
+                <div class="message-content">
+                  @if (message.sender_id !== currentUser?.id) {
+                    <div class="message-meta">
+                      <img [src]="safeAvatar(otherUser?.avatar_url)" class="bubble-avatar" alt="avatar">
+                    </div>
+                  }
+                  <div class="message-text">{{ message.content }}</div>
+                  <div class="message-time">
+                    {{ message.created_at | localTime:'shortTime' }}
+                    @if (message.sender_id === currentUser?.id) {
+                      <span class="read-status">
+                        {{ message.is_read ? '✓✓' : '✓' }}
+                      </span>
+                    }
+                  </div>
                 </div>
-              }
-              <div class="message-text">{{ message.content }}</div>
-              <div class="message-time">
-                {{ message.created_at | localTime:'shortTime' }}
-                @if (message.sender_id === currentUser.id) {
-                  <span class="read-status">
-                    {{ message.is_read ? '✓✓' : '✓' }}
-                  </span>
+              </div>
+            }
+          </cdk-virtual-scroll-viewport>
+        </div>
+      } @else {
+        <!-- Regular scroll for small to medium message lists -->
+        <div class="regular-scroll-container">
+          @for (message of messages; track trackByMessageId($index, message)) {
+            <div 
+              class="message-item"
+              [class.sent]="message.sender_id === currentUser?.id"
+              [class.received]="message.sender_id !== currentUser?.id"
+            >
+              <div class="message-content">
+                @if (message.sender_id !== currentUser?.id) {
+                  <div class="message-meta">
+                    <img [src]="safeAvatar(otherUser?.avatar_url)" class="bubble-avatar" alt="avatar">
+                  </div>
                 }
+                <div class="message-text">{{ message.content }}</div>
+                <div class="message-time">
+                  {{ message.created_at | localTime:'shortTime' }}
+                  @if (message.sender_id === currentUser?.id) {
+                    <span class="read-status">
+                      {{ message.is_read ? '✓✓' : '✓' }}
+                    </span>
+                  }
+                </div>
               </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       }
-    </div>
+    } @else {
+      <!-- No messages state -->
+      <div class="no-messages">
+        <div class="no-messages-icon">💬</div>
+        <p>No messages yet. Start the conversation!</p>
+      </div>
+    }
   </div>
 
   <!-- Message Input -->

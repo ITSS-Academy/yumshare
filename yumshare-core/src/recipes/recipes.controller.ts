@@ -162,4 +162,15 @@ export class RecipesController {
   ) {
     return this.recipesService.uploadImage(id, file);
   }
+
+  @Get(':id/steps')
+  getRecipeSteps(@Param('id') id: string) {
+    return this.recipesService.getRecipeSteps(id);
+  }
+
+  @Get('steps')
+  getMultipleRecipeSteps(@Query('recipeIds') recipeIds: string) {
+    const ids = recipeIds.split(',').filter(id => id.trim());
+    return this.recipesService.getMultipleRecipeSteps(ids);
+  }
 }

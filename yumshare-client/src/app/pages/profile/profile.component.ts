@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AuthService } from '../../services/auth/auth.service';
 import { FollowService } from '../../services/follow/follow.service';
 import { User } from '../../models';
@@ -23,7 +24,8 @@ import * as FollowSelectors from '../../ngrx/follow/follow.selectors';
   templateUrl: './profile.component.html',
   imports: [
     ShareModule,
-    LoadingComponent
+    LoadingComponent,
+    ScrollingModule
   ],
   styleUrls: ['./profile.component.scss']
 })
@@ -32,6 +34,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);
   private store = inject(Store<{ auth: AuthState; follow: FollowState }>);
   private snackBar = inject(MatSnackBar);
+
+  // Virtual scrolling properties
+  followItemSize = 60; // Height of each follow item
 
   // NgRx Observables
   mineProfile$: Observable<User>;
@@ -452,7 +457,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
+  // TrackBy functions for virtual scrolling performance
+  trackByFollowId(index: number, follow: any): string {
+    return follow.id || `${index}-${follow.follower?.id || follow.following?.id}`;
+  }
 }

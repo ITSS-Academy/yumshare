@@ -17,14 +17,17 @@ import * as recipeEffects from './ngrx/recipe/recipe.effects';
 import * as categoryEffects from './ngrx/category/category.effects';
 import * as commentEffects from './ngrx/comment/comment.effects';
 import * as favoriteEffects from './ngrx/favorite/favorite.effects';
+import * as notificationEffects from './ngrx/notification/notification.effects';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideClientHydration } from '@angular/platform-browser';
 import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
 import { categoryReducer } from './ngrx/category/category.reducer';
 import { commentReducer } from './ngrx/comment/comment.reducer';
 import { favoriteReducer } from './ngrx/favorite/favorite.reducer';
+import { notificationReducer } from './ngrx/notification/notification.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,7 +46,7 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
-    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects, favoriteEffects]),
+    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects, favoriteEffects, notificationEffects]),
     provideStore({
       auth: authReducer,
       follow: followReducer,
@@ -52,6 +55,7 @@ export const appConfig: ApplicationConfig = {
       category: categoryReducer,
       comment: commentReducer,
       favorite: favoriteReducer,
+      notification: notificationReducer,
     }),
     provideFirebaseApp(() =>
       initializeApp({
@@ -65,6 +69,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
+    provideClientHydration(),
     // Temporarily disabled to avoid error spam
     // {
     //   provide: ErrorHandler,

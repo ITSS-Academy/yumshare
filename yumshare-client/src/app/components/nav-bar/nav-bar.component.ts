@@ -13,9 +13,10 @@ import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { AuthModel } from '../../models/auth.model';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
+import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
 
 @Component({
   selector: 'app-nav-bar',
@@ -39,59 +40,48 @@ export class NavBarComponent implements OnInit, OnDestroy {
   currentUser: AuthModel | null = null;
 
   searchQuery = '';
-  messageCount = 0;
-  notificationCount = 0;
+  messageCount$!: Observable<number>;
+  notificationCount$!: Observable<number>;
 
-  private authSubscription: Subscription | null = null;
-  private notificationCountSubscription: Subscription | null = null;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private router: Router, 
     private dialog: MatDialog,
     private store: Store<{auth: AuthState}>,
-    private auth: Auth,
-    private notificationService: NotificationService
-  ) {}
+    private auth: Auth
+  ) {
+    // Initialize observables
+    this.messageCount$ = this.store.select(NotificationSelectors.selectMessageCount);
+    this.notificationCount$ = this.store.select(NotificationSelectors.selectUnreadCount);
+  }
 
   ngOnInit() {
-    this.authSubscription = this.store.select(state => state.auth).subscribe(authState => {
-      if (authState.currentUser && authState.currentUser.uid) {
-        this.isLoggedIn = true;
-        this.currentUser = authState.currentUser;
-        this.userName = authState.currentUser.displayName || '';
-        this.userAvatar = authState.currentUser.photoURL || '';
-        
-        // Tự động đóng dialog login nếu đăng nhập thành công
-        this.dialog.closeAll();
-        
-        // Load notification count
-        this.loadNotificationCount();
-        
-        // Subscribe to notification count changes
-        this.subscribeToNotificationCount();
-      } else {
-        this.isLoggedIn = false;
-        this.currentUser = null;
-        this.userName = '';
-        this.userAvatar = '';
-        this.notificationCount = 0;
-        
-        // Unsubscribe from notification count changes
-        if (this.notificationCountSubscription) {
-          this.notificationCountSubscription.unsubscribe();
-          this.notificationCountSubscription = null;
+    this.subscriptions.push(
+      this.store.select(state => state.auth).subscribe(authState => {
+        if (authState.currentUser && authState.currentUser.uid) {
+          this.isLoggedIn = true;
+          this.currentUser = authState.currentUser;
+          this.userName = authState.currentUser.displayName || '';
+          this.userAvatar = authState.currentUser.photoURL || '';
+          
+          // Tự động đóng dialog login nếu đăng nhập thành công
+          this.dialog.closeAll();
+          
+          // Notification counts are now handled by NgRx observables
+        } else {
+          this.isLoggedIn = false;
+          this.currentUser = null;
+          this.userName = '';
+          this.userAvatar = '';
         }
-      }
-    });
+      })
+    );
   }
 
   ngOnDestroy() {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
-    if (this.notificationCountSubscription) {
-      this.notificationCountSubscription.unsubscribe();
-    }
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
   }
 
   onToggleSidebar() { this.toggleSidebar.emit(); }
@@ -126,10 +116,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
         panelClass: 'notification-dialog'
       });
       
-      // Reload notification count when dialog closes
-      dialogRef.afterClosed().subscribe(() => {
-        this.loadNotificationCount();
-      });
+      // Notification counts are now handled by NgRx
     } else {
       this.openLogin();
     }
@@ -174,38 +161,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });
   }
 
-  private loadNotificationCount(): void {
-    if (this.currentUser?.uid) {
-      this.notificationService.getUserNotifications().subscribe({
-        next: (notifications) => {
-          // Total notifications (excluding messages)
-          this.notificationCount = notifications.filter(n => !n.is_read && n.type !== 'message').length;
-          // Message notifications only
-          this.messageCount = notifications.filter(n => !n.is_read && n.type === 'message').length;
-        },
-        error: (err) => {
-          console.error('Error loading notification count:', err);
-          this.notificationCount = 0;
-          this.messageCount = 0;
-        }
-      });
-    }
-  }
-
-  private subscribeToNotificationCount(): void {
-    this.notificationCountSubscription = this.notificationService.notificationCount$.subscribe(
-      count => {
-        this.notificationCount = count;
-      }
-    );
-    
-    // Subscribe to message count changes
-    this.notificationService.messageCount$.subscribe(
-      count => {
-        this.messageCount = count;
-      }
-    );
-  }
+  // Notification counts are now handled by NgRx observables
 
   onSettings() {
     // Navigate to settings page
@@ -219,7 +175,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.isLoggedIn = true;
     this.userName = name;
     this.userAvatar = avatar;
-    this.messageCount = 3;
-    this.notificationCount = 2;
+    // Notification counts are now handled by NgRx
   }
 }

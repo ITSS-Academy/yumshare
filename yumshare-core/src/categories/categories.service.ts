@@ -57,15 +57,13 @@ export class CategoriesService {
   findAllWithRecipes() {
     return this.categoryRepository.find({
       where: { is_active: true },
-      relations: ['recipes'],
       order: { sort_order: 'ASC', name: 'ASC' }
     });
   }
 
   findOne(id: string) {
     return this.categoryRepository.findOne({ 
-      where: { id },
-      relations: ['recipes']
+      where: { id }
     });
   }
 
@@ -124,6 +122,37 @@ export class CategoriesService {
       .getRawMany();
 
     return categories;
+  }
+
+  async getCategoryRecipeCount(categoryId: string): Promise<number> {
+    return this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoin('category.recipes', 'recipe')
+      .where('category.id = :categoryId', { categoryId })
+      .getCount();
+  }
+
+  async getCategoryRecipes(categoryId: string, queryOpts: QueryOptsDto = {}) {
+    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const skip = (page - 1) * size;
+    
+    const [recipes, total] = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.recipes', 'recipe')
+      .leftJoinAndSelect('recipe.user', 'user')
+      .where('category.id = :categoryId', { categoryId })
+      .orderBy(`recipe.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
+
+    return {
+      category: recipes[0] || null,
+      recipes: recipes[0]?.recipes || [],
+      total,
+      page,
+      size
+    };
   }
 
   async searchCategories(queryOpts: QueryOptsDto): Promise<ListResult<Category>> {

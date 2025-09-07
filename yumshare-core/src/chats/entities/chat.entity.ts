@@ -14,11 +14,11 @@ export class Chat {
   user2_id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user1Id' })
+  @JoinColumn({ name: 'user1_id' })
   user1: User;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user2Id' })
+  @JoinColumn({ name: 'user2_id' })
   user2: User;
 
   @OneToMany(() => ChatMessage, message => message.chat, { cascade: true })

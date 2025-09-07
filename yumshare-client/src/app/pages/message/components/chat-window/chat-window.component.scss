@@ -1,5 +1,60 @@
 /* Chat Window Component Styles - Beautiful Modern Design */
 
+// Virtual Scrolling Container
+.virtual-scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.messages-viewport {
+  height: 100%;
+  width: 100%;
+}
+
+// CDK Virtual Scroll specific styles
+.cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.cdk-virtual-scroll-viewport {
+  height: 100%;
+}
+
+// Regular scroll container for small message lists
+.regular-scroll-container {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// No messages state
+.no-messages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+  
+  .no-messages-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
 .chat-window-container {
   display: flex;
   flex-direction: column;

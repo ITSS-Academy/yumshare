@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Chat } from '../../../../models/chat.model';
 import { User } from '../../../../models/user.model';
 import { ChatMessage } from '../../../../models/chat-message.model';
@@ -10,7 +11,7 @@ import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
 @Component({
   selector: 'app-chat-window',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe],
+  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe, ScrollingModule],
   templateUrl: './chat-window.component.html',
   styleUrls: ['./chat-window.component.scss']
 })
@@ -26,6 +27,9 @@ export class ChatWindowComponent {
   @Output() typing = new EventEmitter<void>();
 
   newMessage: string = '';
+  
+  // Virtual scrolling properties
+  itemSize = 100; // Height of each message item (increased for better visibility)
 
   // Helpers to avoid showing "null" avatar/name
   safeAvatar(url?: string): string {
@@ -55,5 +59,17 @@ export class ChatWindowComponent {
       this.sendMessage.emit(this.newMessage);
       this.newMessage = '';
     }
+  }
+
+  getFallbackUserName(): string {
+    if (!this.chat || !this.currentUser) return 'Unknown User';
+    
+    const otherUserId = this.chat.user1_id === this.currentUser.id ? this.chat.user2_id : this.chat.user1_id;
+    return `User ${otherUserId.substring(0, 8)}`;
+  }
+
+  // TrackBy function for virtual scrolling performance
+  trackByMessageId(index: number, message: ChatMessage): string {
+    return message.id;
   }
 }

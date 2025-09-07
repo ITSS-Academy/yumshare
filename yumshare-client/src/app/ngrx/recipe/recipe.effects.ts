@@ -127,6 +127,22 @@ export const searchRecipesEffect = createEffect(
   { functional: true }
 );
 
+// Load Recipes by User Effect
+export const loadRecipesByUserEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.loadRecipesByUser),
+      switchMap(({ userId, queryOptions }) =>
+        recipeService.getRecipeByUserId(userId, queryOptions).pipe(
+          map((recipes) => RecipeActions.loadRecipesByUserSuccess({ recipes })),
+          catchError((error) => of(RecipeActions.loadRecipesByUserFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
 // Get Recipes by Category Effect
 export const getRecipesByCategoryEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {

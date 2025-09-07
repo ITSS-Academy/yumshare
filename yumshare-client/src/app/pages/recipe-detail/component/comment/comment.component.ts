@@ -2,12 +2,13 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, takeUntil, combineLatest, take } from 'rxjs';
+import { Observable, Subscription, combineLatest, take } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { Comment } from '../../../../models/comment.model';
 import { User } from '../../../../models/user.model';
@@ -19,7 +20,7 @@ import * as AuthActions from '../../../../ngrx/auth/auth.actions';
 
 // Selectors
 import { selectCommentsByRecipe, selectCommentsByRecipeLoading, selectCommentsByRecipeError, selectOperationLoading } from '../../../../ngrx/comment/comment.selectors';
-import { selectCurrentUser } from '../../../../ngrx/auth/auth.selectors';
+import { selectCurrentUser, selectMineProfile } from '../../../../ngrx/auth/auth.selectors';
 
 @Component({
   selector: 'app-comment',
@@ -30,7 +31,8 @@ import { selectCurrentUser } from '../../../../ngrx/auth/auth.selectors';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    ScrollingModule
   ],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.scss'
@@ -42,7 +44,10 @@ export class CommentComponent implements OnInit, OnDestroy {
   @Output() commentAdded = new EventEmitter<Comment>();
   @Output() commentDeleted = new EventEmitter<string>();
 
-  private destroy$ = new Subject<void>();
+  private subscriptions: Subscription[] = [];
+  
+  // Virtual scrolling properties
+  itemSize = 120; // Height of each comment item
   
   // Comment data
   comments$: Observable<Comment[]>;
@@ -52,6 +57,7 @@ export class CommentComponent implements OnInit, OnDestroy {
   
   // Auth data
   currentUser$: Observable<any | null>;
+  mineProfile$: Observable<User | null>;
   
   // Local state
   newCommentContent: string = '';
@@ -71,38 +77,48 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.operationLoading$ = this.store.select(selectOperationLoading);
     
     this.currentUser$ = this.store.select(selectCurrentUser);
+    this.mineProfile$ = this.store.select(selectMineProfile);
   }
 
   ngOnInit(): void {
     // Handle comment errors
-    this.commentsError$.pipe(takeUntil(this.destroy$)).subscribe(error => {
-      if (error) {
-        this.snackBar.open(`Error loading comments: ${error}`, 'Close', { duration: 3000 });
-      }
-    });
+    this.subscriptions.push(
+      this.commentsError$.subscribe(error => {
+        if (error) {
+          this.snackBar.open(`Error loading comments: ${error}`, 'Close', { duration: 3000 });
+        }
+      })
+    );
 
     // Handle operation success
-    this.operationLoading$.pipe(takeUntil(this.destroy$)).subscribe(loading => {
-      if (!loading) {
-        // Operation completed, could show success message
-      }
-    });
+    this.subscriptions.push(
+      this.operationLoading$.subscribe(loading => {
+        if (!loading) {
+          // Operation completed, could show success message
+        }
+      })
+    );
 
     // Close menu when clicking outside
     document.addEventListener('click', this.onDocumentClick.bind(this));
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
+  }
+
+  // TrackBy function for virtual scrolling performance
+  trackByCommentId(index: number, comment: Comment): string {
+    return comment.id;
   }
 
   onSubmitComment(): void {
     if (!this.newCommentContent.trim() || !this.recipeId) return;
     
           // Kiểm tra đăng nhập trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
-      this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-        if (!currentUser || !currentUser.uid) {
+      this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
+        if (!mineProfile || !mineProfile.id) {
           // Chưa đăng nhập - chỉ hiển thị thông báo
           this.snackBar.open('Vui lòng đăng nhập để bình luận!', 'Đăng nhập', { 
             duration: 4000,
@@ -113,7 +129,7 @@ export class CommentComponent implements OnInit, OnDestroy {
         
         // Đã đăng nhập - tiếp tục logic comment
         const commentData: CreateCommentDto = {
-          user_id: currentUser.uid,
+          user_id: mineProfile.id,
           recipe_id: this.recipeId,
           content: this.newCommentContent.trim()
         };
@@ -136,8 +152,8 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   onEditComment(comment: Comment): void {
     // Kiểm tra đăng nhập trước
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      if (!currentUser || !currentUser.uid) {
+    this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
+      if (!mineProfile || !mineProfile.id) {
         this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -146,7 +162,7 @@ export class CommentComponent implements OnInit, OnDestroy {
       }
       
       // Kiểm tra xem user có phải là người tạo comment không
-      if (currentUser.uid !== comment.user_id) {
+      if (mineProfile.id !== comment.user_id) {
         this.snackBar.open('Bạn không có quyền chỉnh sửa bình luận này!', 'Đóng', { 
           duration: 3000,
           panelClass: ['warning-snackbar']
@@ -164,8 +180,8 @@ export class CommentComponent implements OnInit, OnDestroy {
     if (!this.editingCommentId || !this.editingContent.trim()) return;
     
     // Kiểm tra đăng nhập trước
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      if (!currentUser || !currentUser.uid) {
+    this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
+      if (!mineProfile || !mineProfile.id) {
         this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -203,8 +219,8 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   onDeleteComment(commentId: string): void {
     // Kiểm tra đăng nhập trước
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
-      if (!currentUser || !currentUser.uid) {
+    this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
+      if (!mineProfile || !mineProfile.id) {
         this.snackBar.open('Vui lòng đăng nhập để xóa bình luận!', 'Đăng nhập', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
@@ -221,7 +237,7 @@ export class CommentComponent implements OnInit, OnDestroy {
         }
         
         // Kiểm tra xem user có phải là người tạo comment không
-        if (currentUser.uid !== comment.user_id) {
+        if (mineProfile.id !== comment.user_id) {
           this.snackBar.open('Bạn không có quyền xóa bình luận này!', 'Đóng', { 
             duration: 3000,
             panelClass: ['warning-snackbar']
@@ -260,10 +276,6 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.commentDeleted.emit(commentId);
   }
 
-  trackByCommentId(index: number, comment: Comment): string {
-    return comment.id;
-  }
-
   // Helper methods for template
   toggleMenu(commentId: string): void {
     if (this.activeMenuId === commentId) {
@@ -273,12 +285,12 @@ export class CommentComponent implements OnInit, OnDestroy {
     }
   }
 
-  canEdit(comment: Comment, currentUser: any | null): boolean {
-    return currentUser?.uid === comment.user_id;
+  canEdit(comment: Comment, mineProfile: User | null): boolean {
+    return mineProfile?.id === comment.user_id;
   }
 
-  canDelete(comment: Comment, currentUser: any | null): boolean {
-    return currentUser?.uid === comment.user_id;
+  canDelete(comment: Comment, mineProfile: User | null): boolean {
+    return mineProfile?.id === comment.user_id;
   }
 
   isEditing(commentId: string): boolean {

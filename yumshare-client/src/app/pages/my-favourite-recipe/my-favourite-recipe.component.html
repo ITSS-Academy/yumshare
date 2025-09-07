@@ -35,50 +35,110 @@
     @if (favoritesLoading$ | async) {
       <div class="loading-container">
         <mat-spinner></mat-spinner>
-        <p>Đang tải danh sách yêu thích...</p>
+        <p>Loading your favorite recipes...</p>
       </div>
     } @else if (isEmpty$ | async) {
       <div class="empty-state">
         <mat-icon class="empty-icon">favorite_border</mat-icon>
-        <h3>Chưa có công thức yêu thích nào</h3>
-        <p>Hãy khám phá và thêm những công thức bạn yêu thích vào danh sách này!</p>
+        <h3>No favorite recipes yet</h3>
+        <p>Explore and add your favorite recipes to this list!</p>
       </div>
     } @else {
-      @for (favorite of displayedRecipes$ | async; track favorite.id) {
-        <div class="recipe-card">
-          <!-- Bên trái: ảnh món ăn -->
-          <div class="recipe-image">
-            <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
-                 [alt]="favorite.recipe?.title || 'Recipe Image'">
-          </div>
-
-          <!-- Bên phải: nội dung -->
-          <div class="recipe-content">
-            <!-- Trên: tiêu đề + tác giả -->
-            <div class="recipe-header">
-              <div class="name-and-author">
-                <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
-                <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+      @if ((displayedRecipes$ | async)?.length > 15) {
+        <!-- Use Virtual Scrolling for large favorite lists -->
+        <div class="virtual-scroll-container">
+          <cdk-virtual-scroll-viewport [itemSize]="itemSize" class="favorite-viewport">
+            @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
+            <div class="recipe-card">
+              <!-- Left: recipe image -->
+              <div class="recipe-image">
+                <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
+                     [alt]="favorite.recipe?.title || 'Recipe Image'">
               </div>
-              <div class="example-button-row">
-                <div class="example-flex-container">
-                  <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
-                    <mat-icon class="filled">favorite</mat-icon>
-                  </button>
+
+              <!-- Right: content -->
+              <div class="recipe-content">
+                <!-- Top: title + author -->
+                <div class="recipe-header">
+                  <div class="name-and-author">
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
+                    <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+                  </div>
+                  <div class="example-button-row">
+                    <div class="example-flex-container">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                        <mat-icon class="filled">favorite</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Middle: description -->
+                <div class="recipe-description">
+                  <p>{{ favorite.recipe?.description || 'No description available' }}</p>
+                </div>
+
+                <!-- Additional info -->
+                <div class="recipe-meta">
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} min</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || 'Unknown' }}</span>
+                </div>
+
+                <!-- Creation date -->
+                <div class="recipe-footer">
+                  <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
                 </div>
               </div>
             </div>
+            }
+          </cdk-virtual-scroll-viewport>
+        </div>
+      } @else {
+        <!-- Regular scroll for small favorite lists -->
+        <div class="regular-favorite-list">
+          @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
+            <div class="recipe-card">
+              <!-- Left: recipe image -->
+              <div class="recipe-image">
+                <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
+                     [alt]="favorite.recipe?.title || 'Recipe Image'">
+              </div>
 
-            <!-- Giữa: mô tả -->
-            <div class="recipe-description">
-              <p>{{ favorite.recipe?.description || 'Không có mô tả' }}</p>
-            </div>
+              <!-- Right: content -->
+              <div class="recipe-content">
+                <!-- Top: title + author -->
+                <div class="recipe-header">
+                  <div class="name-and-author">
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
+                    <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+                  </div>
+                  <div class="example-button-row">
+                    <div class="example-flex-container">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                        <mat-icon class="filled">favorite</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            <!-- Dưới: ngày đăng -->
-            <div class="recipe-footer">
-              <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
+                <!-- Middle: description -->
+                <div class="recipe-description">
+                  <p>{{ favorite.recipe?.description || 'No description available' }}</p>
+                </div>
+
+                <!-- Additional info -->
+                <div class="recipe-meta">
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} min</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || 'Unknown' }}</span>
+                </div>
+
+                <!-- Creation date -->
+                <div class="recipe-footer">
+                  <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
     }

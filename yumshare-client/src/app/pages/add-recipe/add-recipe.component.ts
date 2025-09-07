@@ -22,6 +22,8 @@ import { SafePipe } from '../../pipes/safe.pipe';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { CategoryService } from '../../services/category/category.service';
+import { User } from '../../models/user.model';
+import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 
 @Component({
   selector: 'app-add-recipe',
@@ -58,7 +60,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   uploading = false;
   difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
   countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
-  currentUser: AuthModel | null = null;
+  mineProfile: User | null = null;
   
   // Grid Multi-step properties
   currentStep: number = 1;
@@ -98,7 +100,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadCategories();
-    this.loadCurrentUser();
+    this.loadMineProfile();
     
     // Ensure default values are set
     this.ensureDefaultValues();
@@ -301,27 +303,26 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     this.subscriptions.push(categoriesSubscription);
   }
 
-  loadCurrentUser() {
-    const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
-      console.log('Auth state received:', authState);
-      console.log('Current user from state:', authState?.currentUser);
+  loadMineProfile() {
+    const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
+      console.log('Mine profile received:', profile);
       
-      if (authState && authState.currentUser && authState.currentUser.uid) {
-        this.currentUser = authState.currentUser;
-        console.log('User loaded successfully:', {
-          displayName: this.currentUser.displayName,
-          email: this.currentUser.email,
-          uid: this.currentUser.uid,
-          photoURL: this.currentUser.photoURL
+      if (profile && profile.id) {
+        this.mineProfile = profile;
+        console.log('Profile loaded successfully:', {
+          id: this.mineProfile.id,
+          username: this.mineProfile.username,
+          email: this.mineProfile.email,
+          avatar_url: this.mineProfile.avatar_url
         });
       } else {
-        this.currentUser = null;
-        console.log('No user found in auth state');
+        this.mineProfile = null;
+        console.log('No profile found in auth state');
       }
     });
     
     // Add subscription to array
-    this.subscriptions.push(authSubscription);
+    this.subscriptions.push(profileSubscription);
   }
 
   private ensureDefaultValues() {
@@ -348,7 +349,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   async onSubmit() {
-    if (!this.currentUser) {
+    if (!this.mineProfile) {
       this.snackBar.open('Please login to create a recipe', 'Close', { duration: 3000 });
       return;
     }
@@ -369,7 +370,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         formData.append('difficulty', recipeData.difficulty);
         formData.append('country', recipeData.country);
         formData.append('category_id', recipeData.category_id);
-        formData.append('user_id', this.currentUser?.uid || 'anonymous-user'); // Get from auth store
+        formData.append('user_id', this.mineProfile?.id || 'anonymous-user'); // Get from mine profile
         
         // Add ingredients as JSON string
         formData.append('ingredients', JSON.stringify(recipeData.ingredients));

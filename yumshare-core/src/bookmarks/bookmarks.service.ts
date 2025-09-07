@@ -27,11 +27,44 @@ export class BookmarksService {
   }
 
   findAll() {
-    return this.bookmarkRepository.find({ relations: ['user', 'recipe'] });
+    return this.bookmarkRepository.find({ 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        created_at: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   findOne(id: string) {
-    return this.bookmarkRepository.findOne({ where: { id }, relations: ['user', 'recipe'] });
+    return this.bookmarkRepository.findOne({ 
+      where: { id }, 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        created_at: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   async update(id: string, updateBookmarkDto: UpdateBookmarkDto) {

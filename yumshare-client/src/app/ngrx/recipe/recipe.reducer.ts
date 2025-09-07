@@ -168,6 +168,27 @@ export const recipeReducer = createReducer(
     searchError: error,
   })),
 
+  // Load Recipes by User
+  on(RecipeActions.loadRecipesByUser, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.loadRecipesByUserSuccess, (state, { recipes }) => ({
+    ...state,
+    recipes: recipes.data,
+    paginatedRecipes: recipes,
+    recipesLoading: false,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.loadRecipesByUserFailure, (state, { error }) => ({
+    ...state,
+    recipesLoading: false,
+    recipesError: error,
+  })),
+
   // Get Recipes by Category
   on(RecipeActions.getRecipesByCategory, (state) => ({
     ...state,

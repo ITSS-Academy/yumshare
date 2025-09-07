@@ -106,7 +106,7 @@ export class UserListComponent {
   getOtherUser(chat: Chat): User | null {
     if (!this.currentUser) return null;
     
-    if (chat.user1_id === this.currentUser.id) {
+    if (chat.user1_id === this.currentUser?.id) {
       return chat.user2 || null;
     } else {
       return chat.user1 || null;
@@ -122,13 +122,14 @@ export class UserListComponent {
 
   otherUserName(chat: Chat): string {
     const otherUser = this.getOtherUser(chat);
+    
     if (otherUser && otherUser.username && otherUser.username !== 'null') {
       return otherUser.username;
     }
     
     if (!this.currentUser) return 'Unknown User';
     
-    const otherUserId = chat.user1_id === this.currentUser.id ? chat.user2_id : chat.user1_id;
+    const otherUserId = chat.user1_id === this.currentUser?.id ? chat.user2_id : chat.user1_id;
     return `User ${otherUserId.substring(0, 8)}`;
   }
 
@@ -149,7 +150,7 @@ export class UserListComponent {
   getUnreadCount(chat: Chat): number {
     if (!chat.messages || !this.currentUser) return 0;
     return chat.messages.filter(msg => 
-      msg.sender_id !== this.currentUser!.id && !msg.is_read
+      msg.sender_id !== this.currentUser?.id && !msg.is_read
     ).length;
   }
 }

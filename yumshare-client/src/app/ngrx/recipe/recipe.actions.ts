@@ -146,6 +146,25 @@ export const getRecipesByCategoryFailure = createAction(
   props<{ error: string }>()
 );
 
+// Load Recipes by User
+export const loadRecipesByUser = createAction(
+  '[Recipe] Load Recipes by User',
+  props<{ 
+    userId: string;
+    queryOptions?: any;
+  }>()
+);
+
+export const loadRecipesByUserSuccess = createAction(
+  '[Recipe] Load Recipes by User Success',
+  props<{ recipes: PaginatedResponse<Recipe> }>()
+);
+
+export const loadRecipesByUserFailure = createAction(
+  '[Recipe] Load Recipes by User Failure',
+  props<{ error: string }>()
+);
+
 // Upload Recipe Image
 export const uploadRecipeImage = createAction(
   '[Recipe] Upload Recipe Image',

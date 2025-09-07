@@ -31,11 +31,50 @@ export class RatingsService {
   }
 
   findAll() {
-    return this.ratingRepository.find({ relations: ['user', 'recipe'] });
+    return this.ratingRepository.find({ 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        created_at: true,
+        updated_at: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   findOne(id: string) {
-    return this.ratingRepository.findOne({ where: { id }, relations: ['user', 'recipe'] });
+    return this.ratingRepository.findOne({ 
+      where: { id }, 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        created_at: true,
+        updated_at: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   async update(id: string, updateRatingDto: UpdateRatingDto) {

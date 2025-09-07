@@ -20,7 +20,7 @@ import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.direc
     MatIconModule,
     MatButtonModule,
     CommonModule,
-    LazyImageDirective,
+ 
 
   ],
   templateUrl: './search.component.html',

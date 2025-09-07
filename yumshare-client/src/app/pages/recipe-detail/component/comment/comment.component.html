@@ -2,9 +2,9 @@
   <h1>Comments</h1>
 
   <!-- Comment Input Section -->
-  @if (currentUser$ | async; as currentUser) {
+  @if (mineProfile$ | async; as mineProfile) {
     <div class="comment-input">
-      <img [src]="currentUser.photoURL || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
+      <img [src]="mineProfile.avatar_url || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
       <div class="input-container">
         <input 
           type="text" 
@@ -31,7 +31,7 @@
   }
 
   <!-- Show login prompt if not logged in -->
-  @if (!(currentUser$ | async)) {
+  @if (!(mineProfile$ | async)) {
     <div class="login-prompt">
       <p>Please <a href="/login">login</a> to add a comment</p>
     </div>
@@ -55,8 +55,12 @@
     </div>
   }
 
-  <!-- Comments List -->
-  @for (comment of comments$ | async; track comment.id) {
+  <!-- Comments List with Conditional Virtual Scrolling -->
+  @if ((comments$ | async)?.length > 20) {
+    <!-- Use Virtual Scrolling for large comment lists -->
+    <div class="virtual-scroll-container">
+      <cdk-virtual-scroll-viewport [itemSize]="itemSize" class="comment-viewport">
+        @for (comment of comments$ | async; track trackByCommentId($index, comment)) {
     <div class="comment">
       <img [src]="comment.user?.avatar_url || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
       <div class="comment-body">
@@ -67,8 +71,8 @@
           </div>
           
           <!-- YouTube-style more_vert menu -->
-          @if (currentUser$ | async; as currentUser) {
-            @if (canEdit(comment, currentUser) || canDelete(comment, currentUser)) {
+          @if (mineProfile$ | async; as mineProfile) {
+            @if (canEdit(comment, mineProfile) || canDelete(comment, mineProfile)) {
               <div class="comment-menu">
                 <button class="menu-btn" (click)="toggleMenu(comment.id)">
                   <span class="material-icons">more_vert</span>
@@ -77,13 +81,13 @@
                 <!-- Dropdown Menu -->
                 @if (activeMenuId === comment.id) {
                   <div class="dropdown-menu">
-                    @if (canEdit(comment, currentUser)) {
+                    @if (canEdit(comment, mineProfile)) {
                       <button class="menu-item edit-item" (click)="onEditComment(comment)">
                         <span class="material-icons">edit</span>
                         Edit
                       </button>
                     }
-                    @if (canDelete(comment, currentUser)) {
+                    @if (canDelete(comment, mineProfile)) {
                       <button class="menu-item delete-item" (click)="onDeleteComment(comment.id)">
                         <span class="material-icons">delete</span>
                         Delete
@@ -118,6 +122,87 @@
           </div>
         }
       </div>
+    </div>
+        }
+      </cdk-virtual-scroll-viewport>
+    </div>
+  } @else {
+    <!-- Regular scroll for small comment lists -->
+    <div class="regular-comment-list">
+      @for (comment of comments$ | async; track trackByCommentId($index, comment)) {
+        <div class="comment">
+          <img [src]="comment.user?.avatar_url || 'assets/default-avatar.png'" alt="user avatar" class="avatar">
+          <div class="comment-body">
+            <div class="comment-header">
+              <div class="user-info">
+                <span class="user-name">{{ getUserDisplayName(comment.user) }}</span>
+                <span class="comment-time">{{ getTimeAgo(comment.created_at) }}</span>
+              </div>
+              
+              <!-- YouTube-style more_vert menu -->
+              @if (mineProfile$ | async; as mineProfile) {
+                @if (canEdit(comment, mineProfile) || canDelete(comment, mineProfile)) {
+                  <div class="comment-menu">
+                    <button class="menu-btn" (click)="toggleMenu(comment.id)">
+                      <span class="material-icons">more_vert</span>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    @if (editingCommentId === comment.id) {
+                      <div class="menu-dropdown show">
+                        <button class="menu-item" (click)="onEditComment(comment)">
+                          <span class="material-icons">edit</span>
+                          Edit
+                        </button>
+                        <button class="menu-item delete" (click)="onDeleteComment(comment.id)">
+                          <span class="material-icons">delete</span>
+                          Delete
+                        </button>
+                      </div>
+                    } @else {
+                      <div class="menu-dropdown" [class.show]="openMenuId === comment.id">
+                        <button class="menu-item" (click)="onEditComment(comment)">
+                          <span class="material-icons">edit</span>
+                          Edit
+                        </button>
+                        <button class="menu-item delete" (click)="onDeleteComment(comment.id)">
+                          <span class="material-icons">delete</span>
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </div>
+            
+            <!-- Comment Content -->
+            @if (editingCommentId === comment.id) {
+              <div class="comment-edit">
+                <textarea 
+                  [(ngModel)]="editingCommentContent"
+                  placeholder="Edit your comment..."
+                  rows="3"
+                  class="edit-textarea">
+                </textarea>
+                <div class="edit-actions">
+                  <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+                  <button 
+                    class="save-btn" 
+                    (click)="onSaveEdit(comment.id)"
+                    [disabled]="!editingCommentContent?.trim() || (operationLoading$ | async)">
+                    Save
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="comment-content">
+                <p>{{ comment.content }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
   }
 

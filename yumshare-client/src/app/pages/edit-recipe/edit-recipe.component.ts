@@ -25,6 +25,8 @@ import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { CategoryService } from '../../services/category/category.service';
+import { User } from '../../models/user.model';
+import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 
 @Component({
   selector: 'app-edit-recipe',
@@ -66,7 +68,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
   
   difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
   countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
-  currentUser: AuthModel | null = null;
+  mineProfile: User | null = null;
 
   currentStep: number = 1;
   // Subscriptions management
@@ -128,7 +130,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
     // Load dependencies
     this.loadCategories();
-    this.loadCurrentUser();
+    this.loadMineProfile();
     this.loadRecipe();
   }
 
@@ -249,16 +251,24 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     this.subscriptions.push(categoriesSubscription);
   }
 
-  loadCurrentUser() {
-    const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
-      if (authState && authState.currentUser && authState.currentUser.uid) {
-        this.currentUser = authState.currentUser;
+  loadMineProfile() {
+    const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
+      console.log('Mine profile received in edit-recipe:', profile);
+      
+      if (profile && profile.id) {
+        this.mineProfile = profile;
+        console.log('Profile loaded successfully in edit-recipe:', {
+          id: this.mineProfile.id,
+          username: this.mineProfile.username,
+          email: this.mineProfile.email
+        });
       } else {
-        this.currentUser = null;
+        this.mineProfile = null;
+        console.log('No profile found in auth state for edit-recipe');
       }
     });
     
-    this.subscriptions.push(authSubscription);
+    this.subscriptions.push(profileSubscription);
   }
 
   loadRecipe() {
@@ -270,7 +280,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
         this.originalRecipe = recipe;
         
         // Kiểm tra quyền edit bằng endpoint mới
-        if (this.currentUser) {
+        if (this.mineProfile) {
           this.recipeService.checkEditPermission(this.recipeId!).subscribe({
             next: (permissionResponse) => {
                       if (!permissionResponse.canEdit) {
@@ -589,7 +599,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
 
   async onSubmit() {
-    if (!this.currentUser) {
+    if (!this.mineProfile) {
       this.snackBar.open('Please login to edit recipe', 'Close', { duration: 3000 });
       return;
     }
@@ -600,7 +610,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     }
 
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
-    if (this.originalRecipe && this.originalRecipe.user_id !== this.currentUser.uid) {
+    if (this.originalRecipe && this.originalRecipe.user_id !== this.mineProfile.id) {
       this.snackBar.open('You do not have permission to edit this recipe', 'Close', { duration: 3000 });
       return;
     }
@@ -769,7 +779,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     if (!this.recipeId) return;
     
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được delete
-    if (!this.currentUser || (this.originalRecipe && this.originalRecipe.user_id !== this.currentUser.uid)) {
+    if (!this.mineProfile || (this.originalRecipe && this.originalRecipe.user_id !== this.mineProfile.id)) {
       this.snackBar.open('You do not have permission to delete this recipe', 'Close', { duration: 3000 });
       return;
     }

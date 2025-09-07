@@ -44,9 +44,25 @@
           <h1 class="title">Ingredients</h1>
           <p class="serving">Serving: {{ recipe.servings }}</p>
           <div class="ingredient-list">
-            @for (ingredient of recipe.ingredients; track i; let i = $index) {
-              <div class="row">
-                <p>{{ ingredient }}</p>
+            <!-- Use Virtual Scrolling for large ingredient lists -->
+            @if (recipe.ingredients.length > 15) {
+              <div class="virtual-scroll-container">
+                <cdk-virtual-scroll-viewport [itemSize]="ingredientItemSize" class="ingredient-viewport">
+                  @for (ingredient of recipe.ingredients; track trackByIngredient($index, ingredient); let i = $index) {
+                    <div class="row">
+                      <p>{{ ingredient }}</p>
+                    </div>
+                  }
+                </cdk-virtual-scroll-viewport>
+              </div>
+            } @else {
+              <!-- Regular scroll for small ingredient lists -->
+              <div class="regular-ingredient-list">
+                @for (ingredient of recipe.ingredients; track trackByIngredient($index, ingredient); let i = $index) {
+                  <div class="row">
+                    <p>{{ ingredient }}</p>
+                  </div>
+                }
               </div>
             }
           </div>
@@ -78,24 +94,53 @@
 
         <div class="right">
           <h1 class="title2">Process Steps</h1>
-          @for (step of recipe.steps; track step.id; let i = $index) {
-            <div class="instruction">
-              <div class="instruction-box">
-                <div class="step">
-
-                  <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
-                </div>
-                <div class="step-detail">
-                  <p class="cooking">{{ step.description }}</p>
-                  @if (step.image_url) {
-                    <div appLazyImage 
-                         [appLazyImage]="step.image_url"
-                         [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
-                         class="step-image-container">
+          <!-- Use Virtual Scrolling for large step lists -->
+          @if (recipe.steps.length > 8) {
+            <div class="virtual-scroll-container">
+              <cdk-virtual-scroll-viewport [itemSize]="stepItemSize" class="step-viewport">
+                @for (step of recipe.steps; track trackByStep($index, step); let i = $index) {
+                  <div class="instruction">
+                    <div class="instruction-box">
+                      <div class="step">
+                        <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
+                      </div>
+                      <div class="step-detail">
+                        <p class="cooking">{{ step.description }}</p>
+                        @if (step.image_url) {
+                          <div appLazyImage 
+                               [appLazyImage]="step.image_url"
+                               [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                               class="step-image-container">
+                          </div>
+                        }
+                      </div>
                     </div>
-                  }
+                  </div>
+                }
+              </cdk-virtual-scroll-viewport>
+            </div>
+          } @else {
+            <!-- Regular scroll for small step lists -->
+            <div class="regular-step-list">
+              @for (step of recipe.steps; track trackByStep($index, step); let i = $index) {
+                <div class="instruction">
+                  <div class="instruction-box">
+                    <div class="step">
+                      <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
+                    </div>
+                    <div class="step-detail">
+                      <p class="cooking">{{ step.description }}</p>
+                      @if (step.image_url) {
+                        <div appLazyImage 
+                             [appLazyImage]="step.image_url"
+                             [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                             class="step-image-container">
+                        </div>
+                      }
+                    </div>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           }
         </div>

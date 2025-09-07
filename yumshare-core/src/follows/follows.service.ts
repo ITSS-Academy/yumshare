@@ -63,12 +63,18 @@ export class FollowsService {
   async getFollowers(userId: string, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
     
-
-    
-    // Try using raw query to load relations
+    // Load only basic user info
     const followers = await this.followRepository
       .createQueryBuilder('follow')
       .leftJoinAndSelect('follow.follower', 'follower')
+      .select([
+        'follow.id',
+        'follow.created_at',
+        'follower.id',
+        'follower.username',
+        'follower.avatar_url',
+        'follower.bio'
+      ])
       .where('follow.following_id = :userId', { userId })
       .orderBy('follow.created_at', 'DESC')
       .skip(skip)
@@ -78,8 +84,6 @@ export class FollowsService {
     const total = await this.followRepository.count({
       where: { following_id: userId }
     });
-
-
 
     return {
       data: followers,
@@ -95,12 +99,18 @@ export class FollowsService {
   async getFollowing(userId: string, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
     
-
-    
-    // Try using raw query to load relations
+    // Load only basic user info
     const following = await this.followRepository
       .createQueryBuilder('follow')
       .leftJoinAndSelect('follow.following', 'following')
+      .select([
+        'follow.id',
+        'follow.created_at',
+        'following.id',
+        'following.username',
+        'following.avatar_url',
+        'following.bio'
+      ])
       .where('follow.follower_id = :userId', { userId })
       .orderBy('follow.created_at', 'DESC')
       .skip(skip)
@@ -110,8 +120,6 @@ export class FollowsService {
     const total = await this.followRepository.count({
       where: { follower_id: userId }
     });
-
-
 
     return {
       data: following,

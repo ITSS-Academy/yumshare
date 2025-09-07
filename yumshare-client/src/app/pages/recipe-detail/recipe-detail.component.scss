@@ -1,3 +1,61 @@
+/* Virtual Scrolling Container */
+.virtual-scroll-container {
+  width: 100%;
+  height: 300px; // Fixed height for virtual scrolling
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.ingredient-viewport,
+.step-viewport {
+  height: 100%;
+  width: 100%;
+}
+
+// CDK Virtual Scroll specific styles
+.cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.cdk-virtual-scroll-viewport {
+  height: 100%;
+}
+
+/* Regular Scroll Containers */
+.regular-ingredient-list,
+.regular-step-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
 /* Base typography using Material Design 3 tokens */
 h1 {
   font: var(--mat-sys-headline-large);

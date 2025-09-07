@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
 import { LoadingComponent } from '../../components/loading/loading.component';
 
@@ -43,6 +44,7 @@ import { selectCommentsByRecipe, selectCommentsByRecipeLoading, selectCommentsBy
     MatIconModule,
     MatProgressSpinnerModule,
     FormsModule,
+    ScrollingModule,
     SafePipe,
     LazyImageDirective,
     LoadingComponent
@@ -52,6 +54,10 @@ import { selectCommentsByRecipe, selectCommentsByRecipeLoading, selectCommentsBy
 })
 export class RecipeDetailComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
+  
+  // Virtual scrolling properties
+  ingredientItemSize = 40; // Height of each ingredient item
+  stepItemSize = 150; // Height of each step item
   
   // Recipe data
   recipe$: Observable<Recipe | null>;
@@ -305,5 +311,14 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     
     // If not a valid YouTube URL, return original URL
     return url;
+  }
+
+  // TrackBy functions for virtual scrolling performance
+  trackByIngredient(index: number, ingredient: string): string {
+    return `${index}-${ingredient}`;
+  }
+
+  trackByStep(index: number, step: any): string {
+    return step.id || `${index}-${step.description}`;
   }
 }

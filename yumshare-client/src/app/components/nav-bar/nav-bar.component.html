@@ -19,10 +19,10 @@
       <button mat-icon-button matTooltip="Add Recipe" aria-label="Add Recipe" (click)="onAddRecipe()">
         <mat-icon>add</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Messages" aria-label="Messages" [matBadgeHidden]="messageCount === 0" (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button matTooltip="Messages" aria-label="Messages" [matBadgeHidden]="(messageCount$ | async) === 0" (click)="onMessage()" [matBadge]="messageCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>mail</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="notificationCount === 0" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="(notificationCount$ | async) === 0" [matBadge]="notificationCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>notifications</mat-icon>
       </button>
       <!-- <app-dark-mode-toggle></app-dark-mode-toggle> -->
