@@ -1,79 +1,171 @@
-<div class="search-container">
-  <h2>Search</h2>
+<div class="search-container" id="search-container">
+  <h2 id="search-title">Discover Your Favorites</h2>
 
-  <div class="search-bar">
-    <input type="text" placeholder="Search by keyword or author..." [(ngModel)]="keyword" (keyup.enter)="onSearch()" />
-    <select [(ngModel)]="selectedCategory">
+  <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Search by keyword or author: (use 'author:username' for author search)..."
+      [(ngModel)]="keyword"
+      name="keyword"
+      (input)="onKeywordChange()"
+    />
+    <select 
+      id="category-select" 
+      [(ngModel)]="selectedCategory" 
+      name="category"
+      (change)="onCategoryChange()"
+    >
       <option value="">All Categories</option>
-      @for (c of categories; track c) {
-        <option [value]="c">{{ c }}</option>
+      @for (c of categories; track c.id) {
+        <option [value]="c.id">{{ c.name }}</option>
       }
     </select>
-    <button class="search-btn" (click)="onSearch()">
-      <mat-icon>search</mat-icon>
+    <button class="search-btn" id="search-button" type="submit">
+      <span class="material-icons">search</span>
     </button>
-  </div>
+    <button class="clear-btn" id="clear-button" type="button" (click)="clearSearch()">
+      Clear
+    </button>
+  </form>
 
-  @if (results.length > 0) {
-    <p>Showing results {{ results.length }} for: <b>{{ keyword }}</b></p>
+  @if (getLoadingState() | async) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
   }
 
-  <div class="results-grid">
-    @for (item of displayedResults; track item.title) {
-      <div class="container-card">
-        <mat-card class="dish-card" appearance="outlined" (click)="navigateToDetail(item)">
-          <img mat-card-image [src]="item.image" alt="Dish Image">
-          <mat-card-content>
-            <h2 class="dish-title">{{ item.title }}</h2>
-            <p class="dish-description">
-              {{ item.description }}
-            </p>
-          </mat-card-content>
-          <!-- Độ khó & Thời gian nấu -->
-          <div class="dish-info-row">
-            <span class="difficulty-label" [ngClass]="{
-              'easy': item.difficulty === 'easy',
-              'medium': item.difficulty === 'medium',
-              'hard': item.difficulty === 'hard'
-            }">
-              {{ item.difficulty === 'easy' ? 'Dễ' : item.difficulty === 'medium' ? 'Trung bình' : 'Khó' }}
-            </span>
-            <span class="cooktime-label">
-              <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
-              {{ item.cookTime }} phút
-            </span>
-          </div>
-          <mat-card-actions class="card-footer">
-            <div class="user-info">
-              <img class="avatar" [src]="item.authorAvatar" alt="User avatar">
-              <span class="username">{{ item.author }}</span>
-            </div>
-            <div class="actions">
-              <mat-icon class="favorite-icon" (click)="toggleFavorite(item)">
-                {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
-              </mat-icon>
-              <mat-icon>share</mat-icon>
-            </div>
-          </mat-card-actions>
-        </mat-card>
+  @if (searchError$ | async; as error) {
+    <div class="error-container" id="search-error">
+      <mat-icon>error</mat-icon>
+      <p class="error-message">{{ error }}</p>
+      <button class="retry-btn" (click)="onSearch()">Retry</button>
+    </div>
+  }
+
+  @if (recipesError$ | async; as error) {
+    <div class="error-container" id="recipes-error">
+      <mat-icon>error</mat-icon>
+      <p class="error-message">{{ error }}</p>
+      <button class="retry-btn" (click)="loadInitialRecipes()">Retry</button>
+    </div>
+  }
+
+  @if (getSearchStats() | async; as stats) {
+    @if (stats.totalResults > 0) {
+      <div class="results-info" id="results-info">
+        @if (stats.currentQuery) {
+          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b></p>
+        } @else {
+          <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
+        }
+        @if (stats.totalPages > 1) {
+          <p>Page {{ stats.currentPage }} of {{ stats.totalPages }}</p>
+        }
+        @if (stats.isLoading) {
+          <mat-spinner diameter="20"></mat-spinner>
+        }
+      </div>
+    } @else if (!stats.isLoading && !stats.hasError && stats.currentQuery) {
+      <div class="no-results" id="no-results">
+        <mat-icon>search_off</mat-icon>
+        <p>No results found for "{{ stats.currentQuery }}"</p>
+        <button class="clear-btn" (click)="clearSearch()">Clear Search</button>
       </div>
     }
+  }
+
+  <div class="results-grid-wrapper">
+    <div class="results-grid" id="results-grid">
+      @for (recipe of displayedResults$ | async; track recipe.id) {
+        <div
+          class="container-card"
+          id="card-{{ recipe.title | lowercase }}-{{ $index }}"
+          (click)="viewRecipe(recipe.id)"
+        >
+          <mat-card class="dish-card" appearance="outlined" id="dish-card-{{ recipe.title | lowercase }}-{{ $index }}">
+            <img
+              mat-card-image
+              [src]="recipe.image_url || 'https://via.placeholder.com/260x180'"
+              alt="{{ recipe.title }} Image"
+              id="dish-image-{{ recipe.title | lowercase }}-{{ $index }}"
+            />
+            <mat-card-content>
+              <h2 class="dish-title" id="dish-title-{{ recipe.title | lowercase }}-{{ $index }}">
+                {{ recipe.title }}
+              </h2>
+              <p
+                class="dish-description"
+                id="dish-description-{{ recipe.title | lowercase }}-{{ $index }}"
+              >
+                {{ recipe.description || 'No description available' }}
+              </p>
+            </mat-card-content>
+            <div class="rating" id="rating-{{ recipe.title | lowercase }}-{{ $index }}">
+              @for (star of [1,2,3,4,5]; track star) {
+                <span
+                  class="material-icons"
+                  id="star-{{ recipe.title | lowercase }}-{{ $index }}-{{ star }}"
+                >
+                  {{ star <= (recipe.rating || 0) ? 'star' : 'star_border' }}
+                </span>
+              }
+            </div>
+            <mat-card-actions class="card-footer" id="card-footer-{{ recipe.title | lowercase }}-{{ $index }}">
+              <div class="user-info" id="user-info-{{ recipe.title | lowercase }}-{{ $index }}">
+                <img
+                  class="avatar"
+                  [src]="recipe.authorAvatar || 'https://via.placeholder.com/32'"
+                  alt="{{ recipe.author }} Avatar"
+                  id="avatar-{{ recipe.title | lowercase }}-{{ $index }}"
+                />
+                <span class="username" id="username-{{ recipe.title | lowercase }}-{{ $index }}">
+                  {{ recipe.author || 'Unknown' }}
+                </span>
+              </div>
+              <div class="actions" id="actions-{{ recipe.title | lowercase }}-{{ $index }}">
+                <span
+                  class="material-icons favorite-icon"
+                  id="favorite-icon-{{ recipe.title | lowercase }}-{{ $index }}"
+                  (click)="toggleFavorite(recipe); $event.stopPropagation()"
+                >
+                  {{ recipe.isFavorite ? 'favorite' : 'favorite_border' }}
+                </span>
+                <span
+                  class="material-icons"
+                  id="share-icon-{{ recipe.title | lowercase }}-{{ $index }}"
+                  (click)="shareRecipe(recipe); $event.stopPropagation()"
+                >
+                  share
+                </span>
+              </div>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      }
+    </div>
   </div>
-  <div class="pagination">
-    <button (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
-    <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
 
-    @for (p of visiblePages; track p) {
-      <button (click)="goToPage(p)" [class.active]="p === currentPage">
-        {{ p }}
-      </button>
+  @if (searchResults$ | async; as searchResults) {
+    @if (totalPages > 1) {
+      <div class="pagination" id="pagination">
+        <button id="first-page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+        <button id="prev-page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+        @for (p of visiblePages; track p) {
+          <button
+            id="page-btn-{{ p }}"
+            (click)="goToPage(p)"
+            [class.active]="p === currentPage"
+          >
+            {{ p }}
+          </button>
+        }
+        @if (showEllipsis) {
+          <span id="ellipsis">…</span>
+        }
+        <button id="next-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+        <button id="last-page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+      </div>
     }
-
-    @if (showEllipsis) {
-      <span>…</span>
-    }
-
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
-    <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
-  </div>
+  }
 </div>
