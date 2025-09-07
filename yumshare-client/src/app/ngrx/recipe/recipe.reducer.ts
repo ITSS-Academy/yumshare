@@ -158,6 +158,7 @@ export const recipeReducer = createReducer(
   on(RecipeActions.searchRecipesSuccess, (state, { recipes }) => ({
     ...state,
     searchResults: recipes.data,
+    paginatedRecipes: recipes,
     searchLoading: false,
     searchError: null,
   })),

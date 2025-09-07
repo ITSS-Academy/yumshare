@@ -11,9 +11,8 @@ import { Recipe } from '../../models/recipe.model';
 import { Category } from '../../models/category.model';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
-import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError } from '../../ngrx/recipe/recipe.selectors';
+import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
 import { AsyncPipe, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-search',
@@ -44,6 +43,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   allRecipes$: Observable<Recipe[]>;
   recipesLoading$: Observable<boolean>;
   recipesError$: Observable<string | null>;
+  paginatedRecipes$: Observable<any>;
+  paginatedRecipesLoading$: Observable<boolean>;
+  paginatedRecipesError$: Observable<string | null>;
   
   // Reactive search subjects
   private searchSubject = new Subject<string>();
@@ -62,8 +64,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private router: Router,
-    private recipeService: RecipeService,
-    private categoryService: CategoryService,
+    private recipeService: RecipeService
   ) {
     this.searchResults$ = this.store.select(selectSearchResults);
     this.searchLoading$ = this.store.select(selectSearchLoading);
@@ -73,23 +74,30 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.allRecipes$ = this.store.select(selectAllRecipes);
     this.recipesLoading$ = this.store.select(selectRecipesLoading);
     this.recipesError$ = this.store.select(selectRecipesError);
+    this.paginatedRecipes$ = this.store.select(selectPaginatedRecipes);
+    this.paginatedRecipesLoading$ = this.store.select(selectPaginatedRecipesLoading);
+    this.paginatedRecipesError$ = this.store.select(selectPaginatedRecipesError);
     
-    // Create displayed results observable that combines search results with pagination
-    // If no search results, show all recipes
+    // Create displayed results observable that uses paginated results from backend
     this.displayedResults$ = combineLatest([
+      this.paginatedRecipes$,
       this.searchResults$,
-      this.allRecipes$,
-      this.pageSubject.pipe(startWith(1))
+      this.allRecipes$
     ]).pipe(
-      map(([searchResults, allRecipes, page]) => {
-        // Use search results if available, otherwise use all recipes
-        const results = searchResults.length > 0 ? searchResults : allRecipes;
-        this.currentPage = page;
-        this.totalPages = Math.ceil(results.length / this.pageSize);
-        this.updateVisiblePages();
-        const start = (page - 1) * this.pageSize;
-        const end = start + this.pageSize;
-        return results.slice(start, end);
+      map(([paginatedRecipes, searchResults, allRecipes]) => {
+        if (paginatedRecipes) {
+          // Use paginated results from backend
+          this.currentPage = paginatedRecipes.current_page;
+          this.totalPages = paginatedRecipes.total_pages;
+          this.updateVisiblePages();
+          return paginatedRecipes.data;
+        } else if (searchResults.length > 0) {
+          // Fallback to search results
+          return searchResults;
+        } else {
+          // Fallback to all recipes
+          return allRecipes;
+        }
       })
     );
   }
@@ -99,11 +107,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.store.dispatch(RecipeActions.loadAllRecipes());
 
     // Load categories from RecipeService
-    this.categoryService.getCategories().subscribe({
-      next: (response) => {
+    this.recipeService.getCategories().subscribe({
+      next: (response: any) => {
         this.categories = response.data;
       },
-      error: (error) => console.error('Error loading categories:', error),
+      error: (error: any) => console.error('Error loading categories:', error),
     });
 
     // Setup reactive search with debouncing
@@ -170,7 +178,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   goToPage(page: number) {
-    this.pageSubject.next(page);
+    this.currentPage = page;
+    this.performSearch();
   }
 
   prevPage() {
@@ -194,11 +203,25 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private performSearch() {
+    // Check if keyword starts with "author:" to search by author
+    let query = this.keyword;
+    let author = '';
+    
+    if (this.keyword.toLowerCase().startsWith('author:')) {
+      // Extract author name after "author:"
+      author = this.keyword.substring(7).trim();
+      query = ''; // Clear query when searching by author
+    }
+    
     this.store.dispatch(
       RecipeActions.searchRecipes({
-        query: this.keyword,
+        query: query,
         category: this.selectedCategory,
-        author: '',
+        author: author,
+        page: this.currentPage,
+        size: this.pageSize,
+        orderBy: 'created_at',
+        order: 'DESC'
       })
     );
   }
@@ -226,22 +249,36 @@ export class SearchComponent implements OnInit, OnDestroy {
   // Get search statistics
   getSearchStats() {
     return combineLatest([
+      this.paginatedRecipes$,
       this.searchResults$,
       this.allRecipes$,
       this.searchQuery$,
       this.searchLoading$,
       this.searchError$
     ]).pipe(
-      map(([searchResults, allRecipes, query, loading, error]) => {
-        // Use search results if available, otherwise use all recipes
-        const results = searchResults.length > 0 ? searchResults : allRecipes;
-        return {
-          totalResults: results.length,
-          currentQuery: query,
-          isLoading: loading,
-          hasError: !!error,
-          errorMessage: error
-        };
+      map(([paginatedRecipes, searchResults, allRecipes, query, loading, error]) => {
+        if (paginatedRecipes) {
+          return {
+            totalResults: paginatedRecipes.total,
+            currentQuery: query,
+            isLoading: loading,
+            hasError: !!error,
+            errorMessage: error,
+            currentPage: paginatedRecipes.current_page,
+            totalPages: paginatedRecipes.total_pages
+          };
+        } else {
+          const results = searchResults.length > 0 ? searchResults : allRecipes;
+          return {
+            totalResults: results.length,
+            currentQuery: query,
+            isLoading: loading,
+            hasError: !!error,
+            errorMessage: error,
+            currentPage: 1,
+            totalPages: 1
+          };
+        }
       })
     );
   }

@@ -5,7 +5,7 @@
     <input
       type="text"
       id="search-input"
-      placeholder="Search by keyword or author..."
+      placeholder="Search by keyword or author: (use 'author:username' for author search)..."
       [(ngModel)]="keyword"
       name="keyword"
       (input)="onKeywordChange()"
@@ -58,6 +58,9 @@
           <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b></p>
         } @else {
           <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
+        }
+        @if (stats.totalPages > 1) {
+          <p>Page {{ stats.currentPage }} of {{ stats.totalPages }}</p>
         }
         @if (stats.isLoading) {
           <mat-spinner diameter="20"></mat-spinner>

@@ -70,6 +70,24 @@ export const selectSearchQuery = createSelector(
   (state: RecipeState) => state.searchQuery
 );
 
+// Select paginated recipes
+export const selectPaginatedRecipes = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipes
+);
+
+// Select paginated recipes loading
+export const selectPaginatedRecipesLoading = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipesLoading
+);
+
+// Select paginated recipes error
+export const selectPaginatedRecipesError = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipesError
+);
+
 // Select operation loading
 export const selectOperationLoading = createSelector(
   selectRecipeState,
