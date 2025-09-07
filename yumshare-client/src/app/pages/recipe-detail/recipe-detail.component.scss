@@ -66,6 +66,8 @@ p {
   justify-content: space-evenly;
   align-items: center;
   margin-top: 0.3125rem;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hinh-mon-an-container {
@@ -98,7 +100,7 @@ p {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding-left: 1.25rem;
+  //padding-left: 1.25rem;
 }
 
 .food-description {
@@ -198,10 +200,11 @@ p {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  scrollbar-color: #e1e4e4f2;
 
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: #888 transparent;
+  //scrollbar-color: #888 transparent;
 }
 
 /* Chrome, Edge, Safari */
@@ -243,6 +246,7 @@ p {
   align-items: center;
   gap: 0.5rem;
   font: var(--mat-sys-body-large);
+  //flex-direction: column;
 }
 
 .label {
@@ -303,7 +307,13 @@ p {
 ::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label:hover {
   background: #222;
 }
-
+.post-like{
+  width: 100%;
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
 .login-required-btn {
   padding: 0.4rem 1rem;
   border: 1px solid #ccc;
@@ -355,7 +365,7 @@ p {
   background: #fff;
   border: 0.125rem solid #D9D9D9;
   border-radius: 0.75rem;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -612,6 +622,10 @@ p {
     width: 100% !important;
     max-height: 12rem;
   }
+  .post-like{
+    justify-content: center !important;
+    align-items: center !important;
+  }
   .food-name {
     font: var(--mat-sys-title-medium);
     padding: 0.5rem;
@@ -651,6 +665,8 @@ p {
     align-items: center !important;
     margin-top: 0 !important;
     padding-top: 0.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
   }
   .block {
     gap: 0.5rem;
@@ -662,6 +678,10 @@ p {
   .bottom-under{
     width: 100%;
     height: auto;
+  }
+  .food-description{
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
 

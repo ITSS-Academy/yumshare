@@ -21,6 +21,7 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
+import { CategoryService } from '../../services/category/category.service';
 
 @Component({
   selector: 'app-add-recipe',
@@ -68,7 +69,8 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     private recipeService: RecipeService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private store: Store<{auth: AuthState}>
+    private store: Store<{auth: AuthState}>,
+    private categoryService: CategoryService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', Validators.required],
@@ -237,6 +239,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   onYoutubeUrlChange(url: string) {
     this.youtubeUrl = url;
+    // Extract video ID from YouTube URL for preview
     const videoId = this.extractYoutubeVideoId(url);
     if (videoId) {
       this.videoPreview = `https://www.youtube.com/embed/${videoId}`;
@@ -253,17 +256,21 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     return this.extractYoutubeVideoId(url) !== null;
   }
 
-  loadCategories() {
-    const categoriesSubscription = this.recipeService.getCategories().subscribe({
+    loadCategories() {
+    const categoriesSubscription = this.categoryService.getCategories().subscribe({
       next: (response: any) => {
+        
         let categories: Category[] = [];
         if (Array.isArray(response)) {
           categories = response;
         } else if (response && response.data && Array.isArray(response.data)) {
           categories = response.data;
+        } else if (response && typeof response === 'object') {
         }
         if (categories && categories.length > 0) {
           this.categories = categories;
+          
+          // Always set the first category as default since form starts empty
           this.recipeForm.patchValue({ category_id: categories[0].id });
         } else {
           this.categories = [

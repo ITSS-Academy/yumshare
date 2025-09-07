@@ -18,11 +18,14 @@
 
 .chat-area {
   flex: 1;
-  height: 100%;
+  height: 500px;
   display: flex;
   flex-direction: column;
   min-width: 0;
   background: var(--background);
+  overflow-y: auto; /* Bật cuộn theo chiều dọc */
+  scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+  -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE/Edge */
 }
 
 .empty-chat {
@@ -71,8 +74,7 @@
       border-bottom: 1px solid var(--border);
     }
     ::ng-deep .chat-window-container {
-      height: auto !important;
-      max-height: 35rem !important;
+      height: 37rem !important;
     }
 
     .chat-area {

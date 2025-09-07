@@ -5,6 +5,26 @@ import * as RecipeActions from './recipe.actions';
 export const recipeReducer = createReducer(
   initialRecipeState,
 
+  // Load Paginated Recipes
+  on(RecipeActions.loadPaginatedRecipes, (state) => ({
+    ...state,
+    paginatedRecipesLoading: true,
+    paginatedRecipesError: null,
+  })),
+
+  on(RecipeActions.loadPaginatedRecipesSuccess, (state, { response }) => ({
+    ...state,
+    paginatedRecipes: response,
+    paginatedRecipesLoading: false,
+    paginatedRecipesError: null,
+  })),
+
+  on(RecipeActions.loadPaginatedRecipesFailure, (state, { error }) => ({
+    ...state,
+    paginatedRecipesLoading: false,
+    paginatedRecipesError: error,
+  })),
+
   // Create Recipe
   on(RecipeActions.createRecipe, (state) => ({
     ...state,
@@ -229,4 +249,8 @@ export const recipeReducer = createReducer(
     searchLoading: false,
     searchError: null,
   })),
+
+  
 );
+
+

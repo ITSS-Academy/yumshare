@@ -3,8 +3,7 @@
 .chat-window-container {
   display: flex;
   flex-direction: column;
-  height: auto;
-  max-height: 40rem;
+  height: 32rem;
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-variant) 100%);
   font-family: Noto Sans, sans-serif;
   overflow-y: scroll; /* vẫn cho cuộn */

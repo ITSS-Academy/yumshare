@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity/comment.entity';
@@ -10,6 +10,8 @@ import { ListResult } from '../common/types/list-result.type';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
 import { TimezoneService } from '../common/services/timezone.service';
 import { OptimizedQueryService } from '../common/services/optimized-query.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from 'src/notifications/enums/notification-type.enum';
 
 @Injectable()
 export class CommentsService {
@@ -22,13 +24,18 @@ export class CommentsService {
     private readonly recipeRepository: Repository<Recipe>,
     private readonly timezoneService: TimezoneService,
     private readonly optimizedQueryService: OptimizedQueryService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private readonly logger = new Logger(CommentsService.name);
 
   async create(createCommentDto: CreateCommentDto) {
     const user = await this.userRepository.findOne({ where: { id: createCommentDto.user_id } });
-    const recipe = await this.recipeRepository.findOne({ where: { id: createCommentDto.recipe_id } });
+    const recipe = await this.recipeRepository.findOne({ 
+      where: { id: createCommentDto.recipe_id },
+      relations: ['user']
+    });
     if (!user || !recipe) throw new Error('User or Recipe not found');
     
     // Create comment with proper Vietnam timezone
@@ -42,6 +49,24 @@ export class CommentsService {
     });
     
     const savedComment = await this.commentRepository.save(comment);
+    
+    // Create notification for recipe owner (if not commenting on own recipe)
+    if (recipe.user.id !== createCommentDto.user_id) {
+      try {
+        await this.notificationsService.create({
+          user_id: recipe.user.id,
+          type: NotificationType.COMMENT,
+          content: `${user.username || user.email} commented on your recipe "${recipe.title}"`,
+          metadata: {
+            recipe_id: recipe.id,
+            comment_id: savedComment.id
+          }
+        });
+      } catch (error) {
+        this.logger.error('Error creating comment notification:', error);
+        // Don't throw error to avoid breaking comment creation
+      }
+    }
     
     return savedComment;
   }

@@ -21,6 +21,7 @@ import { RouteLoadingService } from './core/route-loading.service';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { SocketService } from './services/socket/socket.service';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,8 @@ export class AppComponent implements OnInit, OnDestroy {
     }>,
     private dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private socketService: SocketService
   ) {
     this.updateSidebarMode();
     // this.darkModeService.initSystemThemeListener();
@@ -64,7 +66,6 @@ export class AppComponent implements OnInit, OnDestroy {
           phoneNumber: auth.phoneNumber
         };
         
-        console.log('🔐 Storing user and token:', { user, tokenLength: idToken?.length });
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
         
@@ -83,14 +84,21 @@ export class AppComponent implements OnInit, OnDestroy {
         
         // Setup token refresh
         this.setupTokenRefresh(auth);
+        
+        // Connect to socket and join user rooms
+        this.socketService.connect();
+        this.socketService.joinUserRoom(auth.uid); // For notifications
+        this.socketService.joinChatRoom(auth.uid); // For chat
       } else {
-        console.log('No user is signed in.');
         // Xoá flag khi logout để lần sau login lại sẽ hiện
         localStorage.removeItem('loginSnackbarShown');
         // Dispatch clearAuthState để clear hoàn toàn auth state
         this.store.dispatch(AuthActions.clearAuthState());
         // Đóng tất cả dialog nếu có
         this.dialog.closeAll();
+        
+        // Disconnect from socket
+        this.socketService.disconnect();
       }
     });
   }
@@ -156,7 +164,6 @@ export class AppComponent implements OnInit, OnDestroy {
     setInterval(async () => {
       try {
         const newToken = await auth.getIdToken(true);
-        console.log('🔐 Token refreshed, new length:', newToken?.length);
         this.store.dispatch(AuthActions.storeCurrentUser({
           currentUser: {
             uid: auth.uid,

@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, ExtraOptions } from '@angular/router';
 
 export const routes: Routes = [
   {
@@ -60,10 +60,22 @@ export const routes: Routes = [
       import('./pages/message/message.component').then((m) => m.MessageComponent)
   },
   {
+    path: 'chat/:id',
+    loadComponent: () =>
+      import('./pages/message/message.component').then((m) => m.MessageComponent)
+  },
+  {
     path: 'profile',
     loadComponent: () =>
       import('./pages/profile/profile.component').then(
         (m) => m.ProfileComponent
+      )
+  },
+  {
+    path: 'notifications',
+    loadComponent: () =>
+      import('./pages/notifications/notifications.page').then(
+        (m) => m.NotificationsPageComponent
       )
   },
 
@@ -74,3 +86,4 @@ export const routes: Routes = [
   },
  
 ];
+

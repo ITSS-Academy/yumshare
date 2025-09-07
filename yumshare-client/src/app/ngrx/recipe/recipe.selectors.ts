@@ -39,6 +39,22 @@ export const selectRecipeError = createSelector(
   (state: RecipeState) => state.currentRecipeError
 );
 
+// Select paginated recipes
+export const selectPaginatedRecipes = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipes
+);
+
+export const selectPaginatedRecipesLoading = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipesLoading
+);
+
+export const selectPaginatedRecipesError = createSelector(
+  selectRecipeState,
+  (state: RecipeState) => state.paginatedRecipesError
+);
+
 export const selectRecipesError = createSelector(
   selectRecipeState,
   (state: RecipeState) => state.recipesError

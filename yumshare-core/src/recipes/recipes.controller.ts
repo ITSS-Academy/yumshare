@@ -62,6 +62,15 @@ export class RecipesController {
     return this.recipesService.findByCategory(categoryId, queryOpts);
   }
 
+  @Get('user/:userId')
+  @RateLimit(RateLimits.STANDARD)
+  findByUserId(
+    @Param('userId') userId: string,
+    @Query() queryOpts: QueryOptsDto
+  ) {
+    return this.recipesService.findByUserId(userId, queryOpts);
+  }
+
   @Get(':id/check-edit-permission')
   async checkEditPermission(@Param('id') id: string, @Req() req: any) {
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit

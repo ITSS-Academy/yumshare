@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Recipe } from './entities/recipe.entity/recipe.entity';
@@ -10,6 +10,7 @@ import { RecipeStep } from '../recipe-steps/entities/recipe-step.entity';
 import { ListResult } from '../common/types/list-result.type';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
 import { OptimizedQueryService } from '../common/services/optimized-query.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class RecipesService {
@@ -23,6 +24,8 @@ export class RecipesService {
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly dataSource: DataSource,
     private readonly optimizedQueryService: OptimizedQueryService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private readonly logger = new Logger(RecipesService.name);
@@ -58,6 +61,26 @@ export class RecipesService {
       }
 
       await queryRunner.commitTransaction();
+      
+      // Gửi thông báo cho followers sau khi tạo recipe thành công
+      try {
+        const recipeWithUser = await this.findOne(savedRecipe.id);
+        if (recipeWithUser && recipeWithUser.user) {
+          await this.notificationsService.notifyFollowersNewRecipe(
+            createRecipeDto.user_id,
+            {
+              id: savedRecipe.id,
+              title: savedRecipe.title,
+              authorName: recipeWithUser.user.username || recipeWithUser.user.email || 'Unknown User'
+            }
+          );
+          this.logger.log(`Notifications sent to followers for new recipe: ${savedRecipe.title}`);
+        }
+      } catch (notificationError) {
+        // Log lỗi nhưng không làm fail việc tạo recipe
+        this.logger.error('Failed to send notifications for new recipe:', notificationError);
+      }
+      
       return this.findOne(savedRecipe.id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -77,7 +100,7 @@ export class RecipesService {
       {
         relations: ['user', 'category'],
         maxRelations: 2,
-        selectFields: ['id', 'title', 'description', 'thumbnail', 'created_at', 'difficulty', 'cooking_time'],
+        selectFields: ['id', 'title', 'description', 'image_url', 'created_at', 'difficulty', 'total_cooking_time'],
         enableCache: false
       }
     );
@@ -128,6 +151,22 @@ export class RecipesService {
     
     const [recipes, total] = await this.recipeRepository.findAndCount({
       where: { category_id: categoryId },
+      relations: ['user', 'category', 'steps'],
+      order: { [orderBy]: order },
+      skip,
+      take: size,
+    });
+
+    return new ListResult(recipes, total, page, size);
+  }
+
+  async findByUserId(userId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Recipe>> {
+    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    
+    const skip = (page - 1) * size;
+    
+    const [recipes, total] = await this.recipeRepository.findAndCount({
+      where: { user: { id: userId } },
       relations: ['user', 'category', 'steps'],
       order: { [orderBy]: order },
       skip,

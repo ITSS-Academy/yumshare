@@ -21,7 +21,7 @@
   <div class="results-grid">
     @for (item of displayedResults; track item.title) {
       <div class="container-card">
-        <mat-card class="dish-card" appearance="outlined">
+        <mat-card class="dish-card" appearance="outlined" (click)="navigateToDetail(item)">
           <img mat-card-image [src]="item.image" alt="Dish Image">
           <mat-card-content>
             <h2 class="dish-title">{{ item.title }}</h2>
@@ -29,12 +29,19 @@
               {{ item.description }}
             </p>
           </mat-card-content>
-          <div class="rating">
-            @for (star of [1,2,3,4,5]; track star) {
-              <mat-icon>
-                {{ star <= item.rating ? 'star' : 'star_border' }}
-              </mat-icon>
-            }
+          <!-- Độ khó & Thời gian nấu -->
+          <div class="dish-info-row">
+            <span class="difficulty-label" [ngClass]="{
+              'easy': item.difficulty === 'easy',
+              'medium': item.difficulty === 'medium',
+              'hard': item.difficulty === 'hard'
+            }">
+              {{ item.difficulty === 'easy' ? 'Dễ' : item.difficulty === 'medium' ? 'Trung bình' : 'Khó' }}
+            </span>
+            <span class="cooktime-label">
+              <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
+              {{ item.cookTime }} phút
+            </span>
           </div>
           <mat-card-actions class="card-footer">
             <div class="user-info">
