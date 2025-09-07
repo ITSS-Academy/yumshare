@@ -1,7 +1,7 @@
 <!-- Loading State -->
 @if (recipeLoading$ | async) {
   <div class="recipe-loading-container">
-    <app-loading 
+    <app-loading
       size="large"
       message="Loading recipe..."
       centerType="center-container">
@@ -17,17 +17,17 @@
         <div class="food-name">
           <h1 class="title">{{ recipe.title }}</h1>
         </div>
-        <div class="mieu-ta">
-          <div class="trai">
-            <div appLazyImage 
+        <div class="describe">
+          <div class="lefttt">
+            <div appLazyImage
                  [appLazyImage]="recipe.image_url || 'assets/default-recipe.jpg'"
                  [appLazyImageOptions]="{ quality: 0.9, maxWidth: 800, maxHeight: 600, generateThumbnail: true, thumbnailSize: 400 }"
                  [appLazyImagePriority]="true"
                  class="hinh-mon-an-container">
             </div>
           </div>
-          <div class="phai">
-            <p class="mieu-ta-monan">{{ recipe.description }}</p>
+          <div class="righttt">
+            <p class="food-description">{{ recipe.description }}</p>
             <div class="block">
               <mat-chip>{{ recipe.difficulty }}</mat-chip>
               <mat-chip>{{ recipe.total_cooking_time }} min</mat-chip>
@@ -50,7 +50,6 @@
               </div>
             }
           </div>
-
           <div class="user-box">
             <span class="label">Up by:</span>
             <div class="user-info">
@@ -74,6 +73,13 @@
               </button>
             }
           </div>
+          <div class="post-like">
+            Like for this recipe:
+            <button mat-icon-button (click)="toggleLike()" [disabled]="likeLoading$ | async">
+              <mat-icon [style.color]="(isLiked$ | async) ? '#000' : '#e0e0e0'">thumb_up</mat-icon>
+            </button>
+            <span>{{ likeCount$ | async }}</span>
+          </div>
         </div>
 
         <div class="right">
@@ -82,13 +88,12 @@
             <div class="instruction">
               <div class="instruction-box">
                 <div class="step">
-
                   <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
                 </div>
                 <div class="step-detail">
                   <p class="cooking">{{ step.description }}</p>
                   @if (step.image_url) {
-                    <div appLazyImage 
+                    <div appLazyImage
                          [appLazyImage]="step.image_url"
                          [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
                          class="step-image-container">
@@ -104,29 +109,47 @@
 
     @if (recipe$ | async; as recipe) {
       <div class="bottom">
-        @if (recipe.video_url) {
+        @if (recipe.video_url || recipe.video) {
           <div class="video">
             <h1 class="title3">Video Tutorial</h1>
-            <iframe
-              class="clip"
-              width="650"
-              height="400"
-              [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
-              title="Recipe Video Tutorial"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen>
-            </iframe>
+            @if (recipe.video_url) {
+              <iframe
+                class="clip"
+                width="650"
+                height="400"
+                [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
+                title="Recipe Video Tutorial"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+              </iframe>
+            }
+            @if (recipe.video) {
+              <video
+                class="clip"
+                width="650"
+                height="400"
+                [src]="recipe.video"
+                controls
+                title="Recipe Video Tutorial">
+              </video>
+            }
+          </div>
+        } @else {
+          <div class="video">
+            <h1 class="title3">Video Tutorial</h1>
+            <div class="no-video-message">
+              We will update soon
+            </div>
           </div>
         }
-
-        <app-comment style="margin-top: 1rem;"
-          [recipeId]="recipeId"
-          [recipeTitle]="recipe.title"
-          [recipeOwnerId]="recipe.user?.id"
-          (commentAdded)="onCommentAdded($event)"
-          (commentDeleted)="onCommentDeleted($event)">
-        </app-comment>
+        <div class="bottom-under">
+          <app-comment style="margin-top: 1rem;"
+                       [recipeId]="recipeId"
+                       (commentAdded)="onCommentAdded($event)"
+                       (commentDeleted)="onCommentDeleted($event)">
+          </app-comment>
+        </div>
       </div>
     }
   </div>

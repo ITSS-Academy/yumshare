@@ -16,6 +16,7 @@ import * as followEffects from '../app/ngrx/follow/follow.effect';
 import * as recipeEffects from './ngrx/recipe/recipe.effects';
 import * as categoryEffects from './ngrx/category/category.effects';
 import * as commentEffects from './ngrx/comment/comment.effects';
+import * as likesEffects from './ngrx/likes/likes.effects';
 import * as favoriteEffects from './ngrx/favorite/favorite.effects';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -25,6 +26,8 @@ import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
 import { categoryReducer } from './ngrx/category/category.reducer';
 import { commentReducer } from './ngrx/comment/comment.reducer';
 import { favoriteReducer } from './ngrx/favorite/favorite.reducer';
+
+import { likesReducer } from './ngrx/likes/likes.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,6 +46,14 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
+    provideEffects([
+      authEffects,
+      followEffects,
+      recipeEffects,
+      categoryEffects,
+      commentEffects,
+      likesEffects // <-- Thêm likesEffects vào đây
+    ]),
     provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects, favoriteEffects]),
     provideStore({
       auth: authReducer,
@@ -51,6 +62,7 @@ export const appConfig: ApplicationConfig = {
       recipe: recipeReducer,
       category: categoryReducer,
       comment: commentReducer,
+      likes: likesReducer,
       favorite: favoriteReducer,
     }),
     provideFirebaseApp(() =>

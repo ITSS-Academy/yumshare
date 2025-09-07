@@ -11,6 +11,7 @@ export class LikesController {
 
   @Post()
   likeRecipe(@Body() createLikeDto: CreateLikeDto) {
+    console.log('Received Like DTO:', createLikeDto);
     return this.likesService.likeRecipe(createLikeDto);
   }
 

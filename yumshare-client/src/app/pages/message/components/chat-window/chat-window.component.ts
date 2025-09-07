@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Chat } from '../../../../models/chat.model';
@@ -14,7 +14,7 @@ import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
   templateUrl: './chat-window.component.html',
   styleUrls: ['./chat-window.component.scss']
 })
-export class ChatWindowComponent {
+export class ChatWindowComponent implements AfterViewInit, OnChanges {
   @Input() chat: Chat | null = null;
   @Input() messages: ChatMessage[] = [];
   @Input() currentUser: User | null = null;
@@ -27,7 +27,8 @@ export class ChatWindowComponent {
 
   newMessage: string = '';
 
-  // Helpers to avoid showing "null" avatar/name
+  @ViewChild('chatWindowContainer') chatWindowRef!: ElementRef<HTMLDivElement>;
+
   safeAvatar(url?: string): string {
     return url && url !== 'null' && url !== 'undefined' && url.trim() !== ''
       ? url
@@ -47,6 +48,7 @@ export class ChatWindowComponent {
       event.preventDefault();
       this.sendMessage.emit(this.newMessage);
       this.newMessage = '';
+      setTimeout(() => this.scrollToBottom(), 0);
     }
   }
 
@@ -54,6 +56,30 @@ export class ChatWindowComponent {
     if (this.newMessage.trim()) {
       this.sendMessage.emit(this.newMessage);
       this.newMessage = '';
+      setTimeout(() => this.scrollToBottom(), 0);
+    }
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => this.scrollToBottom(), 0);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['messages']) {
+      setTimeout(() => this.scrollToBottom(), 0);
+    }
+  }
+
+  private scrollToBottom() {
+    if (this.chatWindowRef && this.chatWindowRef.nativeElement) {
+      const container = this.chatWindowRef.nativeElement.querySelector('.messages-list');
+      if (container) {
+        const items = container.querySelectorAll('.message-item');
+        if (items.length > 0) {
+          const lastItem = items[items.length - 1] as HTMLElement;
+          lastItem.scrollIntoView({ behavior: 'auto', block: 'end' });
+        }
+      }
     }
   }
 }

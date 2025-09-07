@@ -44,18 +44,18 @@
       position: relative;
       overflow: hidden;
       border-radius: 8px;
-      
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: opacity 0.3s ease;
       }
-      
+
       &.lazy-image-loading img {
         opacity: 0.6;
       }
-      
+
       &.lazy-image-loaded img {
         opacity: 1;
       }
@@ -128,7 +128,7 @@
       color: #555;
       gap: 4px;
       line-height: 1;
-      
+
       mat-icon {
         font-size: 16px !important;
         width: 16px;
@@ -170,7 +170,7 @@
           display: flex;
           align-items: center;
           overflow: hidden;
-          
+
           img {
             width: 100%;
             height: 100%;

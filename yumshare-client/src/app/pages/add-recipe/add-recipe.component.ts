@@ -27,8 +27,8 @@ import { CategoryService } from '../../services/category/category.service';
   selector: 'app-add-recipe',
   templateUrl: './add-recipe.component.html',
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -46,7 +46,9 @@ import { CategoryService } from '../../services/category/category.service';
 export class AddRecipeComponent implements OnInit, OnDestroy {
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
   @ViewChild('videoInput') videoInput!: ElementRef<HTMLInputElement>;
-  
+  @ViewChild('ingredientsListContainer') ingredientsListRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('stepsListContainer') stepsListRef!: ElementRef<HTMLDivElement>;
+
   recipeForm: FormGroup;
   categories: Category[] = [];
   selectedImage: File | null = null;
@@ -59,11 +61,8 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   difficultyLevels: string[] = ['Easy', 'Medium', 'Hard'];
   countries: string[] = ['Vietnam', 'Thailand', 'Japan', 'China', 'Korea', 'Italy', 'France', 'Spain', 'Mexico', 'India', 'United States', 'Other'];
   currentUser: AuthModel | null = null;
-  
-  // Grid Multi-step properties
-  currentStep: number = 1;
 
-  // Subscriptions management
+  currentStep: number = 1;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -77,10 +76,10 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       title: ['', Validators.required],
       description: ['', Validators.required],
       servings: [1, [Validators.required, Validators.min(1)]],
-      total_cooking_time: [90, Validators.required], // Default 1 hour 30 minutes
+      total_cooking_time: [90, Validators.required],
       difficulty: ['Medium', Validators.required],
       country: ['Vietnam', Validators.required],
-      category_id: ['', Validators.required], // Will be set after categories are loaded
+      category_id: ['', Validators.required],
       ingredients: this.fb.array([
         this.fb.control('', Validators.required)
       ]),
@@ -91,7 +90,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Unsubscribe from all subscriptions
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
     this.subscriptions = [];
   }
@@ -99,8 +97,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadCategories();
     this.loadCurrentUser();
-    
-    // Ensure default values are set
     this.ensureDefaultValues();
   }
 
@@ -147,26 +143,45 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   addIngredient() {
     this.ingredients.push(this.fb.control('', Validators.required));
+    setTimeout(() => this.scrollIngredientsListToBottom(), 0);
   }
 
   removeIngredient(index: number) {
     if (this.ingredients.length > 1) {
-    this.ingredients.removeAt(index);
+      this.ingredients.removeAt(index);
     }
   }
 
   addStep() {
     const stepNumber = this.steps.length + 1;
     this.steps.push(this.createStepFormGroup(stepNumber));
+    setTimeout(() => this.scrollStepsListToBottom(), 0);
   }
 
   removeStep(index: number) {
     if (this.steps.length > 1) {
-    this.steps.removeAt(index);
-      // Reorder step numbers
+      this.steps.removeAt(index);
       this.steps.controls.forEach((control, i) => {
         control.patchValue({ step_number: i + 1 });
       });
+    }
+  }
+
+  private scrollIngredientsListToBottom() {
+    if (this.ingredientsListRef) {
+      const container = this.ingredientsListRef.nativeElement;
+      if (container.scrollHeight > container.clientHeight) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    }
+  }
+
+  private scrollStepsListToBottom() {
+    if (this.stepsListRef) {
+      const container = this.stepsListRef.nativeElement;
+      if (container.scrollHeight > container.clientHeight) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
     }
   }
 
@@ -184,7 +199,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     const file = event.target.files[0];
     if (file) {
       this.selectedVideo = file;
-      // Create video preview
       const url = URL.createObjectURL(file);
       this.videoPreview = url;
     }
@@ -198,7 +212,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   onVideoDrop(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
-    
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       const file = files[0];
@@ -248,96 +261,60 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         
         let categories: Category[] = [];
-        
-        // Handle different response formats
         if (Array.isArray(response)) {
-          // Direct array response
           categories = response;
         } else if (response && response.data && Array.isArray(response.data)) {
-          // Paginated response with data property
           categories = response.data;
         } else if (response && typeof response === 'object') {
         }
-        
         if (categories && categories.length > 0) {
           this.categories = categories;
           
           // Always set the first category as default since form starts empty
           this.recipeForm.patchValue({ category_id: categories[0].id });
         } else {
-          console.warn('No categories found from API');
-          console.warn('Response was:', response);
-          
-          // Fallback: Use basic categories for testing
           this.categories = [
             { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
             { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
             { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
           ];
           this.snackBar.open('Using fallback categories - Check API connection', 'Close', { duration: 5000 });
-          
-          // Set default category for fallback
           this.recipeForm.patchValue({ category_id: 'fallback-1' });
         }
       },
       error: (error) => {
-        console.error('Error loading categories from API:', error);
-        console.error('Error details:', error);
-        
-        // Fallback: Use basic categories for testing when API fails
         this.categories = [
           { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
           { id: '2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
           { id: 'fallback-3', name: 'Western Cuisine', image_url: '', is_active: true, sort_order: 3, created_at: new Date(), updated_at: new Date() }
         ];
         this.snackBar.open('API Error - Using fallback categories', 'Close', { duration: 5000 });
-        
-        // Set default category for error fallback
         this.recipeForm.patchValue({ category_id: 'fallback-1' });
       }
     });
-    
-    // Add subscription to array
     this.subscriptions.push(categoriesSubscription);
   }
 
   loadCurrentUser() {
     const authSubscription = this.store.select('auth').subscribe((authState: AuthState) => {
-      console.log('Auth state received:', authState);
-      console.log('Current user from state:', authState?.currentUser);
-      
       if (authState && authState.currentUser && authState.currentUser.uid) {
         this.currentUser = authState.currentUser;
-        console.log('User loaded successfully:', {
-          displayName: this.currentUser.displayName,
-          email: this.currentUser.email,
-          uid: this.currentUser.uid,
-          photoURL: this.currentUser.photoURL
-        });
       } else {
         this.currentUser = null;
-        console.log('No user found in auth state');
       }
     });
-    
-    // Add subscription to array
     this.subscriptions.push(authSubscription);
   }
 
   private ensureDefaultValues() {
-    // Ensure category has a default value after categories are loaded
     if (this.categories.length > 0 && !this.recipeForm.get('category_id')?.value) {
       this.recipeForm.patchValue({ category_id: this.categories[0].id });
-      console.log('EnsureDefaultValues: Set category to', this.categories[0].id);
     }
   }
-
-
 
   formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
     if (hours > 0 && mins > 0) {
       return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''}`;
     } else if (hours > 0) {
@@ -352,15 +329,10 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       this.snackBar.open('Please login to create a recipe', 'Close', { duration: 3000 });
       return;
     }
-    
     if (this.recipeForm.valid) {
       this.uploading = true;
-      
       try {
-        // Create recipe with files using the backend endpoint
         const formData = new FormData();
-        
-        // Add recipe data
         const recipeData = this.recipeForm.value;
         formData.append('title', recipeData.title);
         formData.append('description', recipeData.description);
@@ -369,52 +341,21 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         formData.append('difficulty', recipeData.difficulty);
         formData.append('country', recipeData.country);
         formData.append('category_id', recipeData.category_id);
-        formData.append('user_id', this.currentUser?.uid || 'anonymous-user'); // Get from auth store
-        
-        // Add ingredients as JSON string
+        formData.append('user_id', this.currentUser?.uid || 'anonymous-user');
         formData.append('ingredients', JSON.stringify(recipeData.ingredients));
-        
-        // Add steps as JSON string
         formData.append('steps', JSON.stringify(recipeData.steps));
-        
-        // Add image (file only)
-        console.log('Selected image:', this.selectedImage);
-        
         if (this.selectedImage) {
           formData.append('image', this.selectedImage);
-          console.log('Added image file to FormData');
-        } else {
-          console.log('No image added to FormData');
         }
-        
-        // Add video (file or YouTube URL)
-        console.log('Video type:', this.videoType);
-        console.log('YouTube URL:', this.youtubeUrl);
-        console.log('Selected video:', this.selectedVideo);
-        
         if (this.videoType === 'file' && this.selectedVideo) {
           formData.append('video', this.selectedVideo);
-          console.log('Added video file to FormData');
         } else if (this.videoType === 'youtube' && this.youtubeUrl) {
           formData.append('video_url', this.youtubeUrl);
-          console.log('Added video_url to FormData:', this.youtubeUrl);
-        } else {
-          console.log('No video added to FormData');
         }
-
-        console.log("FormData contents:");
-        for (let [key, value] of formData.entries()) {
-          console.log(`${key}:`, value);
-        }
-
-        // Send to backend
-        const response = await this.recipeService.createRecipeWithFiles(formData).toPromise();
-        console.log("Response", response);
+        await this.recipeService.createRecipeWithFiles(formData).toPromise();
         this.snackBar.open('Recipe created successfully!', 'Close', { duration: 3000 });
         this.resetForm();
-        
       } catch (error) {
-        console.error('Error creating recipe:', error);
         this.snackBar.open('Error creating recipe. Please try again.', 'Close', { duration: 3000 });
       } finally {
         this.uploading = false;
@@ -443,22 +384,16 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
       difficulty: 'Medium',
       country: 'Vietnam'
     });
-    
-    // Reset arrays
     this.ingredients.clear();
     this.steps.clear();
     this.ingredients.push(this.fb.control('', Validators.required));
     this.steps.push(this.createStepFormGroup(1));
-    
-    // Reset files
     this.selectedImage = null;
     this.selectedVideo = null;
     this.imagePreview = null;
     this.videoPreview = null;
     this.youtubeUrl = '';
     this.videoType = 'file';
-    
-    // Reset step
     this.currentStep = 1;
   }
 
@@ -468,7 +403,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Grid Multi-step navigation methods
   nextStep() {
     if (this.currentStep < 4) {
       this.currentStep++;
@@ -484,20 +418,17 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   private scrollToTop() {
-    // Smooth scroll to top of the page with offset for sticky header
-    const headerHeight = 120; // Approximate height of progress header
+    const headerHeight = 120;
     window.scrollTo({
       top: headerHeight,
       behavior: 'smooth'
     });
-    
-    // Alternative: scroll to the add-recipe container with proper offset
     setTimeout(() => {
       const container = document.querySelector('.add-recipe');
       if (container) {
-        container.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
+        container.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
         });
       }
     }, 200);
@@ -509,7 +440,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   setVideoType(type: 'file' | 'youtube') {
     this.videoType = type;
-    // Reset video preview when switching types
     this.videoPreview = null;
     this.selectedVideo = null;
     this.youtubeUrl = '';

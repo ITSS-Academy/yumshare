@@ -13,11 +13,12 @@ import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import { ChatMessage } from '../../models/chat-message.model';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { ChatWindowComponent } from './components/chat-window/chat-window.component';
+import {FooterComponent} from '../../components/footer/footer.component';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, ShareModule, UserListComponent, ChatWindowComponent],
+  imports: [CommonModule, FormsModule, ShareModule, UserListComponent, ChatWindowComponent, FooterComponent],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
@@ -40,34 +41,34 @@ export class MessageComponent implements OnInit, OnDestroy {
   // Loading states
   chatsLoading = signal(true);
   messagesLoading = signal(false);
-  
+
   // Search
   searchQuery: string = '';
   searchResults: User[] = [];
   isSearching: boolean = false;
-  
+
   // Message input
   isTyping: boolean = false;
   typingTimeout: any;
-  
+
   // Track optimistic messages to avoid duplicates
   private optimisticMessageIds = new Set<string>();
-  
+
   // Polling for new messages
   private pollingInterval: any;
   private lastMessageId: string | null = null;
-  
+
   // UI states
   showSearchResults: boolean = false;
   loading: boolean = false;
-  
+
   // Subscriptions
   private subscriptions: Subscription[] = [];
 
   // Debug method to show current time
   getCurrentTime(): string {
     const now = new Date();
-    return now.toLocaleString('vi-VN', { 
+    return now.toLocaleString('vi-VN', {
       timeZone: 'Asia/Ho_Chi_Minh',
       hour: '2-digit',
       minute: '2-digit',
@@ -79,7 +80,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   // Helper method to format time intelligently
   formatTime(date: Date | string): string {
     let messageDate: Date;
-    
+
     if (typeof date === 'string') {
       messageDate = new Date(date);
       if (date.includes('T') && !date.includes('Z') && !date.includes('+')) {
@@ -88,7 +89,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     } else {
       messageDate = date;
     }
-    
+
     const now = new Date();
     const diffInMs = now.getTime() - messageDate.getTime();
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
@@ -101,18 +102,18 @@ export class MessageComponent implements OnInit, OnDestroy {
         timeZone: 'Asia/Ho_Chi_Minh'
       });
     }
-    
+
     if (diffInDays < 2) {
       return 'Hôm qua';
     }
-    
+
     if (diffInDays < 7) {
       return messageDate.toLocaleDateString('vi-VN', {
         weekday: 'short',
         timeZone: 'Asia/Ho_Chi_Minh'
       });
     }
-    
+
     return messageDate.toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
@@ -122,7 +123,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private chatService: ChatService, 
+    private chatService: ChatService,
     private auth: Auth,
     private route: ActivatedRoute,
     private router: Router
@@ -148,7 +149,7 @@ export class MessageComponent implements OnInit, OnDestroy {
       this.loadChats();
       this.joinChat();
     }
-    
+
     // Check for chat ID in route parameters
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -174,7 +175,7 @@ export class MessageComponent implements OnInit, OnDestroy {
           isCurrentUser: message.sender_id === this.currentUser.id,
           currentMessagesCount: this.messages.length
         });
-        
+
         if (message && this.selectedChat && message.chat_id === this.selectedChat?.id) {
           // Check if message already exists by ID first
           const existingMessageById = this.messages.find(m => m.id === message.id);
@@ -182,25 +183,25 @@ export class MessageComponent implements OnInit, OnDestroy {
             console.log('Message already exists by ID, skipping:', message.id);
             return;
           }
-          
+
           // For current user's messages, only handle if it's not from optimistic update
           if (message.sender_id === this.currentUser.id) {
             // Check if this is a duplicate of an optimistic message we're tracking
             const isOptimisticDuplicate = Array.from(this.optimisticMessageIds).some(tempId => {
               const tempMessage = this.messages.find(m => m.id === tempId);
-              return tempMessage && 
-                     tempMessage.content === message.content && 
+              return tempMessage &&
+                     tempMessage.content === message.content &&
                      tempMessage.sender_id === message.sender_id;
             });
-            
+
             if (isOptimisticDuplicate) {
               console.log('Skipping duplicate of optimistic message:', message.content);
               return;
             }
-            
+
             // Check if we already have this message by content and sender (within 5 seconds)
-            const duplicateByContent = this.messages.find(m => 
-              m.content === message.content && 
+            const duplicateByContent = this.messages.find(m =>
+              m.content === message.content &&
               m.sender_id === message.sender_id &&
               Math.abs(new Date(m.created_at).getTime() - new Date(message.created_at).getTime()) < 5000
             );
@@ -208,7 +209,7 @@ export class MessageComponent implements OnInit, OnDestroy {
               console.log('Skipping duplicate message by content:', message.content);
               return;
             }
-            
+
             // Only add if it's a new message from current user (shouldn't happen with current setup)
             console.log('Adding new message from current user via WebSocket:', message.id);
             this.messages.push(message);
@@ -217,7 +218,7 @@ export class MessageComponent implements OnInit, OnDestroy {
             this.messages.push(message);
             console.log('Added message from other user:', message.id);
           }
-          
+
           // Update chat list
           const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
           if (chatIndex !== -1) {
@@ -276,7 +277,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.selectedChat = chat;
     this.loadMessages(chat.id);
     this.markChatAsRead(chat.id);
-    
+
     // Start polling for new messages
     this.startPolling();
   }
@@ -297,14 +298,14 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.chatService.getChatMessages(chatId).subscribe({
       next: (messages) => {
         this.messages = messages;
-        
+
         // Set last message ID for polling
         if (messages && messages.length > 0) {
           this.lastMessageId = messages[messages.length - 1].id as string;
         }
-        
+
         this.scrollToBottom();
-        
+
         if (messages.length === 0 && this.selectedChat) {
           const otherUser = this.getOtherUser(this.selectedChat);
           if (otherUser) {
@@ -406,7 +407,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   // Method to check if chat already exists between two users
   checkExistingChat(otherUserId: string): Chat | null {
-    return this.chats.find(chat => 
+    return this.chats.find(chat =>
       (chat.user1_id === this.currentUser.id && chat.user2_id === otherUserId) ||
       (chat.user1_id === otherUserId && chat.user2_id === this.currentUser.id)
     ) || null;
@@ -414,7 +415,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   // Method to start chat or select existing chat
   startOrSelectChat(user: User) {
-    const existingChat = this.chats.find(chat => 
+    const existingChat = this.chats.find(chat =>
       (chat.user1_id === this.currentUser.id && chat.user2_id === user.id) ||
       (chat.user1_id === user.id && chat.user2_id === this.currentUser.id)
     );
@@ -446,7 +447,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (otherUser && otherUser.username && otherUser.username !== 'null') {
       return otherUser.username;
     }
-    
+
     const otherUserId = chat.user1_id === this.currentUser.id ? chat.user2_id : chat.user1_id;
     return `User ${otherUserId.substring(0, 8)}`;
   }
@@ -454,8 +455,8 @@ export class MessageComponent implements OnInit, OnDestroy {
   getLastMessage(chat: Chat): string {
     if (chat.messages && chat.messages.length > 0) {
       const lastMessage = chat.messages[chat.messages.length - 1];
-      return lastMessage.content.length > 30 
-        ? lastMessage.content.substring(0, 30) + '...' 
+      return lastMessage.content.length > 30
+        ? lastMessage.content.substring(0, 30) + '...'
         : lastMessage.content;
     }
     return 'Start a conversation';
@@ -467,7 +468,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   getUnreadCount(chat: Chat): number {
     if (!chat.messages) return 0;
-    return chat.messages.filter(msg => 
+    return chat.messages.filter(msg =>
       msg.sender_id !== this.currentUser.id && !msg.is_read
     ).length;
   }
@@ -485,7 +486,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
     }
-    
+
     this.pollingInterval = setInterval(() => {
       if (this.selectedChat) {
         this.pollForNewMessages();
@@ -502,12 +503,12 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   private pollForNewMessages() {
     if (!this.selectedChat) return;
-    
+
     this.chatService.getChatMessages(this.selectedChat.id).subscribe({
       next: (messages) => {
         if (messages && messages.length > 0) {
           const latestMessage = messages[messages.length - 1];
-          
+
           // Check if we have new messages
           if (this.lastMessageId !== latestMessage.id) {
             // Update messages if there are new ones
@@ -528,7 +529,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   // Handle message sending from child component
   handleSendMessage(messageContent: string) {
     console.log('handleSendMessage called with:', messageContent);
-    
+
     if (!messageContent.trim() || !this.selectedChat) return;
 
     const messageData: CreateMessageDto = {
@@ -549,22 +550,21 @@ export class MessageComponent implements OnInit, OnDestroy {
       is_read: true,
       created_at: new Date() as any
     } as ChatMessage;
-    
+
     // Track this optimistic message
     this.optimisticMessageIds.add(tempId);
     console.log('Added optimistic message:', tempId, 'Total optimistic messages:', this.optimisticMessageIds.size);
-    
+
     // Add optimistic message to UI immediately
     this.messages.push(optimisticMessage);
     console.log('Added optimistic message to UI. Total messages:', this.messages.length);
-    
+
     // Update chat list
     const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
     if (chatIndex !== -1) {
       this.chats[chatIndex].messages = [optimisticMessage];
       this.chats[chatIndex].updated_at = new Date();
     }
-    
     this.scrollToBottom();
 
     // Send message via REST API (primary method)
@@ -572,7 +572,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.chatService.sendMessage(messageData).subscribe({
       next: (serverMessage) => {
         console.log('REST API response received:', serverMessage.id);
-        
+
         // Replace optimistic message with server message
         const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
         if (tempMessageIndex !== -1) {
@@ -582,20 +582,20 @@ export class MessageComponent implements OnInit, OnDestroy {
             created_at: serverMessage.created_at,
             is_read: serverMessage.is_read
           });
-          
+
           this.optimisticMessageIds.delete(tempId);
           console.log('Updated optimistic message with server data. Total messages:', this.messages.length);
-          
+
           // Update chat list with server message
           if (chatIndex !== -1) {
             this.chats[chatIndex].messages = [this.messages[tempMessageIndex]];
           }
-          
+
           this.scrollToBottom();
         } else {
           console.warn('Optimistic message not found for replacement:', tempId);
         }
-        
+
         // Don't send via WebSocket since we already have the server message
         // WebSocket is only for real-time updates from other users
       },
