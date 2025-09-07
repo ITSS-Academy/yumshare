@@ -8,7 +8,7 @@ import {NutritiousMealsComponent} from '../../components/card/nutritious-meals/n
 import {EasyMealsComponent} from '../../components/card/easy-meals/easy-meals.component';
 import {Router} from '@angular/router';
 import {select, Store} from '@ngrx/store';
-import {RecipeState, selectPaginatedRecipes} from '../../ngrx/recipe';
+import {RecipeState} from '../../ngrx/recipe';
 import { Observable, Subscription } from 'rxjs';
 import { Category, Recipe } from '../../models';
 import * as categoryActions from '../../ngrx/category/category.actions';

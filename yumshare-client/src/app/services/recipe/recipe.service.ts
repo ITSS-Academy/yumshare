@@ -149,6 +149,11 @@ export class RecipeService {
     return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes/search`, { params });
   }
 
+  // Get all categories
+  getCategories(): Observable<PaginatedResponse<Category>> {
+    return this.http.get<PaginatedResponse<Category>>(`${this.apiUrl}/categories`);
+  }
+
   // Get recipes by category
   getRecipesByCategory(
     categoryId: string,
