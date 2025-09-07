@@ -175,17 +175,77 @@ export const recipeReducer = createReducer(
     recipesError: null,
   })),
 
-  on(RecipeActions.getRecipesByCategorySuccess, (state, { recipes }) => ({
+  on(RecipeActions.getRecipesByCategorySuccess, (state, { recipeCategory }) => ({
     ...state,
-    recipes,
-    recipesLoading: false,
-    recipesError: null,
+    getRecipesByCategory: recipeCategory,
+    getRecipesByCategoryLoading: false,
+    getRecipesByCategoryError: null,
   })),
 
   on(RecipeActions.getRecipesByCategoryFailure, (state, { error }) => ({
     ...state,
-    recipesLoading: false,
-    recipesError: error,
+    getRecipesByCategoryLoading: false,
+    getRecipesByCategoryError: error,
+  })),
+
+  // Get Recipes by Category Beverages
+  on(RecipeActions.getRecipesByCategoryBeverages, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategoryBeveragesSuccess, (state, { recipeCategory }) => ({
+    ...state,
+    getRecipesByCategoryBeverages: recipeCategory,
+    getRecipesByCategoryLoadingBeverages: false,
+    getRecipesByCategoryBeveragesError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategoryBeveragesFailure, (state, { error }) => ({
+    ...state,
+    getRecipesByCategoryLoadingBeverages: false,
+    getRecipesByCategoryBeveragesError: error,
+  })),
+
+  // Get Recipes by Category Desserts
+  on(RecipeActions.getRecipesByCategoryDesserts, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategoryDessertsSuccess, (state, { recipeCategory }) => ({
+    ...state,
+    getRecipesByCategoryDesserts: recipeCategory,
+    getRecipesByCategoryLoadingDesserts: false,
+    getRecipesByCategoryDessertsError: null,
+  })),  
+  
+  on(RecipeActions.getRecipesByCategoryDessertsFailure, (state, { error }) => ({
+    ...state,
+    getRecipesByCategoryLoadingDesserts: false,
+    getRecipesByCategoryDessertsError: error,
+  })),
+
+  // Get Recipes by Category Snacks
+  on(RecipeActions.getRecipesByCategorySnacks, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategorySnacksSuccess, (state, { recipeCategory }) => ({
+    ...state,
+    getRecipesByCategorySnacks: recipeCategory,
+    getRecipesByCategoryLoadingSnacks: false,
+    getRecipesByCategorySnacksError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategorySnacksFailure, (state, { error }) => ({
+    ...state,
+    getRecipesByCategoryLoadingSnacks: false,
+    getRecipesByCategorySnacksError: error,
   })),
 
   // Upload Recipe Image

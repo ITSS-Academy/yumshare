@@ -22,6 +22,22 @@ import { Router } from '@angular/router';
   styleUrl: './card.component.scss'
 })
 export class CardComponent {
+  // Chia sẻ món ăn
+  shareRecipe(item: any) {
+    const url = `${window.location.origin}/recipe-detail/${item.id}`;
+    const title = item.title || 'YumShare Recipe';
+    const text = `Check out this recipe: ${title}`;
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => console.log('Share failed:', err));
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+  }
+  
   @Input() cardData: any[] = [];
 
   constructor(private router: Router) {}
@@ -34,4 +50,17 @@ export class CardComponent {
   navigationToDetail(id: string) {
     this.router.navigate(['/recipe-detail', id]).then();
   }
+
+  getDifficultyLabel(difficulty: any): string {
+  if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
+  if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
+  if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
+  return difficulty || 'Unknown';
+}
+getDifficultyClass(difficulty: any): string {
+  if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'easy';
+  if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'medium';
+  if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'hard';
+  return '';
+}
 }

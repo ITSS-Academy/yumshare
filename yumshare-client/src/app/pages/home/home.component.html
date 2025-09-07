@@ -31,52 +31,70 @@
     </button>
   </div>
   <div class="container-card">
-    <ng-container *ngIf="paginatedRecipes$ | async as paginated">
-      <app-card [cardData]="paginated?.data"></app-card>
-    </ng-container>
+      @if (paginatedRecipes) {
+  <app-card [cardData]="paginatedRecipes.data"></app-card>
+}
   </div>
 
   <div class="section-header">
-    <h3>Family Meal</h3>
-    <button class="view-all-btn" (click)="viewAllFamilyMeal()">
+    <h3>Main courses</h3> 
+    <button class="view-all-btn" (click)="viewAllMainCourses()">
+      <span>See All</span>
+      <span class="arrow">&#10095;</span>
+    </button>
+  </div>
+
+<div class="container-card">
+  @if (mainCourses$ | async; as mainCourses) {
+    @if (mainCourses?.data?.length > 0) {
+      <app-family-meal [cardData]="mainCourses.data"></app-family-meal>
+    }
+  }
+</div>
+
+
+  <div class="section-header">
+    <h3>Beverages</h3>
+    <button class="view-all-btn" (click)="viewAllBeverages()">
       <span>See All</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
   <div class="container-card">
-    <app-family-meal></app-family-meal>
+    @if (beverages$ | async; as beverages) {
+      @if (beverages?.data?.length > 0) {
+        <app-refreshing-dishes [cardData]="beverages.data"></app-refreshing-dishes>
+      }
+    }
   </div>
 
   <div class="section-header">
-    <h3>Refreshing Dishes</h3>
-    <button class="view-all-btn" (click)="viewAllRefreshingDishes()">
+    <h3>Desserts</h3>
+    <button class="view-all-btn" (click)="viewAllDesserts()">
       <span>See All</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
   <div class="container-card">
-    <app-refreshing-dishes></app-refreshing-dishes>
+    @if (desserts$ | async; as desserts) {
+      @if (desserts?.data?.length > 0) {
+        <app-nutritious-meals [cardData]="desserts.data"></app-nutritious-meals>
+      }
+    }
   </div>
 
   <div class="section-header">
-    <h3>Nutritious Meals</h3>
-    <button class="view-all-btn" (click)="viewAllNutritiousMeals()">
+    <h3>Snacks</h3>
+    <button class="view-all-btn" (click)="viewAllSnacks()">
       <span>See All</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
   <div class="container-card">
-    <app-nutritious-meals></app-nutritious-meals>
-  </div>
-
-  <div class="section-header">
-    <h3>Easy Meals</h3>
-    <button class="view-all-btn" (click)="viewAllEasyMeals()">
-      <span>See All</span>
-      <span class="arrow">&#10095;</span>
-    </button>
-  </div>
-  <div class="container-card">
-    <app-easy-meals></app-easy-meals>
+    @if (snacks$ | async; as snacks) {
+      @if (snacks?.data?.length > 0) {
+        <app-easy-meals [cardData]="snacks.data"></app-easy-meals>
+      }
+    }
   </div>
 </div>

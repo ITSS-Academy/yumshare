@@ -13,6 +13,7 @@ import { CachingService, CacheOptions } from '../caching/caching.service';
   providedIn: 'root'
 })
 export class RecipeService {
+  [x: string]: any;
   private apiUrl = environment.apiUrl;
   private readonly CACHE_TTL = 10 * 60 * 1000; // 10 minutes
   private readonly SEARCH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -133,6 +134,22 @@ export class RecipeService {
   getRecipesByCategory(categoryId: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
   }
+
+  // Get recipes by category beverages
+  getRecipesByCategoryBeverages(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+  
+  // Get recipes by category desserts
+  getRecipesByCategoryDesserts(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+
+  // Get recipes by category snacks
+  getRecipesByCategorySnacks(categoryId: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  }
+
   // Get all recipes
 getAllRecipes(): Observable<PaginatedResponse<Recipe>> {
   const params = new HttpParams()

@@ -124,12 +124,60 @@ export const getRecipesByCategoryEffect = createEffect(
       ofType(RecipeActions.getRecipesByCategory),
       switchMap(({ categoryId }) =>
         recipeService.getRecipesByCategory(categoryId).pipe(
-          map((recipes) => RecipeActions.getRecipesByCategorySuccess({ recipes })),
+          map((recipes) => RecipeActions.getRecipesByCategorySuccess({recipeCategory: recipes })),
           catchError((error) => of(RecipeActions.getRecipesByCategoryFailure({ error: error.message })))
         )
       )
     );
   },
+  { functional: true }
+);
+
+// Get Recipes by Category Beverages Effect
+export const getRecipesByCategoryBeveragesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategoryBeverages),
+      switchMap(({ categoryId }) =>
+        recipeService.getRecipesByCategoryBeverages(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategoryBeveragesSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategoryBeveragesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+// Get Recipes by Category Desserts Effect
+export const getRecipesByCategoryDessertsEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategoryDesserts),
+      switchMap(({ categoryId }) =>
+        recipeService.getRecipesByCategoryDesserts(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategoryDessertsSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategoryDessertsFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+// Get Recipes by Category Snacks Effect
+export const getRecipesByCategorySnacksEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.getRecipesByCategorySnacks),
+      switchMap(({ categoryId }) => 
+        recipeService.getRecipesByCategorySnacks(categoryId).pipe(
+          map((recipes) => RecipeActions.getRecipesByCategorySnacksSuccess({ recipeCategory: recipes })),
+          catchError((error) => of(RecipeActions.getRecipesByCategorySnacksFailure({ error: error.message })))
+        )
+      )
+    );
+  },  
   { functional: true }
 );
 

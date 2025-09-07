@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
@@ -6,6 +6,7 @@ import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -31,7 +32,12 @@ export class SearchComponent {
   selectedCategory: string = '';
   categories: string[] = ['Salads', 'Soups', 'Desserts'];
   displayedResults: any[] = [];
+  @Input() cardData: any[] = [];
 
+  constructor(private router: Router) {
+    this.setupPagination();
+  }
+  
   results = [
     {
       title: 'Salad',
@@ -64,7 +70,6 @@ export class SearchComponent {
       isFavorite: false
     },
   ];
-
 
   allResults = [...this.results];
   pageSize = 8;
@@ -117,9 +122,39 @@ export class SearchComponent {
     item.isFavorite = !item.isFavorite;
   }
 
-  constructor() {
-    this.setupPagination();
+  // Chia sẻ món ăn
+  shareRecipe(item: any) {
+    const url = `${window.location.origin}/recipe-detail/${item.id}`;
+    const title = item.title || 'YumShare Recipe';
+    const text = `Check out this recipe: ${title}`;
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => console.log('Share failed:', err));
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
   }
+  
+
+  navigationToDetail(id: string) {
+    this.router.navigate(['/recipe-detail', id]).then();
+  }
+
+  getDifficultyLabel(difficulty: any): string {
+  if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
+  if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
+  if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
+  return difficulty || 'Unknown';
+}
+getDifficultyClass(difficulty: any): string {
+  if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'easy';
+  if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'medium';
+  if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'hard';
+  return '';
+}
 
   onSearch() {
     console.log('Search clicked:', this.keyword, this.selectedCategory);

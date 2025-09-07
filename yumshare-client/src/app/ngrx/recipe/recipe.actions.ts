@@ -122,11 +122,59 @@ export const getRecipesByCategory = createAction(
 
 export const getRecipesByCategorySuccess = createAction(
   '[Recipe] Get Recipes by Category Success',
-  props<{ recipes: Recipe[] }>()
+  props<{ recipeCategory: Recipe[] }>()
 );
 
 export const getRecipesByCategoryFailure = createAction(
   '[Recipe] Get Recipes by Category Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Beverages
+export const getRecipesByCategoryBeverages = createAction(
+  '[Recipe] Get Recipes by Category Beverages',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryBeveragesSuccess = createAction(
+  '[Recipe] Get Recipes by Category Beverages Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryBeveragesFailure = createAction(
+  '[Recipe] Get Recipes by Category Beverages Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Desserts
+export const getRecipesByCategoryDesserts = createAction(
+  '[Recipe] Get Recipes by Category Desserts',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryDessertsSuccess = createAction(
+  '[Recipe] Get Recipes by Category Desserts Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryDessertsFailure = createAction(
+  '[Recipe] Get Recipes by Category Desserts Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Snacks
+export const getRecipesByCategorySnacks = createAction(
+  '[Recipe] Get Recipes by Category Snacks',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategorySnacksSuccess = createAction(
+  '[Recipe] Get Recipes by Category Snacks Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategorySnacksFailure = createAction(
+  '[Recipe] Get Recipes by Category Snacks Failure',
   props<{ error: string }>()
 );
 
@@ -188,4 +236,8 @@ export const loadPaginatedRecipesFailure = createAction(
   '[Recipe] Load Paginated Recipes Failure',
   props<{ error: string }>()
 );
+
+export function loadAllRecipes(): any {
+  throw new Error('Function not implemented.');
+}
 
