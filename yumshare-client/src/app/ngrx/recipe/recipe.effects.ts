@@ -1,3 +1,4 @@
+
 import { inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
@@ -136,6 +137,22 @@ export const loadRecipesByUserEffect = createEffect(
         recipeService.getRecipeByUserId(userId, queryOptions).pipe(
           map((recipes) => RecipeActions.loadRecipesByUserSuccess({ recipes })),
           catchError((error) => of(RecipeActions.loadRecipesByUserFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
+          // Load All Recipes Effect
+export const loadAllRecipesEffect = createEffect(
+  (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
+    return actions$.pipe(
+      ofType(RecipeActions.loadAllRecipes),
+      switchMap(() =>
+        recipeService.getAllRecipes(1, 8, 'created_at', 'DESC').pipe( // Load with pagination (8 per page)
+          map((recipes) => RecipeActions.loadAllRecipesSuccess({ recipes })),
+          catchError((error) => of(RecipeActions.loadAllRecipesFailure({ error: error.message })))
         )
       )
     );

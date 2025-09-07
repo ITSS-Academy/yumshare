@@ -158,6 +158,7 @@ export const recipeReducer = createReducer(
   on(RecipeActions.searchRecipesSuccess, (state, { recipes }) => ({
     ...state,
     searchResults: recipes.data,
+    paginatedRecipes: recipes,
     searchLoading: false,
     searchError: null,
   })),
@@ -175,6 +176,13 @@ export const recipeReducer = createReducer(
     recipesError: null,
   })),
 
+  // Load All Recipes
+  on(RecipeActions.loadAllRecipes, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
   on(RecipeActions.loadRecipesByUserSuccess, (state, { recipes }) => ({
     ...state,
     recipes: recipes.data,
@@ -183,7 +191,21 @@ export const recipeReducer = createReducer(
     recipesError: null,
   })),
 
+  on(RecipeActions.loadAllRecipesSuccess, (state, { recipes }) => ({
+    ...state,
+    recipes: recipes.data,
+    paginatedRecipes: recipes, // Also update paginatedRecipes to show all recipes
+    recipesLoading: false,
+    recipesError: null,
+  })),
+
   on(RecipeActions.loadRecipesByUserFailure, (state, { error }) => ({
+    ...state,
+    recipesLoading: false,
+    recipesError: error,
+  })),
+
+  on(RecipeActions.loadAllRecipesFailure, (state, { error }) => ({
     ...state,
     recipesLoading: false,
     recipesError: error,
@@ -269,6 +291,10 @@ export const recipeReducer = createReducer(
     searchResults: [],
     searchLoading: false,
     searchError: null,
+    // Also clear paginated recipes to force reload of all recipes
+    paginatedRecipes: null,
+    paginatedRecipesLoading: false,
+    paginatedRecipesError: null,
   })),
 
   

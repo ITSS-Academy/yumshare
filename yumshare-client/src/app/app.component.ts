@@ -31,6 +31,9 @@ import { SocketService } from './services/socket/socket.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
+  title(title: any) {
+      throw new Error('Method not implemented.');
+  }
   @HostBinding('class.sidebar-mini') isMini = false;
   @HostBinding('class.sidebar-closed') isClosed = false;
 
@@ -65,6 +68,8 @@ export class AppComponent implements OnInit, OnDestroy {
           photoURL: auth.photoURL,
           phoneNumber: auth.phoneNumber
         };
+
+        console.log('🔐 Storing user and token:', { user, tokenLength: idToken?.length });
         
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
@@ -82,7 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
           });
           localStorage.setItem('loginSnackbarShown', 'true');
         }
-        
+
         // Setup token refresh
         this.setupTokenRefresh(auth);
         
@@ -172,7 +177,7 @@ export class AppComponent implements OnInit, OnDestroy {
             email: auth.email,
             photoURL: auth.photoURL,
             phoneNumber: auth.phoneNumber
-          }, 
+          },
           idToken: newToken
         }));
       } catch (error) {

@@ -105,24 +105,31 @@ export class ImageOptimizationService {
    * Convert external URL to optimized service
    */
   private convertToOptimizedService(url: string, options: ImageOptimizationOptions): string {
-    // Use Cloudinary-like service for optimization
-    const encodedUrl = encodeURIComponent(url);
-    return `https://res.cloudinary.com/demo/image/fetch/f_auto,q_${options.quality},w_${options.maxWidth},h_${options.maxHeight}/${encodedUrl}`;
+    // For now, return original URL to avoid Cloudinary demo account issues
+    // TODO: Set up your own Cloudinary account or use alternative image optimization service
+    return url;
   }
 
   /**
    * Convert external URL to thumbnail service
    */
   private convertToThumbnailService(url: string, size: number): string {
-    const encodedUrl = encodeURIComponent(url);
-    return `https://res.cloudinary.com/demo/image/fetch/f_auto,q_70,w_${size},h_${size},c_crop/${encodedUrl}`;
+    // For now, return original URL to avoid Cloudinary demo account issues
+    // TODO: Set up your own Cloudinary account or use alternative image optimization service
+    return url;
   }
 
   /**
    * Generate placeholder URL
    */
   private generatePlaceholderUrl(size: number): string {
-    return `https://via.placeholder.com/${size}x${size}/f0f0f0/cccccc?text=Loading...`;
+    // Use a simple data URI placeholder instead of external service
+    return `data:image/svg+xml;base64,${btoa(`
+      <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f0f0f0"/>
+        <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#999" font-family="Arial, sans-serif" font-size="14">Loading...</text>
+      </svg>
+    `)}`;
   }
 
   /**

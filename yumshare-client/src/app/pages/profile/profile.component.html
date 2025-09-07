@@ -1,8 +1,11 @@
-<div class="profile-edit">
+<div class="profile-edit" style="user-select: none;">
   <!-- Header -->
   <div class="profile-header">
     <h2>Edit Profile</h2>
-    <button class="delete-account" (click)="showDialog = true">Delete account</button>
+    <div class="header-actions">
+      <input type="text" class="search-bar" placeholder="Search users...">
+      <button class="delete-account" (click)="showDialog = true">Delete account</button>
+    </div>
 
     @if (showDialog) {
       <div class="dialog-backdrop">
@@ -259,3 +262,4 @@
     </div>
   }
 </div>
+x
