@@ -36,6 +36,10 @@ export interface RecipeState {
   getRecipesByCategoryLoading: boolean;
   getRecipesByCategoryError: string | null;
 
+  getRecipesByCategoryMainCourses: Recipe[] | null;
+  getRecipesByCategoryLoadingMainCourses: boolean;
+  getRecipesByCategoryErrorMainCourses: string | null;
+
   getRecipesByCategoryBeverages: Recipe[] | null;
   getRecipesByCategoryLoadingBeverages: boolean;
   getRecipesByCategoryErrorBeverages: string | null;
@@ -47,6 +51,7 @@ export interface RecipeState {
   getRecipesByCategorySnacks: Recipe[] | null;
   getRecipesByCategoryLoadingSnacks: boolean;
   getRecipesByCategoryErrorSnacks: string | null;
+
 }
 
 export const initialRecipeState: RecipeState = {
@@ -83,6 +88,10 @@ export const initialRecipeState: RecipeState = {
   getRecipesByCategory: null,
   getRecipesByCategoryLoading: false,
   getRecipesByCategoryError: null,
+
+  getRecipesByCategoryMainCourses: null,
+  getRecipesByCategoryLoadingMainCourses: false,
+  getRecipesByCategoryErrorMainCourses: null,
 
   getRecipesByCategoryBeverages: null,
   getRecipesByCategoryLoadingBeverages: false,

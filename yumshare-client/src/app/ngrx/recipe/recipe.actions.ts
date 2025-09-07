@@ -101,12 +101,22 @@ export const deleteRecipeFailure = createAction(
 // Search Recipes
 export const searchRecipes = createAction(
   '[Recipe] Search Recipes',
-  props<{ query: string; category?: string; author?: string }>()
+  props<{ 
+    query: string; 
+    category?: string; 
+    author?: string; 
+    difficulty?: string;
+    rating?: number;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    order?: 'ASC' | 'DESC';
+  }>()
 );
 
 export const searchRecipesSuccess = createAction(
   '[Recipe] Search Recipes Success',
-  props<{ recipes: Recipe[] }>()
+  props<{ recipes: PaginatedResponse<Recipe> }>()
 );
 
 export const searchRecipesFailure = createAction(
@@ -117,16 +127,39 @@ export const searchRecipesFailure = createAction(
 // Get Recipes by Category
 export const getRecipesByCategory = createAction(
   '[Recipe] Get Recipes by Category',
-  props<{ categoryId: string }>()
+  props<{ 
+    categoryId: string;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    order?: 'ASC' | 'DESC';
+  }>()
 );
 
 export const getRecipesByCategorySuccess = createAction(
   '[Recipe] Get Recipes by Category Success',
-  props<{ recipeCategory: Recipe[] }>()
+  // props<{ recipeCategory: Recipe[] }>()
+  props<{ recipes: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryFailure = createAction(
   '[Recipe] Get Recipes by Category Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Main Courses
+export const getRecipesByCategoryMainCourses = createAction(
+  '[Recipe] Get Recipes by Category Main Courses',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryMainCoursesSuccess = createAction(
+  '[Recipe] Get Recipes by Category Main Courses Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryMainCoursesFailure = createAction(
+  '[Recipe] Get Recipes by Category Main Courses Failure',
   props<{ error: string }>()
 );
 
@@ -224,7 +257,12 @@ import { PaginatedResponse } from '../../models/paginated-response.model';
 
 export const loadPaginatedRecipes = createAction(
   '[Recipe] Load Paginated Recipes',
-  props<{ page?: number; size?: number }>()
+  props<{ 
+    page?: number; 
+    size?: number; 
+    orderBy?: string; 
+    order?: 'ASC' | 'DESC' 
+  }>()
 );
 
 export const loadPaginatedRecipesSuccess = createAction(

@@ -157,7 +157,7 @@ export const recipeReducer = createReducer(
 
   on(RecipeActions.searchRecipesSuccess, (state, { recipes }) => ({
     ...state,
-    searchResults: recipes,
+    searchResults: recipes.data,
     searchLoading: false,
     searchError: null,
   })),
@@ -175,17 +175,37 @@ export const recipeReducer = createReducer(
     recipesError: null,
   })),
 
-  on(RecipeActions.getRecipesByCategorySuccess, (state, { recipeCategory }) => ({
+  on(RecipeActions.getRecipesByCategorySuccess, (state, { recipes }) => ({
     ...state,
-    getRecipesByCategory: recipeCategory,
-    getRecipesByCategoryLoading: false,
-    getRecipesByCategoryError: null,
+    recipes: recipes.data,
+    recipesLoading: false,
+    recipesError: null,
   })),
 
   on(RecipeActions.getRecipesByCategoryFailure, (state, { error }) => ({
     ...state,
     getRecipesByCategoryLoading: false,
     getRecipesByCategoryError: error,
+  })),
+
+  // Get Recipes by Category Main Courses
+  on(RecipeActions.getRecipesByCategoryMainCourses, (state) => ({
+    ...state,
+    recipesLoading: true,
+    recipesError: null,
+  })),
+
+  on(RecipeActions.getRecipesByCategoryMainCoursesSuccess, (state, { recipeCategory }) => ({
+    ...state,
+    getRecipesByCategoryMainCourses: recipeCategory,
+    getRecipesByCategoryLoadingMainCourses: false,
+    getRecipesByCategoryErrorMainCourses: null, 
+  })),
+  
+  on(RecipeActions.getRecipesByCategoryMainCoursesFailure, (state, { error }) => ({
+    ...state,
+    getRecipesByCategoryLoadingMainCourses: false,
+    getRecipesByCategoryErrorMainCourses: error,
   })),
 
   // Get Recipes by Category Beverages

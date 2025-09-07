@@ -16,7 +16,7 @@ import * as followEffects from '../app/ngrx/follow/follow.effect';
 import * as recipeEffects from './ngrx/recipe/recipe.effects';
 import * as categoryEffects from './ngrx/category/category.effects';
 import * as commentEffects from './ngrx/comment/comment.effects';
-
+import * as favoriteEffects from './ngrx/favorite/favorite.effects';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
@@ -24,6 +24,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
 import { categoryReducer } from './ngrx/category/category.reducer';
 import { commentReducer } from './ngrx/comment/comment.reducer';
+import { favoriteReducer } from './ngrx/favorite/favorite.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -42,7 +43,7 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
-    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects]),
+    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects, favoriteEffects]),
     provideStore({
       auth: authReducer,
       follow: followReducer,
@@ -50,6 +51,7 @@ export const appConfig: ApplicationConfig = {
       recipe: recipeReducer,
       category: categoryReducer,
       comment: commentReducer,
+      favorite: favoriteReducer,
     }),
     provideFirebaseApp(() =>
       initializeApp({
