@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent, MatCardImage} from "@angular/material/card";
 import {ShareModule} from '../../../shares/share.module';
 import { CommonModule } from '@angular/common';
@@ -19,105 +19,25 @@ import { Router } from '@angular/router';
   styleUrl: './family-meal.component.scss'
 })
 export class FamilyMealComponent {
+  // Chia sẻ món ăn
+  shareRecipe(item: any) {
+    const url = `${window.location.origin}/recipe-detail/${item.id}`;
+    const title = item.title || 'YumShare Recipe';
+    const text = `Check out this recipe: ${title}`;
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => console.log('Share failed:', err));
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+  }
+  
+  @Input() cardData: any[] = [];
+
   constructor(private router: Router) {}
-  cardData = [
-    {
-      id: 1,
-      title: 'Delicious Pasta',
-      description: 'A classic Italian pasta dish with rich tomato sauce and fresh basil.',
-      imageUrl: 'https://mia.vn/media/uploads/blog-du-lich/mon-an-ngay-tet-1706077156.jpg',
-      difficulty: 'easy', // easy | medium | hard
-      cookTime: 30, // phút
-      isFavorite: false,
-    },
-    {
-      id: 2,
-      title: 'Sushi Platter',
-      description: 'An assortment of fresh sushi rolls and sashimi, perfect for sharing.',
-      imageUrl: 'https://cdn3.ivivu.com/2023/08/pho-bo-ivivu.jpeg',
-      difficulty: 'medium',
-      cookTime: 45,
-      isFavorite: false,
-    },
-    {
-      id: 3,
-      title: 'Grilled Steak',
-      description: 'Juicy grilled steak served with garlic butter and roasted vegetables.',
-      imageUrl: 'https://baothainguyen.vn/file/e7837c027f6ecd14017ffa4e5f2a0e34/052023/quan-com-tam-o-ha-noi-_20230524102142.jpg',
-      difficulty: 'hard',
-      cookTime: 60,
-      isFavorite: false,
-    },
-    {
-      id: 4,
-      title: 'Vegan Buddha Bowl',
-      description: 'A colorful bowl filled with quinoa, chickpeas, avocado.',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTU6A75llbMJ7_6d6aH9yJ0ROIhPakIBwwHQ&s',
-      difficulty: 'easy', // easy | medium | hard
-      cookTime: 30, // phút
-      isFavorite: false,
-    },
-
-    {
-      id: 5,
-      title: 'Grilled Steak',
-      description: 'Juicy grilled steak served with garlic butter and roasted vegetables.',
-      imageUrl: 'https://baothainguyen.vn/file/e7837c027f6ecd14017ffa4e5f2a0e34/052023/quan-com-tam-o-ha-noi-_20230524102142.jpg',
-      difficulty: 'hard',
-      cookTime: 60,
-      isFavorite: false,
-    },
-
-    {
-      id: 6,
-      title: 'Vegan Buddha Bowl',
-      description: 'A colorful bowl filled with quinoa, chickpeas, avocado,',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTU6A75llbMJ7_6d6aH9yJ0ROIhPakIBwwHQ&s',
-      difficulty: 'easy', // easy | medium | hard
-      cookTime: 30, // phút
-      isFavorite: false,
-    },
-
-    {
-      id: 7,
-      title: 'Delicious Pasta',
-      description: 'A classic Italian pasta dish with rich tomato sauce and fresh basil.',
-      imageUrl: 'https://mia.vn/media/uploads/blog-du-lich/mon-an-ngay-tet-1706077156.jpg',
-      difficulty: 'easy', // easy | medium | hard
-      cookTime: 30, // phút
-      isFavorite: false,
-    },
-    {
-      id: 8,
-      title: 'Sushi Platter',
-      description: 'An assortment of fresh sushi rolls and sashimi, perfect for sharing.',
-      imageUrl: 'https://cdn3.ivivu.com/2023/08/pho-bo-ivivu.jpeg',
-      difficulty: 'medium',
-      cookTime: 45,
-      isFavorite: false,
-    },
-    {
-      id: 9,
-      title: 'Grilled Steak',
-      description: 'Juicy grilled steak served with garlic butter and roasted vegetables.',
-      imageUrl: 'https://baothainguyen.vn/file/e7837c027f6ecd14017ffa4e5f2a0e34/052023/quan-com-tam-o-ha-noi-_20230524102142.jpg',
-      difficulty: 'hard',
-      cookTime: 60,
-      isFavorite: false,
-    },
-
-    {
-      id: 10,
-      title: 'Vegan Buddha Bowl',
-      description: 'A colorful bowl filled with quinoa, chickpeas, avocado,',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTU6A75llbMJ7_6d6aH9yJ0ROIhPakIBwwHQ&s',
-      difficulty: 'easy', // easy | medium | hard
-      cookTime: 30, // phút
-      isFavorite: false,
-    },
-  ];
-
-
 
   // ❤️ toggle tim
   toggleFavorite(item: any) {
@@ -126,5 +46,18 @@ export class FamilyMealComponent {
 
   navigationToDetail(id: string) {
     this.router.navigate(['/recipe-detail', id]).then();
+  }
+
+  getDifficultyLabel(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
+    return difficulty || 'Unknown';
+  }
+  getDifficultyClass(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'hard';
+    return '';
   }
 }

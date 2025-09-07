@@ -31,6 +31,27 @@ export interface RecipeState {
   imageUploadLoading: boolean;
   videoUploadLoading: boolean;
   uploadError: string | null;
+
+  getRecipesByCategory: Recipe[] | null;
+  getRecipesByCategoryLoading: boolean;
+  getRecipesByCategoryError: string | null;
+
+  getRecipesByCategoryMainCourses: Recipe[] | null;
+  getRecipesByCategoryLoadingMainCourses: boolean;
+  getRecipesByCategoryErrorMainCourses: string | null;
+
+  getRecipesByCategoryBeverages: Recipe[] | null;
+  getRecipesByCategoryLoadingBeverages: boolean;
+  getRecipesByCategoryErrorBeverages: string | null;
+
+  getRecipesByCategoryDesserts: Recipe[] | null;
+  getRecipesByCategoryLoadingDesserts: boolean;
+  getRecipesByCategoryErrorDesserts: string | null;
+
+  getRecipesByCategorySnacks: Recipe[] | null;
+  getRecipesByCategoryLoadingSnacks: boolean;
+  getRecipesByCategoryErrorSnacks: string | null;
+
 }
 
 export const initialRecipeState: RecipeState = {
@@ -63,6 +84,26 @@ export const initialRecipeState: RecipeState = {
   imageUploadLoading: false,
   videoUploadLoading: false,
   uploadError: null,
+
+  getRecipesByCategory: null,
+  getRecipesByCategoryLoading: false,
+  getRecipesByCategoryError: null,
+
+  getRecipesByCategoryMainCourses: null,
+  getRecipesByCategoryLoadingMainCourses: false,
+  getRecipesByCategoryErrorMainCourses: null,
+
+  getRecipesByCategoryBeverages: null,
+  getRecipesByCategoryLoadingBeverages: false,
+  getRecipesByCategoryErrorBeverages: null,
+
+  getRecipesByCategoryDesserts: null,
+  getRecipesByCategoryLoadingDesserts: false,
+  getRecipesByCategoryErrorDesserts: null,
+
+  getRecipesByCategorySnacks: null,
+  getRecipesByCategoryLoadingSnacks: false,
+  getRecipesByCategoryErrorSnacks: null,
 };
 
 

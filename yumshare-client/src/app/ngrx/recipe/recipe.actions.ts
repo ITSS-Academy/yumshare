@@ -151,6 +151,7 @@ export const getRecipesByCategory = createAction(
 
 export const getRecipesByCategorySuccess = createAction(
   '[Recipe] Get Recipes by Category Success',
+  // props<{ recipeCategory: Recipe[] }>()
   props<{ recipes: PaginatedResponse<Recipe> }>()
 );
 
@@ -175,6 +176,70 @@ export const loadRecipesByUserSuccess = createAction(
 
 export const loadRecipesByUserFailure = createAction(
   '[Recipe] Load Recipes by User Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Main Courses
+export const getRecipesByCategoryMainCourses = createAction(
+  '[Recipe] Get Recipes by Category Main Courses',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryMainCoursesSuccess = createAction(
+  '[Recipe] Get Recipes by Category Main Courses Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryMainCoursesFailure = createAction(
+  '[Recipe] Get Recipes by Category Main Courses Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Beverages
+export const getRecipesByCategoryBeverages = createAction(
+  '[Recipe] Get Recipes by Category Beverages',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryBeveragesSuccess = createAction(
+  '[Recipe] Get Recipes by Category Beverages Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryBeveragesFailure = createAction(
+  '[Recipe] Get Recipes by Category Beverages Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Desserts
+export const getRecipesByCategoryDesserts = createAction(
+  '[Recipe] Get Recipes by Category Desserts',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategoryDessertsSuccess = createAction(
+  '[Recipe] Get Recipes by Category Desserts Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategoryDessertsFailure = createAction(
+  '[Recipe] Get Recipes by Category Desserts Failure',
+  props<{ error: string }>()
+);
+
+// Get Recipes by Category Snacks
+export const getRecipesByCategorySnacks = createAction(
+  '[Recipe] Get Recipes by Category Snacks',
+  props<{ categoryId: string }>()
+);
+
+export const getRecipesByCategorySnacksSuccess = createAction(
+  '[Recipe] Get Recipes by Category Snacks Success',
+  props<{ recipeCategory: Recipe[] }>()
+);
+
+export const getRecipesByCategorySnacksFailure = createAction(
+  '[Recipe] Get Recipes by Category Snacks Failure',
   props<{ error: string }>()
 );
 
@@ -241,4 +306,6 @@ export const loadPaginatedRecipesFailure = createAction(
   '[Recipe] Load Paginated Recipes Failure',
   props<{ error: string }>()
 );
+
+
 

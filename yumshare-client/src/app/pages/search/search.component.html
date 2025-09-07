@@ -29,11 +29,11 @@
     </button>
   </form>
 
-  @if (getLoadingState() | async) {
+  <!-- @if (getLoadingState() | async) {
     <div class="loading">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
-  }
+  } -->
 
   @if (searchError$ | async; as error) {
     <div class="error-container" id="search-error">
