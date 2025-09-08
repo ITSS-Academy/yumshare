@@ -47,7 +47,7 @@
 <div class="container-card">
   @if (mainCourses$ | async; as mainCourses) {
     @if (mainCourses?.data?.length > 0) {
-      <app-family-meal [cardData]="mainCourses.data"></app-family-meal>
+      <app-card [cardData]="mainCourses.data"></app-card>
     }
   }
 </div>
@@ -63,7 +63,7 @@
   <div class="container-card">
     @if (beverages$ | async; as beverages) {
       @if (beverages?.data?.length > 0) {
-        <app-refreshing-dishes [cardData]="beverages.data"></app-refreshing-dishes>
+        <app-card [cardData]="beverages.data"></app-card>
       }
     }
   </div>
@@ -78,7 +78,7 @@
   <div class="container-card">
     @if (desserts$ | async; as desserts) {
       @if (desserts?.data?.length > 0) {
-        <app-nutritious-meals [cardData]="desserts.data"></app-nutritious-meals>
+        <app-card [cardData]="desserts.data"></app-card>
       }
     }
   </div>
@@ -93,7 +93,7 @@
   <div class="container-card">
     @if (snacks$ | async; as snacks) {
       @if (snacks?.data?.length > 0) {
-        <app-easy-meals [cardData]="snacks.data"></app-easy-meals>
+        <app-card [cardData]="snacks.data"></app-card>
       }
     }
   </div>

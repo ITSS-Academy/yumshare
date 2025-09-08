@@ -49,12 +49,19 @@
         <p>Please leave your information if you have any questions, We will contact and answer all of your inquiries</p>
       </div>
       <div class="under">
-        <input class="type-in" matInput placeholder="Name" value="">
-        <input class="type-in" matInput placeholder="Email" value="">
-        <input class="type-in" matInput placeholder="Phone" value="">
-        <input class="type-in" matInput placeholder="Message" value="">
-        <button class="submit-button" mat-flat-button>Submit</button>
+        <input #nameInput class="type-in" matInput placeholder="Name" [(ngModel)]="name" (keydown.enter)="emailInput.focus()" />
+<input #emailInput class="type-in" matInput placeholder="Email" [(ngModel)]="email" (keydown.enter)="phoneInput.focus()" />
+<input #phoneInput class="type-in" matInput placeholder="Phone" [(ngModel)]="phone" (keydown.enter)="messageInput.focus()" />
+<input #messageInput class="type-in" matInput placeholder="Message" [(ngModel)]="message" (keydown.enter)="submitButton.focus()" />
+<button #submitButton class="submit-button" mat-flat-button (click)="onSubmit()" [disabled]="!isFormValid">Submit</button>
       </div>
     </div>
   </div>
 </div>
+@if (showSuccess) {
+  <div class="center-toast" (click)="showSuccess = false">
+    <div class="toast-content" (click)="$event.stopPropagation()">
+      <span>Ý kiến của bạn đã được tiếp nhận!</span>
+    </div>
+  </div>
+}

@@ -2,10 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ShareModule } from '../../shares/share.module';
 import {CardComponent} from '../../components/card/card.component';
-import {FamilyMealComponent} from '../../components/card/family-meal/family-meal.component';
-import {RefreshingDishesComponent} from '../../components/card/refreshing-dishes/refreshing-dishes.component';
-import {NutritiousMealsComponent} from '../../components/card/nutritious-meals/nutritious-meals.component';
-import {EasyMealsComponent} from '../../components/card/easy-meals/easy-meals.component';
+
+
 import {Router} from '@angular/router';
 import {select, Store} from '@ngrx/store';
 import {RecipeState} from '../../ngrx/recipe';
@@ -14,8 +12,7 @@ import { Category, Recipe } from '../../models';
 import * as categoryActions from '../../ngrx/category/category.actions';
 import * as recipeActions from '../../ngrx/recipe/recipe.actions';
 import { CategoryState } from '../../ngrx/category/category.state';
-
-
+import { loadRecipeLikeCount } from '../../ngrx/likes/likes.actions';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -23,10 +20,8 @@ import { CategoryState } from '../../ngrx/category/category.state';
     MatProgressSpinnerModule,
     ShareModule,
     CardComponent,
-    FamilyMealComponent,
-    RefreshingDishesComponent,
-    NutritiousMealsComponent,
-    EasyMealsComponent,
+   
+   
     
 
   ],
@@ -91,43 +86,93 @@ export class HomeComponent implements OnInit, OnDestroy {
       })
     )
 
-   this.subscriptions.push(
-    this.paginatedRecipes$.subscribe(paginatedRecipes => {
-      this.paginatedRecipes = paginatedRecipes;
-      if (this.paginatedRecipes && !Array.isArray(this.paginatedRecipes.data)) {
-        this.paginatedRecipes.data = [];
-      }
-    })
-  );
   this.subscriptions.push(
-  this.mainCourses$.subscribe(data => {
-    this.mainCourses = data || [];
-    console.log('Main Courses loaded in HomeComponent:', this.mainCourses);
+  this.paginatedRecipes$.subscribe(paginatedRecipes => {
+    this.paginatedRecipes = paginatedRecipes;
+    if (this.paginatedRecipes && Array.isArray(this.paginatedRecipes.data)) {
+      // Dispatch loadRecipeLikeCount cho từng recipe
+      this.paginatedRecipes.data.forEach((recipe: any) => {
+        if (recipe && recipe.id) {
+          this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
+        }
+      });
+    } else if (this.paginatedRecipes) {
+      this.paginatedRecipes.data = [];
+    }
+  })
+);
+
+  this.subscriptions.push(
+    this.mainCourses$.subscribe(data => {
+      this.mainCourses = data || [];
+      this.mainCourses.forEach((recipe: any) => {
+        if (recipe && recipe.id) {
+          this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
+        }
+      });
     })
   );
 
   this.subscriptions.push(
     this.beverages$.subscribe(data => {
       this.beverages = data || [];
-      console.log('Beverages loaded in HomeComponent:', this.beverages);
+      this.beverages.forEach((recipe: any) => {
+        if (recipe && recipe.id) {
+          this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
+        }
+      });
     })
   );
 
   this.subscriptions.push(
     this.desserts$.subscribe(data => {
       this.desserts = data || [];
-      console.log('Desserts loaded in HomeComponent:', this.desserts);
+      this.desserts.forEach((recipe: any) => {
+        if (recipe && recipe.id) {
+          this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
+        }
+      });
     })
   );
 
   this.subscriptions.push(
     this.snacks$.subscribe(data => {
       this.snacks = data || [];
-      console.log('Snacks loaded in HomeComponent:', this.snacks);
+      this.snacks.forEach((recipe: any) => {
+        if (recipe && recipe.id) {
+          this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
+        }
+      });
     })
   );
-  }
+  // this.subscriptions.push(
+  // this.mainCourses$.subscribe(data => {
+  //   this.mainCourses = data || [];
+  //   console.log('Main Courses loaded in HomeComponent:', this.mainCourses);
+  //   })
+  // );
 
+  // this.subscriptions.push(
+  //   this.beverages$.subscribe(data => {
+  //     this.beverages = data || [];
+  //     console.log('Beverages loaded in HomeComponent:', this.beverages);
+  //   })
+  // );
+
+  // this.subscriptions.push(
+  //   this.desserts$.subscribe(data => {
+  //     this.desserts = data || [];
+  //     console.log('Desserts loaded in HomeComponent:', this.desserts);
+  //   })
+  // );
+
+  // this.subscriptions.push(
+  //   this.snacks$.subscribe(data => {
+  //     this.snacks = data || [];
+  //     console.log('Snacks loaded in HomeComponent:', this.snacks);
+  //   })
+  // );
+  }
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);

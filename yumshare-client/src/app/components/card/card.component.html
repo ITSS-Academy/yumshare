@@ -25,6 +25,11 @@
             <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
             {{ item.total_cooking_time }} minutes
           </span>
+         <span class="like-count">
+  <mat-icon style="font-size:18px;color:#555555;">thumb_up</mat-icon>
+  {{ getLikeCount((likeCounts$ | async) || {}, item) }}
+</span>
+        
         </div>
 
         <!-- ❤️ Footer -->
