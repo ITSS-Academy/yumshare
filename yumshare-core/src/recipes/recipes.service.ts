@@ -299,7 +299,6 @@ export class RecipesService {
           try {
             // Delete old video from Supabase Storage
             await this.supabaseStorageService.deleteVideo(oldVideoUrl);
-            console.log(`Deleted old video from Supabase Storage: ${oldVideoUrl}`);
           } catch (error) {
             console.error('Failed to delete old video from Supabase Storage:', error);
             // Continue with update even if deletion fails
@@ -316,7 +315,6 @@ export class RecipesService {
           try {
             // Delete old image from Supabase Storage
             await this.supabaseStorageService.deleteImage(oldImageUrl);
-            console.log(`Deleted old image from Supabase Storage: ${oldImageUrl}`);
           } catch (error) {
             console.error('Failed to delete old image from Supabase Storage:', error);
             // Continue with update even if deletion fails
@@ -376,7 +374,6 @@ export class RecipesService {
       if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
         try {
           await this.supabaseStorageService.deleteImage(recipe.image_url);
-          console.log(`Deleted image from Supabase Storage: ${recipe.image_url}`);
         } catch (error) {
           console.error('Failed to delete image from Supabase Storage:', error);
         }
@@ -385,7 +382,6 @@ export class RecipesService {
       if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
         try {
           await this.supabaseStorageService.deleteVideo(recipe.video_url);
-          console.log(`Deleted video from Supabase Storage: ${recipe.video_url}`);
         } catch (error) {
           console.error('Failed to delete video from Supabase Storage:', error);
         }
@@ -415,7 +411,6 @@ export class RecipesService {
     if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
       try {
         await this.supabaseStorageService.deleteImage(recipe.image_url);
-        console.log(`Deleted existing image from Supabase Storage: ${recipe.image_url}`);
       } catch (error) {
         console.error('Failed to delete existing image from Supabase Storage:', error);
         // Continue with upload even if deletion fails
@@ -438,7 +433,6 @@ export class RecipesService {
     if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
       try {
         await this.supabaseStorageService.deleteVideo(recipe.video_url);
-        console.log(`Deleted existing video from Supabase Storage: ${recipe.video_url}`);
       } catch (error) {
         console.error('Failed to delete existing video from Supabase Storage:', error);
         // Continue with upload even if deletion fails

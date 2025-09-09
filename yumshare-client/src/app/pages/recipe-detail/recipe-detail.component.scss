@@ -1,11 +1,14 @@
+// ===== RECIPE DETAIL COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
 /* Virtual Scrolling Container */
 .virtual-scroll-container {
   width: 100%;
-  height: 300px; // Fixed height for virtual scrolling
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  height: 300px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  margin: 8px 0;
+  margin: var(--spacing-sm) 0;
 }
 
 .ingredient-viewport,
@@ -18,8 +21,8 @@
 .cdk-virtual-scroll-content-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
 }
 
 .cdk-virtual-scroll-viewport {
@@ -31,10 +34,10 @@
 .regular-step-list {
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px;
-  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  margin: var(--spacing-sm) 0;
   
   /* Custom scrollbar styling */
   &::-webkit-scrollbar {
@@ -42,16 +45,16 @@
   }
   
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--surface-variant);
     border-radius: 3px;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: var(--text-muted);
     border-radius: 3px;
     
     &:hover {
-      background: #a8a8a8;
+      background: var(--text-secondary);
     }
   }
 }
@@ -99,7 +102,7 @@ p {
 
 .food-name {
   width: 100%;
-  height: 20%;
+  height: 5rem;
   background-color: #88C533;
   display: flex;
   justify-content: center;
@@ -109,7 +112,7 @@ p {
   padding: 1rem;
 }
 
-.mieu-ta {
+.describe {
   width: 100%;
   height: 80%;
   display: flex;
@@ -117,13 +120,15 @@ p {
   padding-top: 2rem;
 }
 
-.trai {
-  width: 60%;
+.lefttt {
+  width: 50%;
   height: 100%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   margin-top: 0.3125rem;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hinh-mon-an-container {
@@ -132,39 +137,42 @@ p {
   border-radius: 1.25rem;
   position: relative;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: auto;
     object-fit: contain;
     transition: opacity 0.3s ease;
   }
-  
+
   &.lazy-image-loading img {
     opacity: 0.6;
   }
-  
+
   &.lazy-image-loaded img {
     opacity: 1;
   }
 }
 
-.phai {
-  width: 40%;
+.righttt {
+  width: 50%;
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  //padding-left: 1.25rem;
 }
 
-.mieu-ta-monan {
+.food-description {
   width: 100%;
   height: auto;
   display: flex;
   flex-direction: row;
+  //justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
-  margin-top: 0.3125rem;
+  //margin-top: 0.3125rem;
   font: var(--mat-sys-body-medium);
 }
 
@@ -226,10 +234,10 @@ p {
   height: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   padding: 1rem;
-  margin-top: 1rem;
+  //margin-top: 1rem;
   gap: 0.5rem;
 }
 
@@ -240,7 +248,7 @@ p {
 }
 
 .serving {
-  margin: 0;
+  padding-left: 0.5rem;
   font: var(--mat-sys-title-medium);
   color: #555;
   text-align: center;
@@ -253,7 +261,31 @@ p {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  scrollbar-color: #e1e4e4f2;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  //scrollbar-color: #888 transparent;
 }
+
+/* Chrome, Edge, Safari */
+.ingredient-list::-webkit-scrollbar {
+  width: 3px;   /* độ rộng của thanh dọc */
+}
+
+.ingredient-list::-webkit-scrollbar-track {
+  background: transparent; /* nền */
+}
+
+.ingredient-list::-webkit-scrollbar-thumb {
+  background-color: #888; /* màu thanh kéo */
+  border-radius: 10px;
+}
+
+.ingredient-list::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* đổi màu khi hover */
+}
+
 
 .row {
   display: flex;
@@ -275,6 +307,7 @@ p {
   align-items: center;
   gap: 0.5rem;
   font: var(--mat-sys-body-large);
+  //flex-direction: column;
 }
 
 .label {
@@ -335,7 +368,13 @@ p {
 ::ng-deep .follow-toggle.mat-mdc-checkbox-checked .mdc-label:hover {
   background: #222;
 }
-
+.post-like{
+  width: 100%;
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
 .login-required-btn {
   padding: 0.4rem 1rem;
   border: 1px solid #ccc;
@@ -387,7 +426,7 @@ p {
   background: #fff;
   border: 0.125rem solid #D9D9D9;
   border-radius: 0.75rem;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -412,18 +451,18 @@ p {
   margin-top: 1rem;
   border-radius: 0.5rem;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: auto;
     object-fit: cover;
     transition: opacity 0.3s ease;
   }
-  
+
   &.lazy-image-loading img {
     opacity: 0.6;
   }
-  
+
   &.lazy-image-loaded img {
     opacity: 1;
   }
@@ -437,6 +476,7 @@ p {
   align-items: center;
   justify-content: space-between;
   margin-top: 2rem;
+
 }
 
 .video {
@@ -448,7 +488,9 @@ p {
   justify-content: center;
 }
 
-.video iframe.clip {
+/* Video container styles - responsive for both iframe and video */
+.video iframe.clip,
+.video video.clip {
   width: 100%;
   max-width: 700px;
   aspect-ratio: 16 / 9;
@@ -456,6 +498,35 @@ p {
   border-radius: 1rem;
   display: flex;
   margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video iframe.clip:hover,
+.video video.clip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Video-specific optimizations */
+.video video.clip {
+  background: #000;
+  object-fit: contain;
+}
+
+/* Loading state for videos */
+.video video.clip[preload="metadata"] {
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+.bottom-under{
+  width: 100%;
+  margin-top: 2rem;
+
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
@@ -476,6 +547,24 @@ p {
   .middle {
     margin-top: 2rem;
   }
+  .title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 0.5rem;
+  }
+
+  .serving {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+  }
+  .bottom-under{
+    width: 100%;
+  }
+
 }
 
 /* Laptop / Tablet ngang (992px – 1199px) */
@@ -502,20 +591,20 @@ p {
     align-items: center;
     margin-top: 0;
   }
-  .hinh-mon-an{
-    width: 60%;
-    height: auto;
-  }
-  .mieu-ta-monan{
-    font: var(--mat-sys-body-medium);
-  }
-  .phai{
-    width: 100%;
-    height: auto;
-    margin-top: 1rem;
-    align-items: center;
-    justify-content: center;
-  }
+  //.hinh-mon-an{
+  //  width: 60%;
+  //  height: auto;
+  //}
+  //.mieu-ta-monan{
+  //  font: var(--mat-sys-body-medium);
+  //}
+  //.phai{
+  //  width: 100%;
+  //  height: auto;
+  //  margin-top: 1rem;
+  //  align-items: center;
+  //  justify-content: center;
+  //}
   .block{
     width: 100%;
     height: auto;
@@ -523,9 +612,18 @@ p {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     margin:0;
+  }
+  //.righttt{
+  //  display: flex;
+  //  justify-content: center !important;
+  //  align-items: flex-start !important;
+  //}
+  .food-description{
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 }
 
@@ -577,6 +675,9 @@ p {
     position: relative;
     right: 1rem;
   }
+  .righttt{
+    gap:0.5rem;
+  }
 }
 
 /* Mobile large (≤767px) */
@@ -608,9 +709,15 @@ p {
     width: 100% !important;
     max-height: 12rem;
   }
+  .post-like{
+    justify-content: center !important;
+    align-items: center !important;
+  }
   .food-name {
     font: var(--mat-sys-title-medium);
     padding: 0.5rem;
+    height: 3rem;
+    width: 100%;
   }
   .title {
     font: var(--mat-sys-title-medium) !important;
@@ -627,18 +734,26 @@ p {
   .comment-body {
     font: var(--mat-sys-body-medium);
   }
-  .hinh-mon-an {
+  .food-pic {
     width: 90%;
     border-radius: 1.25rem;
   }
-  .mieu-ta,
-  .phai,
-  .trai {
+  .user-box {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+  .describe,
+  .righttt,
+  .lefttt {
     flex-direction: column !important;
     width: 100% !important;
     align-items: center !important;
     margin-top: 0 !important;
     padding-top: 0.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
   }
   .block {
     gap: 0.5rem;
@@ -646,6 +761,14 @@ p {
     width: 100%;
     flex-wrap: wrap;
     justify-content: center;
+  }
+  .bottom-under{
+    width: 100%;
+    height: auto;
+  }
+  .food-description{
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
 
@@ -748,13 +871,13 @@ p {
   .comment-body {
     font: var(--mat-sys-body-medium);
   }
-  .hinh-mon-an {
+  .food-pic {
     width: 100%;
     border-radius: 0.75rem;
   }
-  .mieu-ta,
-  .phai,
-  .trai {
+  .describe,
+  .righttt,
+  .lefttt {
     flex-direction: column !important;
     width: 100% !important;
     align-items: center !important;
@@ -765,10 +888,12 @@ p {
     gap: 0.25rem;
     margin-top: 0.5rem;
   }
-  .video iframe.clip {
+  .video iframe.clip,
+  .video video.clip {
     width: 100% !important;
     height: auto !important;
     border-radius: 0.5rem;
+    max-width: 100% !important;
   }
 }
 

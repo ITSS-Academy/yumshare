@@ -49,7 +49,7 @@ export class FavoriteService {
           errorMessage = error.error?.message || 'Dữ liệu không hợp lệ';
           break;
         case 401:
-          errorMessage = 'Bạn cần đăng nhập để thực hiện thao tác này';
+          errorMessage = 'Bạn cần Login để thực hiện thao tác này';
           break;
         case 403:
           errorMessage = 'Bạn không có quyền thực hiện thao tác này';
@@ -84,7 +84,6 @@ export class FavoriteService {
 
     return this.http.post<Favorite>(`${this.apiUrl}/favorites`, createFavoriteRequest)
       .pipe(
-        tap(favorite => console.log('Đã thêm vào favorites:', favorite)),
         catchError(this.handleError.bind(this))
       );
   }
@@ -102,7 +101,6 @@ export class FavoriteService {
 
     return this.http.delete<{message: string}>(`${this.apiUrl}/favorites/${userId}/${recipeId}`)
       .pipe(
-        tap(response => console.log('Đã xóa khỏi favorites:', response)),
         catchError(this.handleError.bind(this))
       );
   }
@@ -134,7 +132,6 @@ export class FavoriteService {
 
     return this.http.get<PaginatedResponse<Favorite>>(`${this.apiUrl}/favorites/user/${userId}`, { params })
       .pipe(
-        tap(response => console.log('Đã lấy danh sách favorites:', response)),
         catchError(this.handleError.bind(this))
       );
   }
@@ -191,7 +188,6 @@ export class FavoriteService {
             // Nếu đã có trong favorites, xóa nó
             this.removeFromFavorites(userId, recipeId).subscribe({
               next: () => {
-                console.log('Đã xóa khỏi favorites');
                 observer.next(false);
                 observer.complete();
               },
@@ -201,7 +197,6 @@ export class FavoriteService {
             // Nếu chưa có trong favorites, thêm nó
             this.addToFavorites({ user_id: userId, recipe_id: recipeId }).subscribe({
               next: () => {
-                console.log('Đã thêm vào favorites');
                 observer.next(true);
                 observer.complete();
               },
@@ -224,7 +219,7 @@ export class FavoriteService {
       return throwError(() => new Error('userId là bắt buộc'));
     }
 
-    return this.getUserFavorites(userId, { size: 1000 }) // Lấy tối đa 1000 items
+    return this.getUserFavorites(userId, { size: 100 }) // Lấy tối đa 100 items (backend limit)
       .pipe(
         map(response => response.data),
         catchError(this.handleError.bind(this))

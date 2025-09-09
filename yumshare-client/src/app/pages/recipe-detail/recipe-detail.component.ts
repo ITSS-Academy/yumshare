@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription, map, take } from 'rxjs';
+import { Observable, Subscription, map, take, Subject, takeUntil, filter } from 'rxjs';
 import { MatChip } from '@angular/material/chips';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
 import { LoadingComponent } from '../../components/loading/loading.component';
-
 import { CommentComponent } from './component/comment/comment.component';
 import { Recipe } from '../../models/recipe.model';
 import { User } from '../../models/user.model';
@@ -25,12 +24,19 @@ import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as FollowActions from '../../ngrx/follow/follow.actions';
 import * as CommentActions from '../../ngrx/comment/comment.actions';
+import * as LikesActions from '../../ngrx/likes/likes.actions';
 
 // Selectors
 import { selectRecipeById, selectRecipeLoading, selectRecipeError } from '../../ngrx/recipe/recipe.selectors';
 import { selectCurrentUser, selectAuthLoading } from '../../ngrx/auth/auth.selectors';
 import { selectIsFollowing, selectIsLoading as selectFollowLoading } from '../../ngrx/follow/follow.selectors';
 import { selectCommentsByRecipe, selectCommentsByRecipeLoading, selectCommentsByRecipeError } from '../../ngrx/comment/comment.selectors';
+import {
+  selectRecipeLikeCount,
+  selectIsRecipeLikedByUser,
+  selectLikesLoading,
+  selectLikesForRecipe
+} from '../../ngrx/likes/likes.selectors';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -63,24 +69,30 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   recipe$: Observable<Recipe | null>;
   recipeLoading$: Observable<boolean>;
   recipeError$: Observable<string | null>;
-  
+
   // Auth data
   currentUser$: Observable<any | null>;
   authLoading$: Observable<boolean>;
-  
+
   // Follow data
   isFollowing$: Observable<boolean>;
   followLoading$: Observable<boolean>;
-  
+
   // Comment data
   comments$: Observable<Comment[]>;
   commentsLoading$: Observable<boolean>;
   commentsError$: Observable<string | null>;
-  
+
+  // Likes data
+  likeCount$!: Observable<number>;
+  likeLoading$!: Observable<boolean>;
+  isLiked$!: Observable<boolean>;
+  likes$!: Observable<any[]>;
+
   // Local state
   recipeId: string = '';
   isFollowed = false;
-  
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -91,17 +103,17 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     this.recipe$ = this.store.select(selectRecipeById);
     this.recipeLoading$ = this.store.select(selectRecipeLoading);
     this.recipeError$ = this.store.select(selectRecipeError);
-    
+
     this.currentUser$ = this.store.select(selectCurrentUser);
     this.authLoading$ = this.store.select(selectAuthLoading);
-    
+
     this.isFollowing$ = this.store.select(selectIsFollowing).pipe(
       map(following => following === true)
     );
     this.followLoading$ = this.store.select(selectFollowLoading).pipe(
       map(loading => loading === true)
     );
-    
+
     this.comments$ = this.store.select(selectCommentsByRecipe);
     this.commentsLoading$ = this.store.select(selectCommentsByRecipeLoading);
     this.commentsError$ = this.store.select(selectCommentsByRecipeError);
@@ -115,6 +127,29 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         this.loadRecipeData();
         this.loadComments();
         this.checkFollowStatus();
+        
+        // Load likes with delay to ensure user auth is ready
+        setTimeout(() => {
+          this.loadLikes();
+        }, 100);
+
+        // Update selectors for likes with new recipeId
+        this.likeCount$ = this.store.select(selectRecipeLikeCount(this.recipeId));
+        this.likeLoading$ = this.store.select(selectLikesLoading);
+        this.likes$ = this.store.select(selectLikesForRecipe(this.recipeId));
+        this.isLiked$ = this.store.select(selectIsRecipeLikedByUser(this.recipeId));
+        
+        // Debug: Subscribe to isLiked$ to see state changes (remove when stable)
+        // const debugSub = this.isLiked$.subscribe(isLiked => {
+        //   console.log(`[RecipeDetail] isLiked for recipe ${this.recipeId}:`, isLiked);
+        // });
+        // this.subscriptions.push(debugSub);
+        
+        // Debug: Subscribe to like count changes (remove when stable)
+        // const countDebugSub = this.likeCount$.subscribe(count => {
+        //   console.log(`[RecipeDetail] like count for recipe ${this.recipeId}:`, count);
+        // });
+        // this.subscriptions.push(countDebugSub);
       }
     });
     this.subscriptions.push(routeSub);
@@ -124,6 +159,18 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
       this.isFollowed = isFollowing;
     });
     this.subscriptions.push(followSub);
+    
+    // Subscribe to current user changes and reload likes when user changes
+    const userChangeSub = this.currentUser$.subscribe(user => {
+      if (user?.uid && this.recipeId) {
+        // console.log('[RecipeDetail] User changed, reloading likes for:', user.uid);
+        // Small delay to ensure previous requests complete
+        setTimeout(() => {
+          this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
+        }, 200);
+      }
+    });
+    this.subscriptions.push(userChangeSub);
 
     // Handle recipe errors
     const recipeErrorSub = this.recipeError$.subscribe(error => {
@@ -143,10 +190,9 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Unsubscribe from all subscriptions
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    
-    // Clear recipe and comment state when leaving
+   
+
     this.store.dispatch(RecipeActions.clearRecipeState());
     this.store.dispatch(CommentActions.clearCommentState());
   }
@@ -159,17 +205,30 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     this.store.dispatch(CommentActions.loadCommentsByRecipe({ recipeId: this.recipeId }));
   }
 
+  private loadLikes(): void {
+    // Load like count and likes list first
+    this.store.dispatch(LikesActions.loadRecipeLikeCount({ recipeId: this.recipeId }));
+    this.store.dispatch(LikesActions.loadRecipeLikes({ recipeId: this.recipeId }));
+    
+    // Wait for current user to be available, then check if liked
+    const loadLikesSub = this.currentUser$.pipe(
+      filter(user => !!user?.uid), // Only proceed when user is available
+      take(1)
+    ).subscribe(user => {
+      // console.log('[RecipeDetail] Loading likes for user:', user.uid, 'recipe:', this.recipeId);
+      this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
+    });
+    this.subscriptions.push(loadLikesSub);
+  }
+
   private checkFollowStatus(): void {
-    // Cần đợi recipe load xong để có user.id của người tạo recipe
     const recipeSub = this.recipe$.subscribe(recipe => {
       if (recipe && recipe.user && recipe.user.id) {
         const userSub = this.currentUser$.subscribe(currentUser => {
-          // Chỉ check follow status nếu đã đăng nhập và không phải chính mình
           if (currentUser && currentUser.uid && currentUser.uid !== recipe.user!.id) {
-            // followerId: người đang xem recipe, followingId: người tạo recipe
-            this.store.dispatch(FollowActions.checkFollowingStatus({ 
-              followerId: currentUser.uid, 
-              followingId: recipe.user!.id 
+            this.store.dispatch(FollowActions.checkFollowingStatus({
+              followerId: currentUser.uid,
+              followingId: recipe.user!.id
             }));
           }
         });
@@ -180,55 +239,58 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   onFollowToggle(event: MatCheckboxChange): void {
-    if (!this.recipeId) {
-      return;
-    }
-    
-    // Kiểm tra đăng nhập trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
+    if (!this.recipeId) return;
+
+    const followToggleSub = this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
       if (!currentUser || !currentUser.uid) {
-        // Chưa đăng nhập - chỉ hiển thị thông báo
-        this.snackBar.open('Vui lòng đăng nhập để follow người dùng!', 'Đăng nhập', { 
+        this.snackBar.open('Please Login to follow user!', 'Login', {
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
-        // Reset checkbox về trạng thái cũ
         event.source.checked = !event.checked;
         return;
       }
-      
-      // Đã đăng nhập - tiếp tục logic follow
-      this.recipe$.pipe(take(1)).subscribe((recipe: Recipe | null) => {
+
+      const recipeSub = this.recipe$.pipe(take(1)).subscribe((recipe: Recipe | null) => {
         if (recipe && recipe.user && recipe.user.id) {
           if (currentUser.uid !== recipe.user!.id) {
             if (event.checked) {
-              // Follow người tạo recipe
-              this.store.dispatch(FollowActions.followUser({ 
-                followerId: currentUser.uid, 
-                followingId: recipe.user!.id 
+              this.store.dispatch(FollowActions.followUser({
+                followerId: currentUser.uid,
+                followingId: recipe.user!.id
               }));
             } else {
-              // Unfollow người tạo recipe
-              this.store.dispatch(FollowActions.unfollowUser({ 
-                followerId: currentUser.uid, 
-                followingId: recipe.user!.id 
+              this.store.dispatch(FollowActions.unfollowUser({
+                followerId: currentUser.uid,
+                followingId: recipe.user!.id
               }));
             }
           }
         }
       });
+      this.subscriptions.push(recipeSub);
     });
+    this.subscriptions.push(followToggleSub);
   }
 
-
+  toggleLike(): void {
+    const toggleLikeSub = this.currentUser$.pipe(
+      filter(user => !!user?.uid),
+      take(1)
+    ).subscribe(user => {
+      this.store.dispatch(LikesActions.toggleLike({
+        userId: user.uid!,
+        recipeId: this.recipeId
+      }));
+    });
+    this.subscriptions.push(toggleLikeSub);
+  }
 
   onLoginRequired(): void {
-    this.snackBar.open('Vui lòng đăng nhập để sử dụng tính năng này!', 'Đăng nhập', { 
+    this.snackBar.open('Please Login to follow user!', 'Login', {
       duration: 4000,
       panelClass: ['warning-snackbar']
     });
-    // Có thể redirect đến trang login nếu muốn
-    // this.router.navigate(['/login']);
   }
 
   onEditRecipe(): void {
@@ -237,24 +299,21 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDeleteRecipe(): void {
-    if (this.recipeId && confirm('Are you sure you want to delete this recipe?')) {
-      this.store.dispatch(RecipeActions.deleteRecipe({ id: this.recipeId }));
-      this.router.navigate(['/']);
-    }
-  }
+  // onDeleteRecipe(): void {
+  //   if (this.recipeId && confirm('Are you sure you want to delete this recipe?')) {
+  //     this.store.dispatch(RecipeActions.deleteRecipe({ id: this.recipeId, idToken: this.authState.idToken }));
+  //     this.router.navigate(['/']);
+  //   }
+  // }
 
   onCommentAdded(comment: Comment): void {
-    // Refresh comments after adding new one
     this.loadComments();
   }
 
   onCommentDeleted(commentId: string): void {
-    // Refresh comments after deleting one
     this.loadComments();
   }
 
-  // Helper methods for template
   isOwner(recipe: Recipe, currentUser: any | null): boolean {
     return currentUser?.uid === recipe.user?.id;
   }
@@ -281,36 +340,131 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Converts YouTube URLs to embed format
-   * Supports multiple YouTube URL formats:
-   * - https://www.youtube.com/watch?v=VIDEO_ID
-   * - https://youtu.be/VIDEO_ID
-   * - https://www.youtube.com/embed/VIDEO_ID
+   * Get optimized video URL based on video type (Supabase, YouTube, Direct)
    */
-  getYouTubeEmbedUrl(url: string): string {
+  getVideoEmbedUrl(url: string): string {
     if (!url) return '';
+
+    // Check if it's a Supabase Storage URL
+    if (this.isSupabaseStorageUrl(url)) {
+      return this.getSupabaseVideoUrl(url);
+    }
     
+    // Check if it's a YouTube URL
+    if (this.isYouTubeUrl(url)) {
+      return this.getYouTubeEmbedUrl(url);
+    }
+    
+    // Check if it's a direct video file
+    if (this.isDirectVideoUrl(url)) {
+      return this.getDirectVideoUrl(url);
+    }
+
+    return url;
+  }
+
+  /**
+   * Check if URL is from Supabase Storage
+   */
+  private isSupabaseStorageUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co') && 
+             urlObj.pathname.includes('/storage/') &&
+             this.isVideoFile(url);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check if URL is a YouTube URL
+   */
+  private isYouTubeUrl(url: string): boolean {
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  }
+
+  /**
+   * Check if URL is a direct video file
+   */
+  private isDirectVideoUrl(url: string): boolean {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  }
+
+  /**
+   * Check if URL points to a video file
+   */
+  private isVideoFile(url: string): boolean {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  }
+
+  /**
+   * Get Supabase video URL (direct playback, no autoplay)
+   */
+  private getSupabaseVideoUrl(url: string): string {
+    // Supabase video - return original URL for direct video playback
+    return url;
+  }
+
+  /**
+   * Get YouTube embed URL (iframe with autoplay=0)
+   */
+  private getYouTubeEmbedUrl(url: string): string {
     let videoId = '';
-    
-    // Handle different YouTube URL formats
+
     if (url.includes('youtube.com/watch?v=')) {
-      // Format: https://www.youtube.com/watch?v=VIDEO_ID
       videoId = url.split('v=')[1]?.split('&')[0] || '';
     } else if (url.includes('youtu.be/')) {
-      // Format: https://youtu.be/VIDEO_ID
       videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
     } else if (url.includes('youtube.com/embed/')) {
-      // Format: https://www.youtube.com/embed/VIDEO_ID
       videoId = url.split('embed/')[1]?.split('?')[0] || '';
     }
-    
+
     if (videoId) {
-      // Return embed URL with additional parameters for better UX
-      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
+      // YouTube - no autoplay, with controls
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1&controls=1&loop=0&mute=0`;
+    }
+
+    return url;
+  }
+
+  /**
+   * Get direct video URL (native video element)
+   */
+  private getDirectVideoUrl(url: string): string {
+    // Direct video file - return original URL for native video playback
+    return url;
+  }
+
+  /**
+   * Determine video element type based on URL
+   */
+  getVideoElementType(url: string): 'iframe' | 'video' {
+    if (this.isYouTubeUrl(url)) {
+      return 'iframe';
+    }
+    return 'video';
+  }
+
+  /**
+   * Get video attributes based on video type
+   */
+  getVideoAttributes(url: string): any {
+    if (this.isYouTubeUrl(url)) {
+      return {
+        frameborder: '0',
+        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+        allowfullscreen: true
+      };
     }
     
-    // If not a valid YouTube URL, return original URL
-    return url;
+    return {
+      controls: true,
+      preload: 'metadata',
+      playsinline: true
+    };
   }
 
   // TrackBy functions for virtual scrolling performance

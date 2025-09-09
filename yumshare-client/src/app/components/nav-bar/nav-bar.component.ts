@@ -3,7 +3,7 @@ import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
 import { NotificationListComponent } from '../notification-list/notification-list.component';
@@ -40,6 +40,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   currentUser: AuthModel | null = null;
 
   searchQuery = '';
+  showSuggestions = false;
   messageCount$!: Observable<number>;
   notificationCount$!: Observable<number>;
 
@@ -65,7 +66,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
           this.userName = authState.currentUser.displayName || '';
           this.userAvatar = authState.currentUser.photoURL || '';
           
-          // Tự động đóng dialog login nếu đăng nhập thành công
+          // Tự động đóng dialog login nếu Login thành công
           this.dialog.closeAll();
           
           // Notification counts are now handled by NgRx observables
@@ -77,6 +78,9 @@ export class NavBarComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // Setup keyboard shortcuts
+    this.setupKeyboardShortcuts();
   }
 
   ngOnDestroy() {
@@ -89,10 +93,53 @@ export class NavBarComponent implements OnInit, OnDestroy {
   onSearch() {
     if (this.searchQuery?.trim()) {
       this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
+      this.showSuggestions = false;
     }
   }
 
-  onSearchInput() { /* realtime suggestions */ }
+  onSearchInput() {
+    // Show suggestions when typing
+    this.showSuggestions = this.searchQuery.length > 0;
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    this.showSuggestions = false;
+  }
+
+  quickSearch(term: string) {
+    this.searchQuery = term;
+    this.onSearch();
+  }
+
+  onSearchFocus() {
+    this.showSuggestions = true;
+  }
+
+  onSearchBlur() {
+    // Delay hiding suggestions to allow clicking on them
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200);
+  }
+
+  private setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (event) => {
+      // Ctrl+K to focus search
+      if (event.ctrlKey && event.key === 'k') {
+        event.preventDefault();
+        const searchInput = document.querySelector('.search input') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+      
+      // Escape to clear search
+      if (event.key === 'Escape' && this.searchQuery) {
+        this.clearSearch();
+      }
+    });
+  }
 
   onMessage() {
     if (this.isLoggedIn && this.currentUser?.uid) {

@@ -13,14 +13,11 @@
 
   <h3>Recipe Categories</h3>
   <div class="container-image-categories">
-    <h2 class="dish-type-1" (click)="categoryClick('Appetizers')"><span>Appetizers</span></h2>
-    <h2 class="dish-type-2" (click)="categoryClick('Main courses')"><span>Main courses</span></h2>
-    <h2 class="dish-type-3" (click)="categoryClick('Side dishes')"><span>Side dishes</span></h2>
-    <h2 class="dish-type-4" (click)="categoryClick('Soups')"><span>Soups</span></h2>
-    <h2 class="dish-type-5" (click)="categoryClick('Desserts')"><span>Desserts</span></h2>
-    <h2 class="dish-type-6" (click)="categoryClick('Beverages')"><span>Beverages</span></h2>
-    <h2 class="dish-type-7" (click)="categoryClick('Snacks')"><span>Snacks</span></h2>
-    <h2 class="dish-type-8" (click)="categoryClick('Vegan dishes')"><span>Vegan dishes</span></h2>
+    @for (category of category$ | async; track category.id; let i = $index) {
+      <h2 [class]="'dish-type-' + (i + 1)" (click)="categoryClick(category)">
+        <span>{{ category.name }}</span>
+      </h2>
+    }
   </div>
 
   <div class="section-header">
@@ -45,10 +42,8 @@
   </div>
 
 <div class="container-card">
-  @if (mainCourses$ | async; as mainCourses) {
-    @if (mainCourses?.data?.length > 0) {
-      <app-family-meal [cardData]="mainCourses.data"></app-family-meal>
-    }
+  @if (mainCourses && mainCourses.length > 0) {
+    <app-card [cardData]="mainCourses"></app-card>
   }
 </div>
 
@@ -61,10 +56,8 @@
     </button>
   </div>
   <div class="container-card">
-    @if (beverages$ | async; as beverages) {
-      @if (beverages?.data?.length > 0) {
-        <app-refreshing-dishes [cardData]="beverages.data"></app-refreshing-dishes>
-      }
+    @if (beverages && beverages.length > 0) {
+      <app-card [cardData]="beverages"></app-card>
     }
   </div>
 
@@ -76,10 +69,8 @@
     </button>
   </div>
   <div class="container-card">
-    @if (desserts$ | async; as desserts) {
-      @if (desserts?.data?.length > 0) {
-        <app-nutritious-meals [cardData]="desserts.data"></app-nutritious-meals>
-      }
+    @if (desserts && desserts.length > 0) {
+      <app-card [cardData]="desserts"></app-card>
     }
   </div>
 
@@ -91,10 +82,8 @@
     </button>
   </div>
   <div class="container-card">
-    @if (snacks$ | async; as snacks) {
-      @if (snacks?.data?.length > 0) {
-        <app-easy-meals [cardData]="snacks.data"></app-easy-meals>
-      }
+    @if (snacks && snacks.length > 0) {
+      <app-card [cardData]="snacks"></app-card>
     }
   </div>
 </div>

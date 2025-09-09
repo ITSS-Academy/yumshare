@@ -8,7 +8,7 @@ export * from './favorite.actions';
 export * from './favorite.reducer';
 
 // Effects
-// export * from './favorite.effects';
+export * from './favorite.effects';
 
 // Selectors
 export * from './favorite.selectors';

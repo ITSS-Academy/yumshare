@@ -1,11 +1,11 @@
-<div class="chat-window-container">
+<div class="chat-window-container" #chatWindowContainer>
   <!-- Chat Header -->
   <div class="chat-header">
     <div class="chat-user-info">
       <button class="back-btn" (click)="onBack()">←</button>
-      <img 
-        [src]="safeAvatar(otherUser?.avatar_url)" 
-        [alt]="otherUser?.username" 
+      <img
+        [src]="safeAvatar(otherUser?.avatar_url)"
+        [alt]="otherUser?.username"
         class="chat-user-avatar"
       >
       <div class="chat-user-details">
@@ -14,9 +14,7 @@
       </div>
     </div>
     <div class="chat-actions">
-      <!-- <button class="action-btn">📞</button>
-      <button class="action-btn">📹</button> -->
-      <button class="action-btn">⋮</button>
+<!--      <button class="action-btn">⋮</button>-->
     </div>
   </div>
 
@@ -99,16 +97,16 @@
   <!-- Message Input -->
   <div class="message-input-container">
     <div class="input-wrapper">
-      <input 
-        type="text" 
-        placeholder="Type a message..." 
+      <input
+        type="text"
+        placeholder="Type a message..."
         [(ngModel)]="newMessage"
         (input)="onTyping()"
         (keypress)="onKeyPress($event)"
         class="message-input"
       >
-      <button 
-        (click)="sendMessageHandler()" 
+      <button
+        (click)="sendMessageHandler()"
         [disabled]="!newMessage.trim()"
         class="send-btn"
       >

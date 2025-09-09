@@ -6,6 +6,7 @@ import { UpdateRecipeDto } from './dto/update-recipe.dto/update-recipe.dto';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
 import { RateLimit, RateLimits } from '../common/decorators/rate-limit.decorator';
 import { RateLimitGuard } from '../common/guards/rate-limit.guard';
+import { MiddlewareAuthMiddleware } from '../auth/auth.middleware';
 
 @Controller('recipes')
 @UseGuards(RateLimitGuard)
@@ -74,6 +75,10 @@ export class RecipesController {
   @Get(':id/check-edit-permission')
   async checkEditPermission(@Param('id') id: string, @Req() req: any) {
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
+    // Note: Auth middleware should be applied at module level
+    if (!req.user || !req.user.uid) {
+      throw new Error('User not authenticated');
+    }
     return this.recipesService.checkEditPermission(id, req.user.uid);
   }
 

@@ -85,7 +85,7 @@ export const updateRecipeWithFilesFailure = createAction(
 // Delete Recipe
 export const deleteRecipe = createAction(
   '[Recipe] Delete Recipe',
-  props<{ id: string }>()
+  props<{ id: string; idToken: string }>()
 );
 
 export const deleteRecipeSuccess = createAction(
@@ -187,7 +187,7 @@ export const getRecipesByCategoryMainCourses = createAction(
 
 export const getRecipesByCategoryMainCoursesSuccess = createAction(
   '[Recipe] Get Recipes by Category Main Courses Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryMainCoursesFailure = createAction(
@@ -203,7 +203,7 @@ export const getRecipesByCategoryBeverages = createAction(
 
 export const getRecipesByCategoryBeveragesSuccess = createAction(
   '[Recipe] Get Recipes by Category Beverages Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryBeveragesFailure = createAction(
@@ -219,7 +219,7 @@ export const getRecipesByCategoryDesserts = createAction(
 
 export const getRecipesByCategoryDessertsSuccess = createAction(
   '[Recipe] Get Recipes by Category Desserts Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryDessertsFailure = createAction(
@@ -235,7 +235,7 @@ export const getRecipesByCategorySnacks = createAction(
 
 export const getRecipesByCategorySnacksSuccess = createAction(
   '[Recipe] Get Recipes by Category Snacks Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategorySnacksFailure = createAction(

@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from "@angular/forms";
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, combineLatest, Subject } from 'rxjs';
-import { map, filter, startWith } from 'rxjs/operators';
+import { map, filter, startWith, take } from 'rxjs/operators';
+import { Actions, ofType } from '@ngrx/effects';
 
 // Material UI imports
-import { MatButton, MatIconButton, MatMiniFabButton } from "@angular/material/button";
+import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatInputModule } from "@angular/material/input";
 import { MatMenu, MatMenuItem, MatMenuTrigger } from "@angular/material/menu";
@@ -46,7 +47,6 @@ import { Category } from '../../models/category.model';
     MatMenuItem,
     MatIcon,
     MatIconButton,
-    MatMiniFabButton,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     DatePipe,
@@ -58,12 +58,20 @@ import { Category } from '../../models/category.model';
 export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private snackBar = inject(MatSnackBar);
+  private actions$ = inject(Actions);
   private subscriptions: Subscription[] = [];
   private filterTrigger$ = new Subject<void>();
+
+  // ViewChild for scrolling
+  @ViewChild('contentContainer', { static: false }) contentContainer!: ElementRef;
 
   // Pagination properties
   pageIndex = 0;
   pageSize = 6;
+  currentPage = 1;
+  totalPages = 0;
+  visiblePages: number[] = [];
+  showEllipsis = false;
   
   // Virtual scrolling properties
   itemSize = 200; // Height of each favorite card
@@ -112,7 +120,12 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.displayedRecipes$ = this.favorites$;
 
     this.totalPages$ = this.paginatedFavorites$.pipe(
-      map(paginatedData => paginatedData ? Math.ceil(paginatedData.total / this.pageSize) : 0)
+      map(paginatedData => {
+        const total = paginatedData ? Math.ceil(paginatedData.total / this.pageSize) : 0;
+        this.totalPages = total;
+        this.updateVisiblePages();
+        return total;
+      })
     );
 
     this.pageNumbers$ = combineLatest([
@@ -152,6 +165,13 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Load active categories
     this.store.dispatch({ type: '[Category] Load Active Categories' });
+    
+    // Debug: Log categories loading
+    this.subscriptions.push(
+      this.activeCategories$.subscribe(categories => {
+        console.log('Active Categories loaded in MyFavouriteRecipe:', categories);
+      })
+    );
 
     // Debug: Log current user ID
     this.subscriptions.push(
@@ -191,6 +211,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.favorites$.subscribe(favorites => {
         console.log('Favorites data:', favorites);
+        console.log('Favorites count:', favorites.length);
       })
     );
 
@@ -209,6 +230,23 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
           console.error('Favorites error:', error);
           this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
         })
+    );
+
+    // Listen for toggle favorite success to reload the list
+    this.subscriptions.push(
+      this.actions$.pipe(
+        ofType(FavoriteActions.toggleFavoriteSuccess),
+        take(1) // Only take the first success to avoid multiple reloads
+      ).subscribe(() => {
+        // Reload favorites after successful toggle
+        this.subscriptions.push(
+          this.currentUserId$
+            .pipe(filter(userId => !!userId), take(1))
+            .subscribe(userId => {
+              this.loadUserFavorites(userId!, this.currentFilters);
+            })
+        );
+      })
     );
 
     // Restore page index from session storage
@@ -249,6 +287,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.selectedCategory = category.name;
     this.selectedCategoryId = category.id;
     this.pageIndex = 0; // Reset to first page when filtering
+    this.currentPage = 1; // Reset to first page when filtering
     
     // Update current filters
     this.currentFilters = {
@@ -264,6 +303,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.selectedCategory = 'Category';
     this.selectedCategoryId = null;
     this.pageIndex = 0; // Reset to first page when clearing filter
+    this.currentPage = 1; // Reset to first page when clearing filter
     
     // Remove category from filters
     const { category, ...restFilters } = this.currentFilters;
@@ -276,6 +316,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   setDifficulty(option: string) {
     this.selectedDifficulty = option;
     this.pageIndex = 0; // Reset to first page when filtering
+    this.currentPage = 1; // Reset to first page when filtering
     
     // Update current filters
     this.currentFilters = {
@@ -290,6 +331,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   clearDifficultyFilter() {
     this.selectedDifficulty = 'Difficulty';
     this.pageIndex = 0; // Reset to first page when clearing filter
+    this.currentPage = 1; // Reset to first page when clearing filter
     
     // Remove difficulty from filters
     const { difficulty, ...restFilters } = this.currentFilters;
@@ -299,47 +341,80 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     this.reloadWithFilters();
   }
 
+  updateVisiblePages() {
+    const maxVisible = 3;
+    let start = Math.max(1, this.currentPage - 1);
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    this.visiblePages = [];
+    for (let i = start; i <= end; i++) {
+      this.visiblePages.push(i);
+    }
+    this.showEllipsis = this.totalPages > end;
+  }
+
   goToPage(page: number) {
-    this.subscriptions.push(
-      this.totalPages$.subscribe(totalPages => {
-        if (page >= 0 && page < totalPages) {
-          this.pageIndex = page;
-          this.reloadWithFilters();
-        }
-      })
-    );
-  }
-
-  goToFirst() {
-    this.pageIndex = 0;
+    this.currentPage = page;
+    this.pageIndex = page - 1; // Convert to 0-based index
     this.reloadWithFilters();
+    // Delay scroll to ensure DOM is updated
+    setTimeout(() => {
+      this.scrollToTop();
+    }, 200);
   }
 
-  goToLast() {
-    this.subscriptions.push(
-      this.totalPages$.subscribe(totalPages => {
-        this.pageIndex = totalPages - 1;
-        this.reloadWithFilters();
-      })
-    );
-  }
-
-  goToPrev() {
-    if (this.pageIndex > 0) {
-      this.pageIndex--;
-      this.reloadWithFilters();
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
     }
   }
 
-  goToNext() {
-    this.subscriptions.push(
-      this.totalPages$.subscribe(totalPages => {
-        if (this.pageIndex < totalPages - 1) {
-          this.pageIndex++;
-          this.reloadWithFilters();
-        }
-      })
-    );
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+
+  private scrollToTop() {
+    // Method 1: Use ViewChild (most reliable)
+    if (this.contentContainer) {
+      this.contentContainer.nativeElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+      return;
+    }
+    
+    // Method 2: Scroll to specific element
+    const contentContainer = document.querySelector('.content-container');
+    if (contentContainer) {
+      contentContainer.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+      return;
+    }
+    
+    // Method 3: Modern smooth scrolling
+    try {
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    } catch (error) {
+      // Method 4: Fallback for older browsers
+      window.scrollTo(0, 0);
+    }
+    
+    // Method 5: Alternative using document.documentElement
+    setTimeout(() => {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 100);
   }
 
   toggleFavourite(recipe: Favorite) {
@@ -365,7 +440,6 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     );
     
     sessionStorage.setItem('myFavouriteRecipePageIndex', this.pageIndex.toString());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // TrackBy function for virtual scrolling performance

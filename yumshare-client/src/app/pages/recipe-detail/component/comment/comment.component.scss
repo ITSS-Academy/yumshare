@@ -194,6 +194,12 @@
   margin: 0;
   color: var(--warning-dark);
 }
+.comment-row {
+  display: flex;
+  align-items: center;
+  //justify-content: space-between;
+  //max-width: 50%;
+}
 
 .login-prompt a {
   color: var(--primary);
@@ -576,6 +582,14 @@ hr {
     padding: 0.6rem 0.8rem;
     font-size: 0.85rem;
   }
+  .comment-row{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
 }
 
 @media (max-width: 320px) {

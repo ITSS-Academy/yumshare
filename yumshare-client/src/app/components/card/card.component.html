@@ -16,7 +16,7 @@
         </mat-card-content>
 
 
-        <!-- Độ khó & Thời gian nấu -->
+        <!-- Độ khó & Thời gian nấu & Like count -->
         <div class="dish-info-row" (click)="navigationToDetail(item.id)">
           <span class="difficulty-label" [ngClass]="getDifficultyClass(item.difficulty)">
             {{ getDifficultyLabel(item.difficulty) }}
@@ -24,6 +24,10 @@
           <span class="cooktime-label">
             <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
             {{ item.total_cooking_time }} minutes
+          </span>
+          <span class="like-count-label">
+            <mat-icon style="font-size:18px;vertical-align:middle;">thumb_up</mat-icon>
+            {{ getLikeCount(item.id) }}
           </span>
         </div>
 
@@ -36,10 +40,14 @@
             <span class="username">{{ item.user?.username }}</span>
           </div>
           <div class="actions">
-            <mat-icon (click)="toggleFavorite(item)" [style.color]="item.isFavorite ? 'red' : '#666'">
-              {{ item.isFavorite ? 'favorite' : 'favorite_border' }}
+            <mat-icon 
+              (click)="getToggleError(item.id) ? clearToggleError(item.id) : toggleFavorite(item)" 
+              [style.color]="isFavorite(item.id) ? 'var(--primary)' : '#666'"
+              [style.cursor]="isToggleLoading(item.id) ? 'wait' : 'pointer'"
+              [title]="getFavoriteTooltip(item.id)">
+              {{ isToggleLoading(item.id) ? 'hourglass_empty' : (isFavorite(item.id) ? 'favorite' : 'favorite_border') }}
             </mat-icon>
-            <mat-icon (click)="shareRecipe(item)" style="cursor:pointer">share</mat-icon>
+            <mat-icon (click)="shareRecipe(item)" style="cursor:pointer" title="Share recipe">share</mat-icon>
           </div>
         </mat-card-actions>
       </mat-card>

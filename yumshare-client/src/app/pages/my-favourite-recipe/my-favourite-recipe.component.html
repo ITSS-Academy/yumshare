@@ -1,4 +1,4 @@
-<div class="content-container">
+<div class="content-container" #contentContainer>
   <div class="my-recipe-header">
     <h1>My Favourite Recipes</h1>
     <p>Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your
@@ -144,49 +144,24 @@
     }
   </div>
 
-  @if (!(isEmpty$ | async)) {
-    <div class="pages-navigation">
-      <div class="example-button-row">
-        <div class="example-flex-container">
-          <div class="example-button-container">
-            <button mat-mini-fab aria-label="First page" (click)="goToFirst()"
-              [disabled]="pageIndex === 0">&lt;&lt;</button>
-            <button mat-mini-fab aria-label="Previous page" (click)="goToPrev()"
-              [disabled]="pageIndex === 0">&lt;</button>
-            
-            @if (pageNumbers$ | async; as pageNumbers) {
-              @if (pageNumbers[0] > 0) {
-                <button mat-mini-fab (click)="goToPage(0)">1</button>
-                @if (pageNumbers[0] > 1) {
-                  <span>...</span>
-                }
-              }
-              
-              @for (page of pageNumbers; track page) {
-                <button mat-mini-fab [class.active]="page === pageIndex" (click)="goToPage(page)">
-                  {{ page + 1 }}
-                </button>
-              }
-              
-              @if (totalPages$ | async; as totalPages) {
-                @if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) {
-                  @if (pageNumbers[pageNumbers.length - 1] < totalPages - 2) {
-                    <span>...</span>
-                  }
-                  <button mat-mini-fab (click)="goToPage(totalPages - 1)">{{ totalPages }}</button>
-                }
-              }
-            }
-            
-            @if (totalPages$ | async; as totalPages) {
-              <button mat-mini-fab aria-label="Next page" (click)="goToNext()"
-                [disabled]="pageIndex === totalPages - 1">&gt;</button>
-              <button mat-mini-fab aria-label="Last page" (click)="goToLast()"
-                [disabled]="pageIndex === totalPages - 1">&gt;&gt;</button>
-            }
-          </div>
-        </div>
-      </div>
+  @if (!(isEmpty$ | async) && (totalPages$ | async) && (totalPages$ | async)! > 1) {
+    <div class="pagination" id="pagination">
+      <button id="first-page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+      <button id="prev-page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+      @for (p of visiblePages; track p) {
+        <button
+          id="page-btn-{{ p }}"
+          (click)="goToPage(p)"
+          [class.active]="p === currentPage"
+        >
+          {{ p }}
+        </button>
+      }
+      @if (showEllipsis) {
+        <span id="ellipsis">…</span>
+      }
+      <button id="next-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+      <button id="last-page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
     </div>
   }
 </div>

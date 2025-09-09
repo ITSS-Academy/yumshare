@@ -14,13 +14,10 @@ export class FollowService {
 
   // Follow a user
   followUser(followerId: string, followingId: string): Observable<Follow> {
-    console.log('Follow service called with:', { followerId, followingId });
     const payload = {
       follower_id: followerId,
       following_id: followingId
     };
-    console.log('API payload:', payload);
-    console.log('API URL:', `${environment.apiUrl}/follows`);
     
     return this.http.post<Follow>(`${environment.apiUrl}/follows`, payload);
   }

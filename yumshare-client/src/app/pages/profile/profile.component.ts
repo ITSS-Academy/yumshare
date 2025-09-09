@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
 import { SideBarComponent } from '../../components/side-bar/side-bar.component';
 import { LoadingComponent } from '../../components/loading/loading.component';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DeleteConfirmDialogComponent } from '../../components/delete-confirm-dialog/delete-confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';

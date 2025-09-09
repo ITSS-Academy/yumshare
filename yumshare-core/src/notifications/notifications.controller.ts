@@ -33,6 +33,12 @@ export class NotificationsController {
     return this.notificationsService.getUserNotifications(userId);
   }
 
+  @Get('user/:userId/counts')
+  @RateLimit(RateLimits.STANDARD)
+  getUserNotificationCounts(@Param('userId') userId: string) {
+    return this.notificationsService.getUserNotificationCounts(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.notificationsService.findOne(id);

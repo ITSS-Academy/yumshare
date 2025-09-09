@@ -1,6 +1,6 @@
-<div class="notification-container">
+<div class="message-container">
   <!-- Header -->
-  <div class="notification-header">
+  <div class="message-header">
     <h3>Messages</h3>
     <div class="header-actions">
       <button 
@@ -43,9 +43,9 @@
 
   <!-- Messages List -->
   @if (!loading && !error && notifications.length > 0) {
-    <div class="notifications-list">
+    <div class="messages-list">
       @for (notification of notifications; track notification.id) {
-        <div class="notification-item" 
+        <div class="message-item" 
              [class.unread]="!notification.is_read"
              (click)="onMessageClick(notification)">
           

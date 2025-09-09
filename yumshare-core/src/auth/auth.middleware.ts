@@ -12,16 +12,18 @@ export class MiddlewareAuthMiddleware implements NestMiddleware {
 
     let token = req.headers.authorization;
 
-    console.log('Auth middleware - Token:', token ? 'Present' : 'Missing');
-    
     if (!token) {
       throw new HttpException('Authorization token is required', HttpStatus.UNAUTHORIZED);
+    }
+
+    // Handle Bearer token format
+    if (token.startsWith('Bearer ')) {
+      token = token.slice(7);
     }
 
     try {
       let decodedToken = await admin.auth().verifyIdToken(token);
       req.user = decodedToken; // Attach the user info to the request object
-      console.log('User authenticated:', req.user.uid);
       next(); // Call the next middleware or route handler
     } catch (error) {
       console.error('Auth middleware error:', error.message);

@@ -1,144 +1,108 @@
+// ===== EDIT RECIPE COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
 /* ===== PREMIUM GRID MULTI-STEP EDIT RECIPE STYLES ===== */
 
 .edit-recipe {
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: var(--spacing-lg);
   max-width: 1400px;
   margin: 0 auto;
-  gap: 2rem;
+  gap: var(--spacing-lg);
   background: var(--background);
   min-height: 100vh;
+  font-family: var(--mat-sys-plain-font-family);
 }
 
-/* ===== PREMIUM PROGRESS HEADER ===== */
+/* ===== SIMPLE PROGRESS HEADER ===== */
 .premium-progress {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  background: var(--primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-medium);
 }
 
 .progress-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  position: relative;
+  gap: var(--spacing-md);
   flex-wrap: wrap;
 }
 
 .progress-step {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(0, 50, 100, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  min-width: 200px;
-}
-
-.progress-step::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.6s ease;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  min-width: 180px;
 }
 
 .progress-step.active {
   background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.9);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .progress-step.completed {
-  background: rgba(var(--success), 0.2);
-  border-color: rgba(0, 50, 100, 0.7);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--success);
 }
 
 .progress-step .step-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-round);
   background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 20px;
-  backdrop-filter: blur(10px);
+  font-size: 18px;
   flex-shrink: 0;
 }
 
 .progress-step.active .step-icon {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
 }
 
 .progress-step .step-content h3 {
   color: white;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: var(--mat-sys-medium-font-weight);
   margin: 0;
-  text-shadow: 0 2px 4px var(--shadow-strong);
 }
 
 .progress-step .step-content p {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  font-size: 11px;
   margin: 0;
-  font-weight: 500;
+  font-weight: var(--mat-sys-regular-font-weight);
 }
 
 .progress-step .step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
   background: rgba(255, 255, 255, 0.2);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  backdrop-filter: blur(10px);
+  font-weight: var(--mat-sys-medium-font-weight);
+  font-size: 12px;
 }
 
 .progress-connector {
-  width: 40px;
-  height: 3px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-  border-radius: 2px;
-  position: relative;
+  width: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
   flex-shrink: 0;
-}
-
-.progress-connector::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.6), transparent);
-  border-radius: 2px;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }
 
 /* ===== STEP CONTAINERS ===== */
@@ -766,6 +730,58 @@
 
 ::ng-deep .mat-mdc-form-field-subscript-wrapper {
   display: none !important;
+}
+
+/* ===== VALIDATION STYLES ===== */
+.error-message {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.error-message::before {
+  content: "⚠";
+  font-size: 14px;
+}
+
+.form-input.error,
+.form-textarea.error {
+  border-color: var(--error) !important;
+  background-color: rgba(var(--error-rgb), 0.05) !important;
+}
+
+.form-input.error:focus,
+.form-textarea.error:focus {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px rgba(var(--error-rgb), 0.1) !important;
+}
+
+::ng-deep .mat-mdc-form-field.error .mat-mdc-text-field-wrapper {
+  border-color: var(--error) !important;
+  background-color: rgba(var(--error-rgb), 0.05) !important;
+}
+
+::ng-deep .mat-mdc-form-field.error .mat-mdc-text-field-wrapper:focus-within {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px rgba(var(--error-rgb), 0.1) !important;
+}
+
+.ingredient-input-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.step-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */

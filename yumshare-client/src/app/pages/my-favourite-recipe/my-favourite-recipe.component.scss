@@ -1,8 +1,55 @@
+// ===== MY FAVOURITE RECIPE COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
+// Pagination styles from search component
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0;
+  flex-wrap: wrap;
+
+  button {
+    @include button-base;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-round);
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    font-size: 1rem;
+    padding: 0;
+
+    &.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: var(--mat-sys-medium-font-weight);
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--primary-dark);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  span#ellipsis {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+  }
+}
+
 // Virtual Scrolling Container
 .virtual-scroll-container {
   width: 100%;
-  height: 500px; // Fixed height for virtual scrolling
-  border: 1px solid #e0e0e0;
+  height: 600px; // Fixed height for virtual scrolling
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -31,7 +78,7 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
   margin-bottom: 16px;
   
@@ -41,16 +88,16 @@
   }
   
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
+    background: var(--surface-variant);
+    border-radius: 8px;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
+    background: var(--text-muted);
+    border-radius: 8px;
     
     &:hover {
-      background: #a8a8a8;
+      background: var(--text-secondary);
     }
   }
 }
@@ -63,7 +110,7 @@
   justify-content: center;
   gap: 16px;
   border-bottom: 1px solid #e0e0e0;
-  background: #F8FCF3;
+  // background: var(--primary-lightest);
 }
 
 .pages-navigation button {
@@ -78,7 +125,7 @@
 }
 
 .pages-navigation button.active {
-  background-color: #88C533 !important;
+  background-color: var(--primary) !important;
   color: white !important;
 }
 
@@ -96,19 +143,20 @@
 .recipe-card {
   flex-shrink: 0;
   width: 94%;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  height: 12rem; // Fixed height using rem
+  border: 1px solid var(--border);
+  border-radius: 12px;
   overflow: hidden;
-  background: #faf6fb;
-  font-family: Arial, sans-serif;
+  background: var(--surface);
+  font-family: Noto Sans, sans-serif;
   display: flex;
 }
 
 .recipe-image {
-  width: 150px;
-  height: 150px;
+  width: 12rem; // Match card height
+  height: 12rem; // Match card height
   flex: 0 0 auto;
-  background: #e0e0e0;
+  background: var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,8 +164,8 @@
 }
 
 .recipe-image img {
-  width: 150px;
-  height: 150px;
+  width: 12rem; // Match image container
+  height: 12rem; // Match image container
   object-fit: cover;
   object-position: center;
 }
@@ -126,7 +174,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 12px;
+  padding: 12px;
 }
 
 .recipe-header {
@@ -144,14 +192,14 @@
 
 .recipe-author {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin: 2px 0 0;
 }
 
 .recipe-description {
   flex: 1;
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
   margin: 0;
   
   p {
@@ -174,40 +222,41 @@
   
   // Màu sắc theo độ khó
   &.easy {
-    color: #4CAF50;
+    color: var(--success);
     background: rgba(76, 175, 80, 0.1);
   }
   
   &.medium {
-    color: #FF9800;
+    color: var(--warning);
     background: rgba(255, 152, 0, 0.1);
   }
   
   &.hard {
-    color: #F44336;
+    color: var(--error);
     background: rgba(244, 67, 54, 0.1);
   }
   
   // Fallback cho các giá trị khác
   &:not(.easy):not(.medium):not(.hard) {
-    color: #88C533;
+    color: var(--primary);
     background: rgba(136, 197, 51, 0.1);
   }
 }
 
 .recipe-footer {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   text-align: left;
 }
 
 .my-recipe-header {
   width: 100%;
   flex: 0 0 auto;
-  height: 200px;
+  height: 140px; // Giảm từ 200px xuống 140px
   background-color: #88C533;
   display: block;
-  border-radius: 16px;
+  border-radius: 12px; // Giảm border-radius
+  padding: 1rem; // Thêm padding
 }
 
 .my-recipe-header h1 {
@@ -215,23 +264,23 @@
   font-family: Sail, sans-serif;
   color: white;
   font-weight: lighter;
-  font-size: 46px;
-  padding-top: 16px;
+  font-size: 32px; // Giảm từ 46px xuống 32px
+  padding-top: 8px; // Giảm padding-top
   display: flex;
   justify-content: center;
 }
 
 .my-recipe-header p {
-  width: 50%;
-  height: 50%;
+  width: 60%; // Tăng width để text dễ đọc hơn
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  font-size: 12px;
+  font-size: 14px; // Tăng font-size từ 12px lên 14px
   color: white;
   text-align: center;
+  line-height: 1.4; // Thêm line-height
 }
 
 .sort-and-category {
@@ -252,7 +301,7 @@
 mat-form-field {
   width: 80% !important;
   border-radius: 8px !important;
-  color: #88C533 !important;
+  color: var(--primary) !important;
   font-size: 16px !important;
   margin-top: 20px;
 }
@@ -260,7 +309,7 @@ mat-form-field {
 .category {
   width: 13% !important;
   height: 69% !important;
-  background-color: #88C533 !important;
+  background-color: var(--primary) !important;
   border-radius: 8px !important;
   display: flex !important;
   flex-direction: row !important;
@@ -285,7 +334,7 @@ mat-form-field {
 .difficulty {
   width: 13% !important;
   height: 69% !important;
-  background-color: #88C533 !important;
+  background-color: var(--primary) !important;
   border-radius: 8px !important;
   display: flex !important;
   flex-direction: row !important;
@@ -311,7 +360,7 @@ mat-form-field {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #fafafa;
+  background: var(--surface-variant);
 }
 
 .content-container{
@@ -319,7 +368,7 @@ mat-form-field {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  background-color: #F8FCF3 !important;
+  // background-color: var(--primary-lightest) !important;
 }
 
 .material-symbols-outlined {
@@ -477,7 +526,7 @@ mat-form-field {
   }
 
   .pages-navigation button.active {
-    background-color: #88C533 !important;
+    background-color: var(--primary) !important;
     color: white !important;
   }
 }
@@ -580,13 +629,13 @@ mat-form-field {
     flex-direction: column;
     width: 100%;
     min-width: 0;
-    border-radius: 6px;
+    border-radius: 8px;
   }
   .recipe-image {
     width: 100%;
     height: 180px;
     flex: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-light);
     overflow: hidden;
   }
   
@@ -644,7 +693,7 @@ mat-form-field {
   }
 
   .pages-navigation button.active {
-    background-color: #88C533 !important;
+    background-color: var(--primary) !important;
     color: white !important;
   }
 }
@@ -662,12 +711,12 @@ mat-form-field {
   }
 
 .favourite-btn .mat-icon.filled {
-  color: #88C533 !important;
+  color: var(--primary) !important;
   background: transparent !important;
 }
 
 .favourite-btn .mat-icon.outlined {
-  color: #777474 !important;
+  color: var(--text-secondary) !important;
   background: transparent !important;
 }
 
@@ -716,7 +765,7 @@ mat-form-field {
   }
   
   p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 16px;
     margin: 0;
     text-align: center;
@@ -735,19 +784,19 @@ mat-form-field {
   
   .empty-icon {
     font-size: 64px;
-    color: #ccc;
+    color: var(--text-muted);
     margin-bottom: 16px;
   }
   
   h3 {
-    color: #333;
+    color: var(--text-primary);
     font-size: 24px;
     margin: 0 0 8px 0;
     font-weight: 500;
   }
   
   p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 16px;
     margin: 0;
     max-width: 400px;

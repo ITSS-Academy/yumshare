@@ -60,6 +60,22 @@ export class NotificationsService {
     });
   }
 
+  async getUserNotificationCounts(userId: string) {
+    const notifications = await this.notificationRepository.find({
+      where: { user: { id: userId } }
+    });
+
+    const unreadCount = notifications.filter(n => !n.is_read && n.type !== NotificationType.MESSAGE).length;
+    const messageCount = notifications.filter(n => !n.is_read && n.type === NotificationType.MESSAGE).length;
+    const totalCount = notifications.length;
+
+    return {
+      unreadCount,
+      messageCount,
+      totalCount
+    };
+  }
+
   findOne(id: string) {
     return this.notificationRepository.findOne({ where: { id }, relations: ['user'] });
   }
@@ -89,7 +105,7 @@ export class NotificationsService {
   async notifyFollowersNewRecipe(authorId: string, recipeData: { id: string; title: string; authorName: string }) {
     try {
       // Lấy danh sách followers của author
-      const followersResult = await this.followsService.getFollowers(authorId, 1, 1000); // Lấy tối đa 1000 followers
+      const followersResult = await this.followsService.getFollowers(authorId, 1, 100); // Lấy tối đa 1000 followers
       const followers = followersResult.data;
 
       if (followers.length === 0) {

@@ -130,32 +130,32 @@ export const selectNotificationPagination = createSelector(
 // Computed Selectors
 export const selectUnreadNotifications = createSelector(
   selectNotifications,
-  (notifications: Notification[]) => notifications.filter(n => !n.is_read)
+  (notifications: Notification[]) => notifications?.filter(n => !n.is_read) || []
 );
 
 export const selectReadNotifications = createSelector(
   selectNotifications,
-  (notifications: Notification[]) => notifications.filter(n => n.is_read)
+  (notifications: Notification[]) => notifications?.filter(n => n.is_read) || []
 );
 
 export const selectMessageNotifications = createSelector(
   selectNotifications,
-  (notifications: Notification[]) => notifications.filter(n => n.type === NotificationType.MESSAGE)
+  (notifications: Notification[]) => notifications?.filter(n => n.type === NotificationType.MESSAGE) || []
 );
 
 export const selectNonMessageNotifications = createSelector(
   selectNotifications,
-  (notifications: Notification[]) => notifications.filter(n => n.type !== NotificationType.MESSAGE)
+  (notifications: Notification[]) => notifications?.filter(n => n.type !== NotificationType.MESSAGE) || []
 );
 
 export const selectUnreadMessageCount = createSelector(
   selectMessageNotifications,
-  (messageNotifications: Notification[]) => messageNotifications.filter(n => !n.is_read).length
+  (messageNotifications: Notification[]) => messageNotifications?.filter(n => !n.is_read).length || 0
 );
 
 export const selectUnreadNonMessageCount = createSelector(
   selectNonMessageNotifications,
-  (nonMessageNotifications: Notification[]) => nonMessageNotifications.filter(n => !n.is_read).length
+  (nonMessageNotifications: Notification[]) => nonMessageNotifications?.filter(n => !n.is_read).length || 0
 );
 
 // Filtered Notifications

@@ -111,7 +111,19 @@
             <input type="text" 
                    formControlName="title" 
                    placeholder="Enter your recipe name..." 
-                   class="form-input recipe-name">
+                   class="form-input recipe-name"
+                   [class.error]="recipeForm.get('title')?.invalid && recipeForm.get('title')?.touched">
+            @if (recipeForm.get('title')?.invalid && recipeForm.get('title')?.touched) {
+              <div class="error-message">
+                @if (recipeForm.get('title')?.errors?.['required']) {
+                  Recipe name is required
+                } @else if (recipeForm.get('title')?.errors?.['minlength']) {
+                  Recipe name must be at least 3 characters long
+                } @else if (recipeForm.get('title')?.errors?.['maxlength']) {
+                  Recipe name must be less than 100 characters
+                }
+              </div>
+            }
           </div>
 
           <div class="user-profile">
@@ -145,7 +157,19 @@
             </label>
             <textarea formControlName="description" 
                       placeholder="Describe your recipe, cooking tips, and what makes it special..."
-                      class="form-textarea"></textarea>
+                      class="form-textarea"
+                      [class.error]="recipeForm.get('description')?.invalid && recipeForm.get('description')?.touched"></textarea>
+            @if (recipeForm.get('description')?.invalid && recipeForm.get('description')?.touched) {
+              <div class="error-message">
+                @if (recipeForm.get('description')?.errors?.['required']) {
+                  Recipe description is required
+                } @else if (recipeForm.get('description')?.errors?.['minlength']) {
+                  Recipe description must be at least 10 characters long
+                } @else if (recipeForm.get('description')?.errors?.['maxlength']) {
+                  Recipe description must be less than 1000 characters
+                }
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -181,17 +205,43 @@
                  formControlName="servings" 
                  placeholder="4" 
                  class="form-input serving-input" 
+                 [class.error]="recipeForm.get('servings')?.invalid && recipeForm.get('servings')?.touched"
                  min="1">
+          @if (recipeForm.get('servings')?.invalid && recipeForm.get('servings')?.touched) {
+            <div class="error-message">
+              @if (recipeForm.get('servings')?.errors?.['required']) {
+                Servings is required
+              } @else if (recipeForm.get('servings')?.errors?.['min']) {
+                Servings must be at least 1
+              } @else if (recipeForm.get('servings')?.errors?.['max']) {
+                Servings cannot exceed 50
+              }
+            </div>
+          }
         </div>
 
         <div class="ingredients-list">
           <div formArrayName="ingredients">
             @for (ingredient of ingredients.controls; track $index; let i = $index) {
               <div class="ingredient-item">
-                <input type="text" 
-                       [formControl]="getIngredientControl(i)" 
-                       placeholder="Ingredient name..." 
-                       class="form-input ingredient-input">
+                <div class="ingredient-input-container">
+                  <input type="text" 
+                         [formControl]="getIngredientControl(i)" 
+                         placeholder="Ingredient name..." 
+                         class="form-input ingredient-input"
+                         [class.error]="getIngredientControl(i).invalid && getIngredientControl(i).touched">
+                  @if (getIngredientControl(i).invalid && getIngredientControl(i).touched) {
+                    <div class="error-message">
+                      @if (getIngredientControl(i).errors?.['required']) {
+                        Ingredient name is required
+                      } @else if (getIngredientControl(i).errors?.['minlength']) {
+                        Ingredient name must be at least 2 characters long
+                      } @else if (getIngredientControl(i).errors?.['maxlength']) {
+                        Ingredient name must be less than 100 characters
+                      }
+                    </div>
+                  }
+                </div>
                 <button class="remove-btn" 
                         type="button" 
                         (click)="removeIngredient(i)" 
@@ -224,10 +274,22 @@
                  formControlName="total_cooking_time" 
                  placeholder="90" 
                  class="form-input time-input" 
+                 [class.error]="recipeForm.get('total_cooking_time')?.invalid && recipeForm.get('total_cooking_time')?.touched"
                  min="1">
           <div class="time-display">
             {{ formatTime(recipeForm.get('total_cooking_time')?.value || 0) }}
           </div>
+          @if (recipeForm.get('total_cooking_time')?.invalid && recipeForm.get('total_cooking_time')?.touched) {
+            <div class="error-message">
+              @if (recipeForm.get('total_cooking_time')?.errors?.['required']) {
+                Total cooking time is required
+              } @else if (recipeForm.get('total_cooking_time')?.errors?.['min']) {
+                Total cooking time must be at least 1 minute
+              } @else if (recipeForm.get('total_cooking_time')?.errors?.['max']) {
+                Total cooking time cannot exceed 24 hours (1440 minutes)
+              }
+            </div>
+          }
         </div>
 
         <div class="steps-list">
@@ -239,7 +301,19 @@
                   <input type="text" 
                          [formControl]="getStepDescriptionControl(i)" 
                          placeholder="Describe step {{ i + 1 }}..." 
-                         class="form-input">
+                         class="form-input"
+                         [class.error]="getStepDescriptionControl(i).invalid && getStepDescriptionControl(i).touched">
+                  @if (getStepDescriptionControl(i).invalid && getStepDescriptionControl(i).touched) {
+                    <div class="error-message">
+                      @if (getStepDescriptionControl(i).errors?.['required']) {
+                        Step description is required
+                      } @else if (getStepDescriptionControl(i).errors?.['minlength']) {
+                        Step description must be at least 5 characters long
+                      } @else if (getStepDescriptionControl(i).errors?.['maxlength']) {
+                        Step description must be less than 500 characters
+                      }
+                    </div>
+                  }
                 </div>
                 <button class="remove-btn" 
                         type="button" 
@@ -288,13 +362,18 @@
           <mat-icon>category</mat-icon>
           Category *
         </label>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [class.error]="recipeForm.get('category_id')?.invalid && recipeForm.get('category_id')?.touched">
           <mat-select formControlName="category_id">
-            @for (category of safeCategories; track category.id) {
+            @for (category of safeCategories; track trackByCategoryId($index, category)) {
               <mat-option [value]="category.id">{{category.name}}</mat-option>
             }
           </mat-select>
         </mat-form-field>
+        @if (recipeForm.get('category_id')?.invalid && recipeForm.get('category_id')?.touched) {
+          <div class="error-message">
+            Please select a category
+          </div>
+        }
       </div>
 
       <div class="form-row">
@@ -303,13 +382,18 @@
             <mat-icon>public</mat-icon>
             Country *
           </label>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" [class.error]="recipeForm.get('country')?.invalid && recipeForm.get('country')?.touched">
             <mat-select formControlName="country">
               @for (country of safeCountries; track country) {
                 <mat-option [value]="country">{{country}}</mat-option>
               }
             </mat-select>
           </mat-form-field>
+          @if (recipeForm.get('country')?.invalid && recipeForm.get('country')?.touched) {
+            <div class="error-message">
+              Please select a country
+            </div>
+          }
         </div>
 
         <div class="form-group">
@@ -317,13 +401,18 @@
             <mat-icon>speed</mat-icon>
             Difficulty *
           </label>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" [class.error]="recipeForm.get('difficulty')?.invalid && recipeForm.get('difficulty')?.touched">
             <mat-select formControlName="difficulty">
               @for (difficulty of safeDifficultyLevels; track difficulty) {
                 <mat-option [value]="difficulty">{{difficulty}}</mat-option>
               }
             </mat-select>
           </mat-form-field>
+          @if (recipeForm.get('difficulty')?.invalid && recipeForm.get('difficulty')?.touched) {
+            <div class="error-message">
+              Please select a difficulty level
+            </div>
+          }
         </div>
       </div>
     </div>

@@ -91,8 +91,8 @@ export const deleteRecipeEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
     return actions$.pipe(
       ofType(RecipeActions.deleteRecipe),
-      switchMap(({ id }) =>
-        recipeService.deleteRecipe(id).pipe(
+      switchMap(({ id, idToken }) =>
+        recipeService.deleteRecipe(id, idToken).pipe(
           map(() => RecipeActions.deleteRecipeSuccess({ id })),
           catchError((error) => of(RecipeActions.deleteRecipeFailure({ error: error.message })))
         )
@@ -293,7 +293,6 @@ export const navigateAfterCreateEffect = createEffect(
     return actions$.pipe(
       ofType(RecipeActions.createRecipeSuccess, RecipeActions.createRecipeWithFilesSuccess),
       tap(({ recipe }) => {
-        console.log(`Recipe created successfully: ${recipe.id}`);
         // You can inject Router here and navigate to recipe detail page
         // const router = inject(Router);
         // router.navigate(['/recipes', recipe.id]);
@@ -309,7 +308,6 @@ export const navigateAfterUpdateEffect = createEffect(
     return actions$.pipe(
       ofType(RecipeActions.updateRecipeSuccess, RecipeActions.updateRecipeWithFilesSuccess),
       tap(({ recipe }) => {
-        console.log(`Recipe updated successfully: ${recipe.id}`);
         // You can inject Router here and navigate to recipe detail page
         // const router = inject(Router);
         // router.navigate(['/recipes', recipe.id]);
@@ -330,7 +328,6 @@ export const logRecipeActionsEffect = createEffect(
         RecipeActions.searchRecipes
       ),
       tap((action) => {
-        console.log(`Recipe Action: ${action.type}`, action);
       })
     );
   },

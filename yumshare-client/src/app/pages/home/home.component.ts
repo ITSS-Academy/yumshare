@@ -1,11 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import {CardComponent} from '../../components/card/card.component';
-import {FamilyMealComponent} from '../../components/card/family-meal/family-meal.component';
-import {RefreshingDishesComponent} from '../../components/card/refreshing-dishes/refreshing-dishes.component';
-import {NutritiousMealsComponent} from '../../components/card/nutritious-meals/nutritious-meals.component';
-import {EasyMealsComponent} from '../../components/card/easy-meals/easy-meals.component';
 import {Router} from '@angular/router';
 import {select, Store} from '@ngrx/store';
 import {RecipeState} from '../../ngrx/recipe';
@@ -22,13 +18,7 @@ import { CategoryState } from '../../ngrx/category/category.state';
   imports: [
     MatProgressSpinnerModule,
     ShareModule,
-    CardComponent,
-    FamilyMealComponent,
-    RefreshingDishesComponent,
-    NutritiousMealsComponent,
-    EasyMealsComponent,
-    
-
+    CardComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -39,16 +29,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   paginatedRecipes$!: Observable<any>;
   paginatedRecipes: any;
   
-  mainCourses$!: Observable<Recipe[] | null>;
+  mainCourses$!: Observable<{ data: Recipe[], total: number } | null>;
   mainCourses: Recipe[] = [];
 
-  beverages$!: Observable<Recipe[] | null>;
+  beverages$!: Observable<{ data: Recipe[], total: number } | null>;
   beverages: Recipe[] = [];
 
-  desserts$!: Observable<Recipe[] | null>;
+  desserts$!: Observable<{ data: Recipe[], total: number } | null>;
   desserts: Recipe[] = [];
 
-  snacks$!: Observable<Recipe[] | null>;
+  snacks$!: Observable<{ data: Recipe[], total: number } | null>;
   snacks: Recipe[] = [];
 
   subscriptions: Subscription[] = [];
@@ -87,7 +77,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(
       this.category$.subscribe(categories => {
-        console.log('Categories loaded in HomeComponent:', categories);
+        // Categories loaded successfully
       })
     )
 
@@ -101,29 +91,65 @@ export class HomeComponent implements OnInit, OnDestroy {
   );
   this.subscriptions.push(
   this.mainCourses$.subscribe(data => {
-    this.mainCourses = data || [];
-    console.log('Main Courses loaded in HomeComponent:', this.mainCourses);
+    // Handle different data structures
+    if (Array.isArray(data?.data)) {
+      this.mainCourses = data.data;
+    } else if (Array.isArray(data)) {
+      this.mainCourses = data;
+    } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+      // Handle nested object: {data: {data: [...]}}
+      this.mainCourses = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+    } else {
+      this.mainCourses = [];
+    }
     })
   );
 
   this.subscriptions.push(
     this.beverages$.subscribe(data => {
-      this.beverages = data || [];
-      console.log('Beverages loaded in HomeComponent:', this.beverages);
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.beverages = data.data;
+      } else if (Array.isArray(data)) {
+        this.beverages = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.beverages = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.beverages = [];
+      }
     })
   );
 
   this.subscriptions.push(
     this.desserts$.subscribe(data => {
-      this.desserts = data || [];
-      console.log('Desserts loaded in HomeComponent:', this.desserts);
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.desserts = data.data;
+      } else if (Array.isArray(data)) {
+        this.desserts = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.desserts = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.desserts = [];
+      }
     })
   );
 
   this.subscriptions.push(
     this.snacks$.subscribe(data => {
-      this.snacks = data || [];
-      console.log('Snacks loaded in HomeComponent:', this.snacks);
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.snacks = data.data;
+      } else if (Array.isArray(data)) {
+        this.snacks = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.snacks = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.snacks = [];
+      }
     })
   );
   }
@@ -164,8 +190,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/search']).then();
   }
 
-  categoryClick(category: string) {
-    this.router.navigate(['/search'], { queryParams: { category } }).then();
+  categoryClick(category: Category) {
+    this.router.navigate(['/search']).then();
   }
 
 }

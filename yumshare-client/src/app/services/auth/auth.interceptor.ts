@@ -18,40 +18,76 @@ export const authInterceptor = (
     '/recipes/search'        // SearchComponent - search recipes
   ];
   
+  // Define endpoints that require authentication
+  const protectedEndpoints = [
+    '/recipes/:id/check-edit-permission'
+  ];
+  
   // Check if this is a public endpoint
   const isPublicEndpoint = publicEndpoints.some(endpoint => 
     request.url.includes(endpoint)
   );
   
+  // Check if this is a protected endpoint
+  const isProtectedEndpoint = protectedEndpoints.some(endpoint => 
+    request.url.includes('/check-edit-permission') // Check for the actual endpoint pattern
+  );
+  
+  // Debug log
+  if (request.url.includes('check-edit-permission')) {
+    console.log('🔍 Auth Interceptor - check-edit-permission request detected');
+    console.log('🔍 URL:', request.url);
+    console.log('🔍 Is protected endpoint:', isProtectedEndpoint);
+  }
+  
   // If it's a public endpoint, proceed without authentication
   if (isPublicEndpoint) {
-    console.log('🔓 Auth Interceptor - Public endpoint, proceeding without auth:', request.url);
     return next(request);
   }
   
   // For protected endpoints, require authentication
-  return store.select('auth').pipe(
-    // Đợi cho đến khi có token hoặc user
-    filter(authState => {
-      const hasToken = !!(authState.idToken && authState.idToken.length > 0);
-      const hasUser = !!(authState.currentUser && authState.currentUser.uid);
-      return hasToken || hasUser; // Đợi ít nhất 1 trong 2
-    }),
-    take(1),
-    switchMap(authState => {
-      console.log('🔐 Auth Interceptor - Protected endpoint, checking auth:', request.url);
-      
-      if (authState.idToken && authState.idToken.length > 0) {
+  if (isProtectedEndpoint) {
+    return store.select('auth').pipe(
+      take(1),
+      switchMap(authState => {
+        const hasToken = !!(authState.idToken && authState.idToken.length > 0);
+        console.log('🔍 Auth State for protected endpoint:', {
+          hasToken,
+          tokenLength: authState.idToken?.length || 0,
+          currentUser: authState.currentUser?.uid || 'none'
+        });
+        
+        if (!hasToken) {
+          console.warn('❌ No token available for protected endpoint:', request.url);
+          // Return the request without token - let the backend handle the 401
+          return next(request);
+        }
+        
+        console.log('✅ Sending token for protected endpoint:', request.url);
+        console.log('✅ Token preview:', authState.idToken?.substring(0, 20) + '...');
+        
         const authReq = request.clone({
           setHeaders: {
             Authorization: authState.idToken // Gửi token trực tiếp, không có Bearer
           }
         });
-        console.log('🔐 Auth Interceptor - Adding token to protected request');
+        return next(authReq);
+      })
+    );
+  }
+  
+  // For other endpoints, try to add token if available
+  return store.select('auth').pipe(
+    take(1),
+    switchMap(authState => {
+      if (authState.idToken && authState.idToken.length > 0) {
+        const authReq = request.clone({
+          setHeaders: {
+            Authorization: `Bearer ${authState.idToken}`
+          }
+        });
         return next(authReq);
       }
-      
-      console.log('🔐 Auth Interceptor - No token for protected endpoint, proceeding without auth');
       return next(request);
     })
   );

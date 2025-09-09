@@ -1,148 +1,108 @@
+// ===== ADD RECIPE COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
 /* ===== PREMIUM GRID MULTI-STEP ADD RECIPE STYLES ===== */
 
 .add-recipe {
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: var(--spacing-lg);
   max-width: 1400px;
   margin: 0 auto;
-  gap: 2rem;
+  gap: var(--spacing-lg);
   background: var(--background);
   min-height: 100vh;
-  // font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--mat-sys-plain-font-family);
 }
 
-/* ===== PREMIUM PROGRESS HEADER ===== */
+/* ===== SIMPLE PROGRESS HEADER ===== */
 .premium-progress {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px var(--shadow-strong);
-  // margin-bottom: 2rem;
+  background: var(--primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-medium);
 }
 
 .progress-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  position: relative;
+  gap: var(--spacing-md);
   flex-wrap: wrap;
 }
 
 .progress-step {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(0, 50, 100, 0.4); /* Viền xanh đen đồng nhất cho tất cả bước */
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  min-width: 200px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  min-width: 180px;
 }
-
-.progress-step::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.6s ease;
-}
-
-/* Removed hover effect */
 
 .progress-step.active {
   background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.9); /* Viền trắng rõ nhất cho bước hiện tại */
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .progress-step.completed {
-  background: rgba(var(--success), 0.2);
-  border-color: rgba(0, 50, 100, 0.7); /* Viền xanh đen đậm hơn cho bước hoàn thành */
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--success);
 }
 
 .progress-step .step-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-round);
   background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 20px;
-  backdrop-filter: blur(10px);
+  font-size: 18px;
   flex-shrink: 0;
 }
 
 .progress-step.active .step-icon {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
 }
 
 .progress-step .step-content h3 {
   color: white;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: var(--mat-sys-medium-font-weight);
   margin: 0;
-  text-shadow: 0 2px 4px var(--shadow-strong);
 }
 
 .progress-step .step-content p {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  font-size: 11px;
   margin: 0;
-  font-weight: 500;
+  font-weight: var(--mat-sys-regular-font-weight);
 }
 
 .progress-step .step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
   background: rgba(255, 255, 255, 0.2);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  backdrop-filter: blur(10px);
+  font-weight: var(--mat-sys-medium-font-weight);
+  font-size: 12px;
 }
 
 .progress-connector {
-  width: 40px;
-  height: 3px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-  border-radius: 2px;
-  position: relative;
+  width: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
   flex-shrink: 0;
-}
-
-.progress-connector::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.6), transparent);
-  border-radius: 2px;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }
 
 /* ===== STEP CONTAINERS ===== */
@@ -478,10 +438,66 @@
 
 /* Removed hover effect */
 
-.ingredients-list,
+.ingredients-list{
+  margin: 1rem 0;
+    height: auto;
+    max-height: 20rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+
+}
 .steps-list {
   margin: 1rem 0;
+    height: auto;
+    max-height: 20rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    // scrollbar-width: thin;
+    // scrollbar-color: #e1e4e4f2;
 }
+.ingredients-list,
+.steps-list {
+  scrollbar-width: thin;              /* Firefox */
+  scrollbar-color: transparent transparent; /* ban đầu ẩn */
+  transition: all 0.3s ease;
+}
+
+/* Chrome, Edge, Safari */
+.ingredients-list::-webkit-scrollbar,
+.steps-list::-webkit-scrollbar {
+  width: 2px;
+}
+
+/* Track */
+.ingredients-list::-webkit-scrollbar-track,
+.steps-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb (ẩn mặc định) */
+.ingredients-list::-webkit-scrollbar-thumb,
+.steps-list::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Khi hover container thì hiện scrollbar */
+.ingredients-list:hover::-webkit-scrollbar-thumb,
+.steps-list:hover::-webkit-scrollbar-thumb {
+  background-color: #e1e4e4f2;
+}
+
+/* Firefox hover */
+.ingredients-list:hover,
+.steps-list:hover {
+  scrollbar-color: #e1e4e4f2 transparent;
+}
+
 
 .ingredient-item,
 .step-item {
@@ -798,13 +814,65 @@
   display: none !important;
 }
 
+/* ===== VALIDATION STYLES ===== */
+.error-message {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.error-message::before {
+  content: "⚠";
+  font-size: 14px;
+}
+
+.form-input.error,
+.form-textarea.error {
+  border-color: var(--error) !important;
+  background-color: rgba(var(--error-rgb), 0.05) !important;
+}
+
+.form-input.error:focus,
+.form-textarea.error:focus {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px rgba(var(--error-rgb), 0.1) !important;
+}
+
+::ng-deep .mat-mdc-form-field.error .mat-mdc-text-field-wrapper {
+  border-color: var(--error) !important;
+  background-color: rgba(var(--error-rgb), 0.05) !important;
+}
+
+::ng-deep .mat-mdc-form-field.error .mat-mdc-text-field-wrapper:focus-within {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px rgba(var(--error-rgb), 0.1) !important;
+}
+
+.ingredient-input-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.step-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .hero-section {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .content-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -815,50 +883,50 @@
   .add-recipe {
     padding: 1rem;
   }
-  
+
   .premium-progress {
     padding: 1.5rem;
   }
-  
+
   .progress-container {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .progress-connector {
     width: 3px;
     height: 30px;
   }
-  
+
   .progress-step {
     min-width: 280px;
     padding: 1rem 1.25rem;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .action-bar {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .right-actions {
     width: 100%;
     justify-content: center;
   }
-  
+
   .action-btn {
     width: 100%;
     min-width: unset;
   }
-  
+
   .upload-tabs {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .tab-btn {
     width: 100%;
     max-width: 300px;
@@ -871,17 +939,17 @@
     text-align: center;
     gap: 0.5rem;
   }
-  
+
   .upload-zone {
     padding: 2rem 1rem;
   }
-  
+
   .upload-icon {
     width: 60px;
     height: 60px;
     font-size: 30px;
   }
-  
+
   .profile-info {
     flex-direction: column;
     text-align: center;

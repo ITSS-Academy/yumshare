@@ -1,10 +1,7 @@
-h1{
-  headline-large: var(--mat-sys-headline-large-weight) var(--mat-sys-headline-large-size) / var(--mat-sys-headline-large-line-height) var(--mat-sys-headline-large-font),
-}
-p{
-  title-medium: var(--mat-sys-title-medium-weight) var(--mat-sys-title-medium-size) / var(--mat-sys-title-medium-line-height) var(--mat-sys-title-medium-font),
-}
-.container-right{
+// ===== FAQ COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
+.container-right {
   width: 100%;
   height: auto;
   display: flex;
@@ -12,7 +9,8 @@ p{
   align-items: center;
   justify-content: center;
 }
-.top{
+
+.top {
   width: 100%;
   min-height: 55vh;
   height: auto;
@@ -21,29 +19,28 @@ p{
   align-items: flex-end;
   justify-content: center;
   background-image: url("https://img.freepik.com/premium-photo/beef-steak-with-rosemary-pepper-black-table-with-copy-space_118631-https://img.freepik.com/free-photo/gourmet-meal-rustic-wood-table-indoors-generated-by-ai_188544-24622.jpg?semt=ais_hybrid&w=740&q=80");
-  background-size: cover ;
-  background-position: center;  /* canh giữa ảnh */
-  background-repeat: no-repeat; /* không lặp lại */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: white;
   padding-top: 4%;
   margin-bottom: 0;
   padding-bottom: 4%;
-
-
 }
-.t1{
+
+.t1 {
   margin-top: 5%;
   margin-right: 32%;
   margin-bottom: 0;
-
 }
-.headtext1{
+
+.headtext1 {
   width: 40%;
   margin-top: 0;
   margin-right: 3.5%;
 }
 
-.middle{
+.middle {
   width: 100%;
   min-height: auto;
   height: auto;
@@ -56,31 +53,29 @@ p{
   background-position: center;
   background-repeat: no-repeat;
   color: black;
-
 }
+
 .box {
   width: 95%;
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: var(--spacing-lg) auto;
   background-color: #0e0e0d;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  border-radius: 20px;
-  padding: 2rem 1rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-
-  position: relative;   /* bắt buộc để pseudo-element bám */
-  overflow: hidden;     /* ẩn phần dư của hiệu ứng */
+  border-radius: var(--radius-xxl);
+  padding: var(--spacing-lg) var(--spacing-md);
+  box-shadow: var(--shadow-medium);
+  position: relative;
+  overflow: hidden;
 }
-
 /* hiệu ứng bóng loáng */
 .box::after {
   content: "";
   position: absolute;
   top: 0;
-  left: -150%;  /* bắt đầu ngoài khung */
+  left: -150%;
   width: 50%;
   height: 100%;
   background: linear-gradient(
@@ -92,18 +87,15 @@ p{
   transform: skewX(-20deg);
   animation: shine 4s infinite;
 }
-
 @keyframes shine {
   0%   { left: -150%; }
   100% { left: 150%; }
 }
-
 .t2 {
   color: white;
   margin-bottom: 2rem;
   text-align: center;
 }
-
 .big-group {
   width: 100%;
   display: flex;
@@ -112,7 +104,6 @@ p{
   gap: 2rem;
   justify-content: center;
 }
-
 .group1, .group2, .group3, .group4 {
   width: 100%;
   max-width: 250px;
@@ -123,8 +114,7 @@ p{
   position: relative;
   margin-bottom: 2rem;
 }
-
-.hinh {
+.pic {
   width: 100%;
   max-width: 190px;
   height: auto;
@@ -132,8 +122,7 @@ p{
   border-radius: 10px;
   object-fit: cover;
 }
-
-/* ==== Base chat bubble (ô trắng) ==== */
+/* ==== Base chat bubble ==== */
 .chat1, .chat2, .chat3, .chat4 {
   position: absolute;
   left: 50%;
@@ -143,66 +132,55 @@ p{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.875rem 1rem;     /* 14px 16px */
-  min-height: 5.5rem;         /* 88px */
-  border-radius: 1.25rem;     /* 20px */
+  padding: 0.875rem 1rem;
+  min-height: 5.5rem;
+  border-radius: 1.25rem;
   background: rgba(255,255,255,0.5);
-  backdrop-filter: blur(0.1875rem); /* 3px → 0.1875rem */
+  backdrop-filter: blur(0.1875rem);
   text-align: center;
   box-sizing: border-box;
   overflow: hidden;
   z-index: 2;
-
 }
-
-/* Text gốc bên trong p */
 .chat1 p, .chat2 p, .chat3 p, .chat4 p {
   margin: 0;
   line-height: 1.45;
   font-weight: 600;
   color: #111;
-  position: relative;              /* cho ::before bám theo */
+  position: relative;
   max-width: 90%;
 }
-
-/* ==== Khi hover: tăng chiều cao ô + đổi nội dung ==== */
+/* hover effect */
 .group1:hover .chat1,
 .group2:hover .chat2,
 .group3:hover .chat3,
 .group4:hover .chat4 {
-  min-height: 10rem;                 /* 160px */
-  padding-top: 1.125rem;             /* 18px */
-  padding-bottom: 1.125rem;          /* 18px */
-  box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.15); /* 0 8px 32px */
+  min-height: 10rem;
+  padding-top: 1.125rem;
+  padding-bottom: 1.125rem;
+  box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.15);
   background: rgba(255,255,255,0.9);
 }
-
-
-/* Ẩn màu chữ gốc (vẫn giữ chỗ để canh giữa) */
 .group1:hover .chat1 p,
 .group2:hover .chat2 p,
 .group3:hover .chat3 p,
 .group4:hover .chat4 p {
   color: transparent;
 }
-
-/* Thêm text thay thế – nằm GỌN trong ô trắng, tự xuống dòng */
 .group1:hover .chat1 p::before,
 .group2:hover .chat2 p::before,
 .group3:hover .chat3 p::before,
 .group4:hover .chat4 p::before {
   display: block;
   color: #222;
-  white-space: normal;             /* cho phép xuống dòng */
+  white-space: normal;
   text-align: center;
   max-width: 100%;
   margin: 0 auto;
   line-height: 1.45;
   font-weight: 600;
-  content: "";                     /* set riêng từng ô bên dưới */
+  content: "";
 }
-
-/* Nội dung cụ thể cho từng group */
 .group1:hover .chat1 p::before {
   content: "Explore hundreds of world-class recipes, from everyday meals to fine dining";
 }
@@ -215,46 +193,48 @@ p{
 .group4:hover .chat4 p::before {
   content: "Connect, share, and learn with food lovers worldwide.";
 }
-
-/* (Tùy chọn) Đẩy icon tròn xuống nhẹ nếu bị đè lên ô trắng */
 .group1 .nut, .group2 .nut, .group3 .nut, .group4 .nut {
   z-index: 3;
 }
-
-
 .bottom{
   width: 100%;
-  min-height: 60vh;
+  //min-height: 60vh;
   height: auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
-.hinh-contact{
-  width: 40.625rem;
+.bottum-pic{
+  width: 55%;
+  height: auto;
+}
+.contact-pic{
+  //width: 40rem;
+  width: 100%;
   height: 31.5625rem;
   object-fit: cover;
-
 }
 .contact{
-  width: 40%;
+  width: 42%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-right: 5%;
+  justify-content: center;
+  //padding-right: 5%;
+  //margin-right: 1rem;
 }
-.tren{
+.above{
+  width: 80%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   align-content: center;
   padding-top: 3%;
-
 }
-.duoi{
+.under{
   width: 90%;
   height: 100%;
   display: flex;
@@ -266,32 +246,29 @@ p{
   padding-right: 3%;
   padding-bottom: 3%;
 }
-.nhap {
+.type-in {
   width: 100%;
   padding: 14px 16px;
-  //border-radius: 10px;
   border: 1px solid transparent;
   font-size: 1rem;
   transition: all 0.3s ease;
   outline: none;
   background-color: transparent;
   border-bottom: 1px solid black;
-
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
 }
-.nut-submmit{
-  background-color: #88C533;
+.submit-button {
+  @include button-primary;
 }
-.nhap::placeholder {
+.type-in::placeholder {
   color: #999;
 }
-
-.nhap:focus {
-  border-color: #88C533;               /* viền xanh */
-  box-shadow: 0 0 8px rgba(136,197,51,0.5); /* ánh sáng xanh */
-}
-//RESPONSIVE
-
-
+//.type-in:focus {
+//  border-color: #88C533;
+//  box-shadow: 0 0 8px rgba(136,197,51,0.5);
+//}
+/* RESPONSIVE */
 /* ===== Mobile large (≤425px) ===== */
 @media (max-width: 600px) {
   .container-right,
@@ -300,46 +277,37 @@ p{
     width: 100%;
   }
   .top {
-    //min-height:  40vh;                /* giảm chiều cao để vừa màn hình nhỏ */
-    padding: 1rem 0.5rem;             /* padding gọn lại */
-    align-items: center;              /* căn giữa thay vì bên phải */
+    padding: 1rem 0.5rem;
+    align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    //border-radius: 0 0 1rem 1rem;     /* bo góc dưới cho đẹp */
     background-size: cover;
     background-position: center;
     position: relative;
     margin: 0;
     padding: 0;
   }
-
-  /* thêm lớp overlay mờ để chữ dễ đọc hơn */
   .top::before {
     content: "";
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0,0,0,0.35);   /* lớp phủ đen trong suốt */
+    background: rgba(0,0,0,0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    //border-radius: 0 0 1rem 1rem;
   }
-
-  /* đảm bảo chữ nằm trên overlay */
   .top * {
     position: relative;
     z-index: 1;
   }
-
   .top h1,
   .top .title {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
     font-weight: 600;
     position: relative;
-
   }
   .t1{
     position: relative;
@@ -351,7 +319,6 @@ p{
     line-height: 1.4;
     max-width: 90%;
   }
-
   .middle {
     flex-direction: column !important;
     align-items: center !important;
@@ -359,25 +326,20 @@ p{
     width: 100% !important;
     margin: 0;
     gap: 1rem;
-
   }
-
   .box {
     width: 100%;
     padding: 1rem;
     border-radius: 1rem;
-    //background: rgba(255, 255, 255, 0.1); /* nền trong suốt nhẹ */
     background-color: #1E2021;
-    backdrop-filter: blur(6px);            /* hiệu ứng mờ kính */
+    backdrop-filter: blur(6px);
   }
-
   .big-group {
     flex-direction: column;
     gap: 1rem;
     align-items: center;
     width: 100%;
   }
-
   .group1, .group2, .group3, .group4 {
     width: 92%;
     max-width: 100%;
@@ -385,14 +347,12 @@ p{
     border-radius: 1rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
-
-  .hinh {
+  .pic {
     max-width: 140px;
     aspect-ratio: 1 / 1;
     border-radius: 0.75rem;
     object-fit: cover;
   }
-
   .chat1, .chat2, .chat3, .chat4 {
     min-height: 3.25rem;
     padding: 0.6rem 0.75rem;
@@ -400,14 +360,12 @@ p{
     font-size: 0.95rem;
     line-height: 1.4;
   }
-
   .t2 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
     font-weight: 600;
     text-align: center;
   }
-
   .bottom {
     flex-direction: column;
     align-items: center;
@@ -417,29 +375,24 @@ p{
     background-size: cover;
     background-position: center;
     color: white;
-    //border-radius: 1rem;
     text-align: center;
   }
-
   .bottom h2 {
     font-size: 1.1rem;
   }
-
   .bottom p {
     font-size: 0.9rem;
     line-height: 1.4;
   }
-
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
 
-
-  .hinh-contact {
-    display: none; /* ẩn hình khi quá nhỏ, tránh vỡ bố cục */
+  .contact-pic {
+    display: none;
   }
-
   .contact {
     width: 100%;
     padding: 0.75rem;
@@ -448,7 +401,7 @@ p{
   .bottom h1{
     font-size: 1.2rem;
   }
-  .duoi{
+  .under{
     width: 100%;
     height: auto;
     background-color: white;
@@ -456,16 +409,12 @@ p{
     opacity: 0.5;
     padding-right: 0;
   }
-  .duoi:hover,
-  .duoi:active {
-    opacity: 1; /* khi hover hoặc nhấn giữ */
+  .under:hover,
+  .under:active {
+    opacity: 1;
   }
-
 }
-
-
 /* ===== Mobile/Small Tablet (≤780px) ===== */
-
 @media (min-width: 600px) and (max-width: 780px) {
   .container-right {
     max-width: 1200px;
@@ -490,7 +439,7 @@ p{
     flex-direction: row;
     gap: 2rem;
   }
-  .hinh {
+  .pic {
     max-width: 190px;
   }
   .bottom {
@@ -502,29 +451,23 @@ p{
     background-size: cover;
     background-position: center;
     color: white;
-    //border-radius: 1rem;
     text-align: center;
   }
-
   .bottom h2 {
     font-size: 1.1rem;
   }
-
   .bottom p {
     font-size: 0.9rem;
     line-height: 1.4;
   }
-
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
-
-
-  .hinh-contact {
-    display: none; /* ẩn hình khi quá nhỏ, tránh vỡ bố cục */
+  .contact-pic {
+    display: none;
   }
-
   .contact {
     width: 100%;
     padding: 0.75rem;
@@ -533,7 +476,7 @@ p{
   .bottom h1{
     font-size: 1.2rem;
   }
-  .duoi{
+  .under{
     width: 60%;
     height: auto;
     background-color: white;
@@ -541,55 +484,11 @@ p{
     opacity: 0.5;
     padding-right: 0;
   }
-  .duoi:hover,
-  .duoi:active {
-    opacity: 1; /* khi hover hoặc nhấn giữ */
+  .under:hover,
+  .under:active {
+    opacity: 1;
   }
 }
-
-///* ===== Tablet Landscape (768px → 1024px) ===== */
-//@media (min-width: 800px) and (max-width: 1024px) {
-//  .container-right {
-//    width: 100%;
-//    padding: 0 2rem;
-//  }
-//  .top {
-//    padding: 2rem 1.5rem;
-//    align-items: flex-end;
-//    flex-direction: row;
-//    text-align: left;
-//  }
-//  .middle {
-//    flex-direction: row;
-//    gap: 2rem;
-//  }
-//  .box {
-//    width: 95%;
-//    padding: 2rem;
-//  }
-//  .big-group {
-//    flex-direction: row;
-//    gap: 2rem;
-//  }
-//  .hinh {
-//    max-width: 180px;
-//  }
-//  .bottom {
-//    flex-direction: row;
-//    gap: 2rem;
-//    padding: 2rem;
-//  }
-//  .hinh-contact {
-//    display: block;
-//    width: 30rem;
-//    height: 22rem;
-//  }
-//  .contact {
-//    width: 50%;
-//    padding: 2rem;
-//  }
-//}
-
 /* ===== Desktop (1025px → 1439px) ===== */
 @media (min-width: 781px) and (max-width: 1439px) {
   .container-right {
@@ -615,7 +514,7 @@ p{
     flex-direction: row;
     gap: 2rem;
   }
-  .hinh {
+  .pic {
     max-width: 190px;
   }
   .bottom {
@@ -627,29 +526,23 @@ p{
     background-size: cover;
     background-position: center;
     color: white;
-    //border-radius: 1rem;
     text-align: center;
   }
-
   .bottom h2 {
     font-size: 1.1rem;
   }
-
   .bottom p {
     font-size: 0.9rem;
     line-height: 1.4;
   }
-
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
-
-
-  .hinh-contact {
-    display: none; /* ẩn hình khi quá nhỏ, tránh vỡ bố cục */
+  .contact-pic {
+    display: none;
   }
-
   .contact {
     width: 100%;
     padding: 0.75rem;
@@ -658,7 +551,7 @@ p{
   .bottom h1{
     font-size: 1.2rem;
   }
-  .duoi{
+  .under{
     width: 50%;
     height: auto;
     background-color: white;
@@ -666,9 +559,90 @@ p{
     opacity: 0.5;
     padding-right: 0;
   }
-  .duoi:hover,
-  .duoi:active {
-    opacity: 1; /* khi hover hoặc nhấn giữ */
+  .under:hover,
+  .under:active {
+    opacity: 1;
   }
 }
+@media (min-width: 781px) and (max-width: 1439px) {
+  .container-right {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+  .top {
+    padding: 2.5rem 1.5rem;
+    align-items: flex-end;
+    flex-direction: row;
+    text-align: left;
+  }
+  .middle {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  .box {
+    width: 95%;
+    padding: 2rem;
+  }
+  .big-group {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  .pic {
+    max-width: 190px;
+  }
+  .bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem;
+    background-image: url("https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+  }
+  .bottom h2 {
+    font-size: 1.1rem;
+  }
+  .bottom p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .bottom button {
+    @include button-primary;
+    font-size: 0.9rem;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+  .contact-pic {
+    display: none;
+  }
+  .contact {
+    width: 100%;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .bottom h1{
+    font-size: 1.2rem;
+  }
+  .under{
+    width: 50%;
+    height: auto;
+    background-color: white;
+    border-radius: 1rem;
+    opacity: 0.5;
+    padding-right: 0;
+  }
+  .under:hover,
+  .under:active {
+    opacity: 1;
+  }
+}
+@media (min-width: 1126px) and (max-width: 1371px){
+  .big-group{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
+  }
+}

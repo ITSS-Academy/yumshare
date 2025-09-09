@@ -40,12 +40,10 @@ export class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Connected to server');
       this.connectionStatusSubject.next(true);
     });
 
     this.socket.on('disconnect', () => {
-      console.log('❌ Disconnected from server');
       this.connectionStatusSubject.next(false);
     });
 
@@ -55,23 +53,19 @@ export class SocketService {
     });
 
     this.socket.on('notification', (notification: Notification) => {
-      console.log('🔔 Received notification:', notification);
       this.notificationSubject.next(notification);
     });
 
     // Chat events
     this.socket.on('newMessage', (message: ChatMessage) => {
-      console.log('💬 Received new message:', message);
       this.newMessageSubject.next(message);
     });
 
     this.socket.on('userTyping', (data: {chatId: string, userId: string, isTyping: boolean}) => {
-      console.log('⌨️ User typing:', data);
       this.userTypingSubject.next(data);
     });
 
     this.socket.on('messagesRead', (data: {chatId: string, userId: string}) => {
-      console.log('👁️ Messages read:', data);
       this.messagesReadSubject.next(data);
     });
   }
@@ -91,25 +85,18 @@ export class SocketService {
   joinUserRoom(userId: string): void {
     if (this.socket.connected) {
       this.socket.emit('join', userId);
-      console.log(`👤 User ${userId} joined notification room`);
-    } else {
-      console.warn('Socket not connected, cannot join room');
     }
   }
 
   joinChatRoom(userId: string): void {
     if (this.socket.connected) {
       this.socket.emit('join', { userId });
-      console.log(`💬 User ${userId} joined chat room`);
-    } else {
-      console.warn('Socket not connected, cannot join chat room');
     }
   }
 
   leaveUserRoom(userId: string): void {
     if (this.socket.connected) {
       this.socket.emit('leave', userId);
-      console.log(`👋 User ${userId} left room`);
     }
   }
 
@@ -140,23 +127,18 @@ export class SocketService {
   sendMessage(messageData: any): void {
     if (this.socket.connected) {
       this.socket.emit('sendMessage', messageData);
-      console.log('📤 Sent message via WebSocket:', messageData.content);
-    } else {
-      console.warn('Socket not connected, cannot send message');
     }
   }
 
   sendTypingIndicator(chatId: string, userId: string, isTyping: boolean): void {
     if (this.socket.connected) {
       this.socket.emit('typing', { chatId, userId, isTyping });
-      console.log('⌨️ Sent typing indicator:', { chatId, userId, isTyping });
     }
   }
 
   markMessagesAsRead(chatId: string, userId: string): void {
     if (this.socket.connected) {
       this.socket.emit('markAsRead', { chatId, userId });
-      console.log('👁️ Marked messages as read:', { chatId, userId });
     }
   }
 }

@@ -13,10 +13,27 @@ export const loadCategories = createEffect(
       switchMap(() =>
         categoryService.getCategories().pipe(
           map((response) => {
-            const categories = response.data || response;
+            // Handle both array and paginated response formats
+            let categories: any[] = [];
+            if (Array.isArray(response)) {
+              categories = response;
+            } else if (response && (response as any).data) {
+              // Check if data is an array directly
+              if (Array.isArray((response as any).data)) {
+                categories = (response as any).data;
+              } 
+              // Check if data has nested data property
+              else if ((response as any).data.data && Array.isArray((response as any).data.data)) {
+                categories = (response as any).data.data;
+              }
+            }
+            
             return CategoryActions.loadCategoriesSuccess({ categories });
           }),
-          catchError((error) => of(CategoryActions.loadCategoriesFailure({ error: error.message })))
+          catchError((error) => {
+            console.error('❌ Category Effect: Error loading categories:', error);
+            return of(CategoryActions.loadCategoriesFailure({ error: error.message }));
+          })
         )
       )
     );

@@ -227,9 +227,8 @@ export class ChatsService {
 
   async updateUserStatus(userId: string, isOnline: boolean) {
     // This method should update user's online status
-    // You might want to use the AuthService here or create a separate method
-    // For now, we'll just log it
-    console.log(`User ${userId} is now ${isOnline ? 'online' : 'offline'}`);
+    // Update user online status
+    // TODO: Implement proper user status tracking
   }
 
 

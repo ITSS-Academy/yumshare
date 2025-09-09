@@ -35,7 +35,7 @@ import { selectCurrentUser, selectMineProfile } from '../../../../ngrx/auth/auth
     ScrollingModule
   ],
   templateUrl: './comment.component.html',
-  styleUrl: './comment.component.scss'
+  styleUrls: ['./comment.component.scss']
 })
 export class CommentComponent implements OnInit, OnDestroy {
   @Input() recipeId: string = '';
@@ -54,7 +54,7 @@ export class CommentComponent implements OnInit, OnDestroy {
   commentsLoading$: Observable<boolean>;
   commentsError$: Observable<string | null>;
   operationLoading$: Observable<boolean>;
-  
+
   // Auth data
   currentUser$: Observable<any | null>;
   mineProfile$: Observable<User | null>;
@@ -64,7 +64,7 @@ export class CommentComponent implements OnInit, OnDestroy {
   editingCommentId: string | null = null;
   editingContent: string = '';
   activeMenuId: string | null = null;
-  
+
   constructor(
     private store: Store,
     private snackBar: MatSnackBar,
@@ -75,7 +75,7 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.commentsLoading$ = this.store.select(selectCommentsByRecipeLoading);
     this.commentsError$ = this.store.select(selectCommentsByRecipeError);
     this.operationLoading$ = this.store.select(selectOperationLoading);
-    
+
     this.currentUser$ = this.store.select(selectCurrentUser);
     this.mineProfile$ = this.store.select(selectMineProfile);
   }
@@ -115,61 +115,61 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   onSubmitComment(): void {
     if (!this.newCommentContent.trim() || !this.recipeId) return;
-    
-          // Kiểm tra đăng nhập trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
+
+          // Kiểm tra Login trước - sử dụng take(1) để chỉ lấy giá trị hiện tại
       this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
         if (!mineProfile || !mineProfile.id) {
-          // Chưa đăng nhập - chỉ hiển thị thông báo
-          this.snackBar.open('Vui lòng đăng nhập để bình luận!', 'Đăng nhập', { 
+          // Chưa Login - chỉ hiển thị thông báo
+          this.snackBar.open('Please login to comment!', 'Login', {
             duration: 4000,
             panelClass: ['warning-snackbar']
           });
           return;
         }
-        
-        // Đã đăng nhập - tiếp tục logic comment
+
+        // Đã Login - tiếp tục logic comment
         const commentData: CreateCommentDto = {
           user_id: mineProfile.id,
           recipe_id: this.recipeId,
           content: this.newCommentContent.trim()
         };
-        
+
         this.store.dispatch(CommentActions.createComment({ commentData }));
       this.newCommentContent = '';
-      
+
       // Note: Notification is automatically created by backend when comment is created
       // No need to call notification helper from frontend
-      
+
       // Force reload comments after creating
       setTimeout(() => {
         this.store.dispatch(CommentActions.loadCommentsByRecipe({ recipeId: this.recipeId }));
       }, 1000);
-      
+
       // Emit event to parent component
       this.commentAdded.emit(commentData as any);
     });
   }
 
   onEditComment(comment: Comment): void {
-    // Kiểm tra đăng nhập trước
+    // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
+        this.snackBar.open('Please login to edit comment!', 'Login', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
         return;
       }
-      
+
       // Kiểm tra xem user có phải là người tạo comment không
       if (mineProfile.id !== comment.user_id) {
-        this.snackBar.open('Bạn không có quyền chỉnh sửa bình luận này!', 'Đóng', { 
+        this.snackBar.open('You do not have permission to edit this comment!', 'Close', { 
           duration: 3000,
           panelClass: ['warning-snackbar']
         });
         return;
       }
-      
+
       this.editingCommentId = comment.id;
       this.editingContent = comment.content;
       this.activeMenuId = null; // Close menu when starting edit
@@ -178,29 +178,29 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   onSaveEdit(): void {
     if (!this.editingCommentId || !this.editingContent.trim()) return;
-    
-    // Kiểm tra đăng nhập trước
+
+    // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Vui lòng đăng nhập để chỉnh sửa bình luận!', 'Đăng nhập', { 
+        this.snackBar.open('Please login to edit comment!', 'Login', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
         return;
       }
-      
+
       const commentData: UpdateCommentDto = {
         content: this.editingContent.trim()
       };
-      
-      this.store.dispatch(CommentActions.updateComment({ 
-        id: this.editingCommentId!, 
-        commentData 
+
+      this.store.dispatch(CommentActions.updateComment({
+        id: this.editingCommentId!,
+        commentData
       }));
-      
+
       // Reset editing state
       this.cancelEdit();
-      
+
       // Force reload comments after update
       setTimeout(() => {
         this.store.dispatch(CommentActions.loadCommentsByRecipe({ recipeId: this.recipeId }));
@@ -218,39 +218,39 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
   onDeleteComment(commentId: string): void {
-    // Kiểm tra đăng nhập trước
+    // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Vui lòng đăng nhập để xóa bình luận!', 'Đăng nhập', { 
+        this.snackBar.open('Please login to delete comment!', 'Login', { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
         return;
       }
-      
+
       // Tìm comment để kiểm tra quyền
       this.comments$.pipe(take(1)).subscribe((comments: Comment[]) => {
         const comment = comments.find(c => c.id === commentId);
-        
+
         if (!comment) {
           return;
         }
-        
+
         // Kiểm tra xem user có phải là người tạo comment không
         if (mineProfile.id !== comment.user_id) {
-          this.snackBar.open('Bạn không có quyền xóa bình luận này!', 'Đóng', { 
+          this.snackBar.open('You do not have permission to delete this comment!', 'Close', { 
             duration: 3000,
             panelClass: ['warning-snackbar']
           });
           return;
         }
-        
-        if (confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
+
+        if (confirm('Are you sure you want to delete this comment?')) {
           this.store.dispatch(CommentActions.deleteComment({ id: commentId }));
-          
+
           // Emit event to parent component
           this.commentDeleted.emit(commentId);
-          
+
           // Close menu after delete
           this.activeMenuId = null;
         }
@@ -300,7 +300,7 @@ export class CommentComponent implements OnInit, OnDestroy {
   getTimeAgo(date: Date | string): string {
     try {
       const now = new Date();
-      
+
       // Convert database UTC time to local time
       let commentDate: Date;
       if (typeof date === 'string') {
@@ -311,15 +311,15 @@ export class CommentComponent implements OnInit, OnDestroy {
       } else {
         commentDate = new Date(date);
       }
-      
+
       // Check if date is valid
       if (isNaN(commentDate.getTime())) {
         return 'Unknown time';
       }
-      
+
       // Calculate difference in seconds
       const diffInSeconds = Math.floor((now.getTime() - commentDate.getTime()) / 1000);
-      
+
       // WORKAROUND: If the time difference is suspiciously large (> 6 hours),
       // it might be a backend timezone issue. Show a more user-friendly message.
       if (diffInSeconds > 21600) { // 6 hours
@@ -331,7 +331,7 @@ export class CommentComponent implements OnInit, OnDestroy {
           return `${days} ngày trước`;
         }
       }
-      
+
       if (diffInSeconds < 0) {
         return commentDate.toLocaleDateString('vi-VN', {
           year: 'numeric',
@@ -341,13 +341,13 @@ export class CommentComponent implements OnInit, OnDestroy {
           minute: '2-digit'
         });
       }
-      
-      if (diffInSeconds < 60) return 'Vừa xong';
-      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} phút trước`;
-      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} giờ trước`;
-      if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} ngày trước`;
-      if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} tháng trước`;
-      
+
+      if (diffInSeconds < 60) return 'Just now';
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+      if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+      if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+
       return commentDate.toLocaleDateString('vi-VN', {
         year: 'numeric',
         month: 'short',
@@ -363,17 +363,17 @@ export class CommentComponent implements OnInit, OnDestroy {
     if (comment.username) {
       return comment.username;
     }
-    
+
     // Try to get username from user relation first
     if (comment.user?.username) {
       return comment.user.username;
     }
-    
+
     // If no user relation, show user ID as fallback
     if (comment.user_id) {
       return `User ${comment.user_id.substring(0, 8)}...`;
     }
-    
+
     return 'Anonymous User';
   }
 
@@ -382,12 +382,12 @@ export class CommentComponent implements OnInit, OnDestroy {
     if (comment.avatar_url) {
       return comment.avatar_url;
     }
-    
+
     // Try to get avatar from user relation first
     if (comment.user?.avatar_url) {
       return comment.user.avatar_url;
     }
-    
+
     // Fallback to default avatar
     return 'assets/default-avatar.png';
   }
@@ -395,7 +395,7 @@ export class CommentComponent implements OnInit, OnDestroy {
   private onDocumentClick(event: MouseEvent): void {
     const target = event.target as Node;
     const commentMenu = document.querySelector('.comment-menu');
-    
+
     // Close menu when clicking outside
     if (commentMenu && !commentMenu.contains(target)) {
       this.activeMenuId = null;

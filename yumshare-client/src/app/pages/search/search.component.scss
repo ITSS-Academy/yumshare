@@ -1,111 +1,97 @@
-$primary-color: #8DC63F;
-$accent-color: #7AB83A;
-$background-color: #f8fafc;
-$text-color: #2d3748;
-$border-color: #e2e8f0;
-$hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-$transition: all 0.3s ease;
+// ===== SEARCH COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
 
 .search-container {
   max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 24px;
-  font-family: 'Poppins', sans-serif;
+  margin: var(--spacing-xxxl) auto;
+  padding: 0 var(--spacing-lg);
+  font-family: var(--mat-sys-plain-font-family);
 }
 
 #search-title {
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: $text-color;
+  font: var(--mat-sys-headline-large);
+  color: var(--text-primary);
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: var(--spacing-xl);
   letter-spacing: -0.02em;
 }
 
 .search-bar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
   align-items: center;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  flex-wrap: wrap;
+  background: var(--surface);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-light);
+  flex-wrap: nowrap;
 }
 
 .search-bar input,
 .search-bar select {
+  @include input-base;
   flex: 1;
   min-width: 200px;
-  padding: 12px 16px;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: $text-color;
-  background: #fff;
-  transition: $transition;
 }
 
-.search-bar input:focus,
-.search-bar select:focus {
-  outline: none;
-  border-color: $primary-color;
-  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+#category-select {
+  flex: 0 0 180px;
+  min-width: 180px;
+  flex-shrink: 0;
 }
 
-// Custom styling for search and clear buttons
+.search-type-select {
+  min-width: 160px !important;
+  flex: 0 0 160px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: var(--mat-sys-medium-font-weight);
+  border: 2px solid var(--primary);
+  flex-shrink: 0;
+  
+  &:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+  }
+}
+
+// Search bar buttons using design system
 .search-bar {
   button {
+    @include button-base;
     min-width: 120px;
     height: 48px;
-    border-radius: 8px;
-    font-weight: 600;
+    font-weight: var(--mat-sys-medium-font-weight);
     font-size: 0.95rem;
     text-transform: none;
     letter-spacing: 0.5px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     color: #fff !important;
+    flex-shrink: 0;
     
     mat-icon {
-      margin-right: 8px;
+      margin-right: var(--spacing-sm);
       font-size: 20px;
       color: #fff !important;
     }
     
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    }
-    
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    // Search button specific styling - using primary color
+    // Search button - primary style
     &[color="primary"] {
-      background: $primary-color !important;
-      border: none;
-      
-      &:hover {
-        background: darken($primary-color, 10%) !important;
-        box-shadow: 0 4px 16px rgba(141, 198, 63, 0.3);
-      }
+      @include button-primary;
     }
     
-    // Clear button specific styling - using text-secondary color
+    // Clear button - secondary style
     &[color="warn"] {
-      background: #6c757d !important; // text-secondary color
+      @include button-secondary;
+      background: var(--text-muted) !important;
+      color: white !important;
       border: none;
       
-      &:hover {
-        background: darken(#6c757d, 10%) !important;
-        box-shadow: 0 4px 16px rgba(108, 117, 125, 0.3);
+      &:hover:not(:disabled) {
+        background: var(--text-secondary) !important;
       }
     }
   }
@@ -114,55 +100,60 @@ $transition: all 0.3s ease;
 .loading {
   display: flex;
   justify-content: center;
-  margin: 24px 0;
+  margin: var(--spacing-lg) 0;
 }
 
 .error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 20px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 12px;
-  margin: 24px 0;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--error-light);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-lg) 0;
   text-align: center;
 
   mat-icon {
-    color: #e74c3c;
+    color: var(--error);
     font-size: 2rem;
   }
 
   .error-message {
-    color: #e74c3c;
-    font-size: 1rem;
+    color: var(--error);
+    font: var(--mat-sys-body-large);
     margin: 0;
   }
-
-  // Angular Material buttons will handle their own styling
 }
 
 .results-info {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--spacing-sm);
   text-align: center;
-  font-size: 1.1rem;
-  color: $text-color;
-  margin-bottom: 24px;
-  padding: 12px;
-  background: #f0fff4;
-  border: 1px solid #c6f6d5;
-  border-radius: 8px;
+  font: var(--mat-sys-body-large);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-sm);
+  background: var(--success-light);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
 
   p {
     margin: 0;
   }
 
+  .search-type-badge {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: var(--mat-sys-regular-font-weight);
+    font-style: italic;
+  }
+
   mat-spinner {
-    margin-left: 8px;
+    margin-left: var(--spacing-sm);
   }
 }
 
@@ -170,41 +161,169 @@ $transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 40px 20px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xxxl) var(--spacing-lg);
   text-align: center;
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  margin: 24px 0;
+  background: var(--surface-variant);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-lg) 0;
 
   mat-icon {
-    color: #a0aec0;
+    color: var(--text-muted);
     font-size: 3rem;
   }
 
   p {
-    color: #718096;
-    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font: var(--mat-sys-body-large);
     margin: 0;
   }
-
-  // Angular Material buttons will handle their own styling
 }
 
 .results-grid-wrapper {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .results-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  gap: var(--spacing-lg);
   justify-content: center;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   align-items: start;
+
+  .recipe-card {
+    @include card-base;
+    @include card-hover;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .recipe-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .recipe-content {
+      padding: var(--spacing-md);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .recipe-title {
+        font: var(--mat-sys-title-medium);
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing-sm) 0;
+        line-height: 1.3;
+      }
+
+      .recipe-description {
+        font: var(--mat-sys-body-medium);
+        color: var(--text-secondary);
+        margin: 0 0 var(--spacing-sm) 0;
+        line-height: 1.4;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .recipe-info {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+
+        .difficulty {
+          padding: var(--spacing-xs) var(--spacing-sm);
+          border-radius: var(--radius-lg);
+          font: var(--mat-sys-label-small);
+
+          &.easy {
+            background: var(--success-light);
+            color: var(--success-on);
+          }
+
+          &.medium {
+            background: var(--warning-light);
+            color: var(--warning-on);
+          }
+
+          &.hard {
+            background: var(--error-light);
+            color: var(--error-on);
+          }
+        }
+
+        .cooking-time {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-xs);
+          font: var(--mat-sys-label-small);
+          color: var(--text-secondary);
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+
+      .recipe-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+
+          .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-round);
+            object-fit: cover;
+          }
+
+          .username {
+            font: var(--mat-sys-label-small);
+            color: var(--text-secondary);
+          }
+        }
+
+        .actions {
+          display: flex;
+          gap: var(--spacing-sm);
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color var(--animation-duration-fast) var(--animation-easing);
+
+            &:hover {
+              color: var(--primary);
+            }
+
+            &.favorite-icon:hover {
+              color: var(--error);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .container-card {
@@ -396,7 +515,7 @@ $transition: all 0.3s ease;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
           &:hover {
-            color: $primary-color;
+            color: var(--primary);
             background: rgba(46, 204, 113, 0.1);
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
@@ -426,29 +545,28 @@ $transition: all 0.3s ease;
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin: 48px 0;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-xxl) 0;
   flex-wrap: wrap;
 
   button {
+    @include button-base;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: #edf2f7;
-    color: $text-color;
+    border-radius: var(--radius-round);
+    background: var(--surface-hover);
+    color: var(--text-primary);
     font-size: 1rem;
-    cursor: pointer;
-    transition: $transition;
+    padding: 0;
 
     &.active {
-      background: $primary-color;
+      background: var(--primary);
       color: #fff;
-      font-weight: 500;
+      font-weight: var(--mat-sys-medium-font-weight);
     }
 
     &:hover:not(:disabled) {
-      background: $accent-color;
+      background: var(--primary-dark);
       color: #fff;
       transform: translateY(-2px);
     }
@@ -463,14 +581,16 @@ $transition: all 0.3s ease;
     display: flex;
     align-items: center;
     font-size: 1.2rem;
-    color: #718096;
+    color: var(--text-muted);
   }
 }
+
+// ===== RESPONSIVE DESIGN =====
 
 @media (max-width: 1200px) {
   .results-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: var(--spacing-md);
   }
   
   .container-card .dish-card {
@@ -485,7 +605,7 @@ $transition: all 0.3s ease;
 @media (max-width: 1024px) {
   .results-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: var(--spacing-md);
   }
   
   .container-card .dish-card {
@@ -499,53 +619,65 @@ $transition: all 0.3s ease;
 
 @media (max-width: 768px) {
   .search-container {
-    padding: 0 16px;
+    padding: 0 var(--spacing-md);
   }
 
   .search-bar {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     max-width: 100%;
-    padding: 12px;
-    gap: 8px;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
   }
 
   .search-bar input,
   .search-bar select {
     width: 100%;
     min-width: auto;
+    flex: 1;
   }
 
-  // Responsive styling for buttons
+  #category-select {
+    flex: 1;
+    min-width: auto;
+  }
+
+  .search-type-select {
+    min-width: 140px !important;
+    flex: 0 0 140px;
+  }
+
   .search-bar button {
     min-width: 100px;
     height: 44px;
     font-size: 0.9rem;
+    flex: 1;
     
     mat-icon {
       font-size: 18px;
-      margin-right: 6px;
+      margin-right: var(--spacing-xs);
     }
   }
 
-
   .pagination {
-    margin: 32px 0;
+    margin: var(--spacing-xl) 0;
   }
 }
 
 @media (max-width: 480px) {
   .search-container {
-    padding: 0 12px;
+    padding: 0 var(--spacing-sm);
   }
 
   #search-title {
-    font-size: 1.8rem;
+    font: var(--mat-sys-headline-medium);
   }
 
   .results-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: var(--spacing-md);
   }
   
   .container-card .dish-card {
@@ -556,26 +688,25 @@ $transition: all 0.3s ease;
     }
     
     .dish-title {
-      font-size: 1.1rem;
-      margin: 12px 12px 6px;
+      font: var(--mat-sys-title-small);
+      margin: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs);
     }
     
     .dish-description {
-      font-size: 0.85rem;
-      margin: 0 12px 8px;
+      font: var(--mat-sys-body-small);
+      margin: 0 var(--spacing-sm) var(--spacing-sm);
       height: 40px;
     }
     
     .dish-info-row {
-      margin: 0 12px 8px;
-      padding: 6px 10px;
+      margin: 0 var(--spacing-sm) var(--spacing-sm);
+      padding: var(--spacing-xs) var(--spacing-sm);
     }
     
     .card-footer {
-      padding: 10px 12px;
+      padding: var(--spacing-sm);
     }
   }
-
 
   .pagination button {
     width: 36px;
@@ -583,16 +714,22 @@ $transition: all 0.3s ease;
     font-size: 0.9rem;
   }
   
-  // Mobile button styling
+  .search-type-select {
+    min-width: 120px !important;
+    flex: 0 0 120px;
+    font-size: 0.85rem;
+  }
+
   .search-bar button {
     min-width: 80px;
     height: 40px;
     font-size: 0.85rem;
-    padding: 0 12px;
+    padding: 0 var(--spacing-sm);
+    flex: 1;
     
     mat-icon {
       font-size: 16px;
-      margin-right: 4px;
+      margin-right: var(--spacing-xs);
     }
   }
 }

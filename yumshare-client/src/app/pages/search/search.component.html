@@ -2,10 +2,20 @@
   <h2 id="search-title">Discover Your Favorites</h2>
 
   <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
+    <select 
+      id="search-type-select" 
+      [(ngModel)]="searchType" 
+      name="searchType"
+      class="search-type-select"
+      (ngModelChange)="onSearchTypeChange()"
+    >
+      <option value="recipe">Search Recipes</option>
+      <option value="author">Search by Author</option>
+    </select>
     <input
       type="text"
       id="search-input"
-      placeholder="Search by keyword or author: (use 'author:username' for author search)..."
+      [placeholder]="getSearchPlaceholder()"
       [(ngModel)]="keyword"
       name="keyword"
     />
@@ -13,6 +23,7 @@
       id="category-select" 
       [(ngModel)]="selectedCategory" 
       name="category"
+      [disabled]="searchType === 'author'"
     >
       <option value="">All Categories</option>
       @for (c of categories; track c.id) {
@@ -55,7 +66,13 @@
     @if (stats.totalResults > 0) {
       <div class="results-info" id="results-info">
         @if (stats.currentQuery) {
-          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b></p>
+          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b> 
+            @if (searchType === 'author') {
+              <span class="search-type-badge">(by author)</span>
+            } @else {
+              <span class="search-type-badge">(recipes)</span>
+            }
+          </p>
         } @else {
           <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
         }
@@ -69,7 +86,13 @@
     } @else if (!stats.isLoading && !stats.hasError && stats.currentQuery) {
       <div class="no-results" id="no-results">
         <mat-icon>search_off</mat-icon>
-        <p>No results found for "{{ stats.currentQuery }}"</p>
+        <p>No results found for "{{ stats.currentQuery }}" 
+          @if (searchType === 'author') {
+            <span class="search-type-badge">(by author)</span>
+          } @else {
+            <span class="search-type-badge">(recipes)</span>
+          }
+        </p>
         <button mat-raised-button color="primary" (click)="clearSearch()">Clear Search</button>
       </div>
     }
@@ -78,70 +101,37 @@
   <div class="results-grid-wrapper">
     <div class="results-grid" id="results-grid">
       @for (recipe of displayedResults$ | async; track recipe.id) {
-        <div
-          class="container-card"
-          id="card-{{ recipe.title | lowercase }}-{{ $index }}"
-          (click)="viewRecipe(recipe.id)"
-        >
-          <mat-card class="dish-card" appearance="outlined" id="dish-card-{{ recipe.title | lowercase }}-{{ $index }}">
-            <img
-              mat-card-image
-              [src]="recipe.image_url || 'https://via.placeholder.com/260x180'"
-              alt="{{ recipe.title }} Image"
-              id="dish-image-{{ recipe.title | lowercase }}-{{ $index }}"
-            />
-            <mat-card-content>
-              <h2 class="dish-title" id="dish-title-{{ recipe.title | lowercase }}-{{ $index }}">
-                {{ recipe.title }}
-              </h2>
-              <p
-                class="dish-description"
-                id="dish-description-{{ recipe.title | lowercase }}-{{ $index }}"
-              >
-                {{ recipe.description || 'No description available' }}
-              </p>
-            </mat-card-content>
-            <div class="rating" id="rating-{{ recipe.title | lowercase }}-{{ $index }}">
-              @for (star of [1,2,3,4,5]; track star) {
-                <span
-                  class="material-icons"
-                  id="star-{{ recipe.title | lowercase }}-{{ $index }}-{{ star }}"
-                >
-                  {{ star <= (recipe.rating || 0) ? 'star' : 'star_border' }}
-                </span>
-              }
+        <div class="recipe-card" (click)="viewRecipe(recipe.id)">
+          <img [src]="recipe.image_url || 'https://via.placeholder.com/260x180'" 
+               [alt]="recipe.title" 
+               class="recipe-image">
+          <div class="recipe-content">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <p class="recipe-description">{{ recipe.description || 'No description available' }}</p>
+            <div class="recipe-info">
+              <span class="difficulty" [ngClass]="getDifficultyClass(recipe.difficulty)">
+                {{ getDifficultyLabel(recipe.difficulty) }}
+              </span>
+              <span class="cooking-time">
+                <mat-icon>schedule</mat-icon>
+                {{ recipe.total_cooking_time }} min
+              </span>
             </div>
-            <mat-card-actions class="card-footer" id="card-footer-{{ recipe.title | lowercase }}-{{ $index }}">
-              <div class="user-info" id="user-info-{{ recipe.title | lowercase }}-{{ $index }}">
-                <img
-                  class="avatar"
-                  [src]="recipe.user?.avatar_url || 'assets/default-avatar.png'"
-                  alt="{{ recipe.user?.username || 'User' }} Avatar"
-                  id="avatar-{{ recipe.title | lowercase }}-{{ $index }}"
-                  onerror="this.src='assets/default-avatar.png'"
-                />
-                <span class="username" id="username-{{ recipe.title | lowercase }}-{{ $index }}">
-                  {{ recipe.user?.username || 'Unknown User' }}
-                </span>
+            <div class="recipe-footer">
+              <div class="user-info">
+                <img [src]="recipe.user?.avatar_url || 'assets/default-avatar.png'" 
+                     [alt]="recipe.user?.username" 
+                     class="user-avatar">
+                <span class="username">{{ recipe.user?.username || 'Unknown User' }}</span>
               </div>
-              <div class="actions" id="actions-{{ recipe.title | lowercase }}-{{ $index }}">
-                <span
-                  class="material-icons favorite-icon"
-                  id="favorite-icon-{{ recipe.title | lowercase }}-{{ $index }}"
-                  (click)="toggleFavorite(recipe); $event.stopPropagation()"
-                >
-                  {{ recipe.isFavorite ? 'favorite' : 'favorite_border' }}
-                </span>
-                <span
-                  class="material-icons"
-                  id="share-icon-{{ recipe.title | lowercase }}-{{ $index }}"
-                  (click)="shareRecipe(recipe); $event.stopPropagation()"
-                >
-                  share
-                </span>
+              <div class="actions">
+                <mat-icon (click)="toggleFavorite(recipe); $event.stopPropagation()" 
+                         class="favorite-icon">favorite_border</mat-icon>
+                <mat-icon (click)="shareRecipe(recipe); $event.stopPropagation()" 
+                         class="share-icon">share</mat-icon>
               </div>
-            </mat-card-actions>
-          </mat-card>
+            </div>
+          </div>
         </div>
       }
     </div>

@@ -102,8 +102,12 @@ export class RecipeService {
   }
 
   // Check edit permission for recipe
-  checkEditPermission(id: string): Observable<{canEdit: boolean, message: string, recipe?: Recipe}> {
-    return this.http.get<{canEdit: boolean, message: string, recipe?: Recipe}>(`${this.apiUrl}/recipes/${id}/check-edit-permission`);
+  checkEditPermission(id: string, idToken: string): Observable<{canEdit: boolean, message: string, recipe?: Recipe}> {
+    return this.http.get<{canEdit: boolean, message: string, recipe?: Recipe}>(`${this.apiUrl}/recipes/${id}/check-edit-permission`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
   }
 
   // Update recipe
@@ -117,7 +121,12 @@ export class RecipeService {
   }
 
   // Delete recipe
-  deleteRecipe(id: string): Observable<void> {
+  deleteRecipe(id: string, idToken: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/recipes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
     return this.http.delete<void>(`${this.apiUrl}/recipes/${id}`);
   }
 
@@ -215,23 +224,63 @@ export class RecipeService {
     return this.http.get<RecipeStep[]>(`${this.apiUrl}/recipes/steps`, { params });
   }
   // Get recipes by category main courses
-  getRecipesByCategoryMainCourses(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryMainCourses(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get recipes by category beverages
-  getRecipesByCategoryBeverages(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryBeverages(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
   
   // Get recipes by category desserts
-  getRecipesByCategoryDesserts(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryDesserts(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get recipes by category snacks
-  getRecipesByCategorySnacks(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategorySnacks(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get all recipes

@@ -12,7 +12,7 @@ import { Category } from '../../models/category.model';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
-import { AsyncPipe, CommonModule, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-search',
@@ -24,7 +24,6 @@ import { AsyncPipe, CommonModule, LowerCasePipe, NgClass, NgFor, NgIf } from '@a
     MatButtonModule,
     CommonModule,
     MatProgressSpinnerModule,
-    LowerCasePipe,
     AsyncPipe,
   ],
   templateUrl: './search.component.html',
@@ -33,6 +32,7 @@ import { AsyncPipe, CommonModule, LowerCasePipe, NgClass, NgFor, NgIf } from '@a
 export class SearchComponent implements OnInit, OnDestroy {
   keyword: string = '';
   selectedCategory: string = '';
+  searchType: 'recipe' | 'author' = 'recipe';
   categories: Category[] = [];
   
   // NgRx observables
@@ -172,7 +172,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe(loading => {
         if (loading) {
-          console.log('Search in progress...');
+          // Search in progress
         }
       })
     );
@@ -197,6 +197,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   goToPage(page: number) {
     this.currentPage = page;
     this.performSearch(false); // Don't reset page when paginating
+    this.scrollToTop(); // Scroll to top when changing page
   }
 
   prevPage() {
@@ -209,6 +210,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onSearch() {
     this.performSearch();
+    this.scrollToTop(); // Scroll to top when performing new search
   }
 
   onKeywordChange() {
@@ -221,26 +223,44 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Search will be triggered only when user clicks Search button
   }
 
+  onSearchTypeChange() {
+    // Clear category when switching to author search
+    if (this.searchType === 'author') {
+      this.selectedCategory = '';
+    }
+  }
+
+  getSearchPlaceholder(): string {
+    return this.searchType === 'author' 
+      ? 'Enter author username...' 
+      : 'Search recipes by name, ingredients...';
+  }
+
   private performSearch(resetPage: boolean = true) {
     // Reset to first page when performing new search (not when paginating)
     if (resetPage) {
       this.currentPage = 1;
     }
     
-    // Check if keyword starts with "author:" to search by author
-    let query = this.keyword;
+    // Determine search parameters based on search type
+    let query = '';
     let author = '';
+    let category = '';
     
-    if (this.keyword.toLowerCase().startsWith('author:')) {
-      // Extract author name after "author:" 
-      author = this.keyword.substring(7).trim();
-      query = ''; // Clear query when searching by author
+    if (this.searchType === 'author') {
+      // Search by author
+      author = this.keyword.trim();
+      category = ''; // Don't use category filter when searching by author
+    } else {
+      // Search by recipe
+      query = this.keyword.trim();
+      category = this.selectedCategory;
     }
     
     this.store.dispatch(
       RecipeActions.searchRecipes({
         query: query,
-        category: this.selectedCategory,
+        category: category,
         author: author,
         page: this.currentPage,
         size: this.pageSize,
@@ -254,6 +274,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Reset form fields
     this.keyword = '';
     this.selectedCategory = '';
+    this.searchType = 'recipe';
     
     // Reset pagination
     this.currentPage = 1;
@@ -273,6 +294,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         order: 'DESC'
       }));
     }, 100);
+    
+    this.scrollToTop(); // Scroll to top when clearing search
   }
 
   loadInitialRecipes() {
@@ -331,16 +354,61 @@ export class SearchComponent implements OnInit, OnDestroy {
     );
   }
 
+  // Methods for card functionality
   toggleFavorite(recipe: Recipe) {
     // TODO: Dispatch action để cập nhật trạng thái yêu thích
   }
 
   shareRecipe(recipe: Recipe) {
-    console.log(`Sharing recipe: ${recipe.title}`);
+    const url = `${window.location.origin}/recipe-detail/${recipe.id}`;
+    const title = recipe.title || 'YumShare Recipe';
+    const text = `Check out this recipe: ${title}`;
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => {
+          // Share failed - could show toast notification
+        });
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
   }
 
   viewRecipe(recipeId: string) {
     this.store.dispatch(RecipeActions.loadRecipeById({ id: recipeId }));
     this.router.navigate(['/recipe-detail', recipeId]);
+  }
+
+  getDifficultyLabel(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
+    return difficulty || 'Unknown';
+  }
+
+  getDifficultyClass(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'hard';
+    return '';
+  }
+
+  private scrollToTop() {
+    // Scroll to top of the search container
+    const searchContainer = document.getElementById('search-container');
+    if (searchContainer) {
+      searchContainer.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    } else {
+      // Fallback: scroll to top of window
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    }
   }
 }
