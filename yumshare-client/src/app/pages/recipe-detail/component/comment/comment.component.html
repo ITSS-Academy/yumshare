@@ -1,5 +1,5 @@
 <div class="comments-section">
-  <h1>Comments</h1>
+  <h1>{{ 'Comments' | translate }}</h1>
 
   <!-- Comment Input Section -->
   @if (currentUser$ | async; as currentUser) {
@@ -8,7 +8,7 @@
       <div class="input-container">
         <input
           type="text"
-          placeholder="Add your comment..."
+          [placeholder]="'Add your comment...' | translate"
           [(ngModel)]="newCommentContent"
           (keyup.enter)="onSubmitComment()"
           [disabled]="operationLoading$ | async" />
@@ -17,13 +17,13 @@
             class="cancel-btn"
             (click)="newCommentContent = ''"
             [disabled]="!newCommentContent?.trim()">
-            Cancel
+            {{ 'Cancel' | translate }}
           </button>
           <button
             class="comment-btn"
             (click)="onSubmitComment()"
             [disabled]="!newCommentContent?.trim() || (operationLoading$ | async)">
-            Comment
+            {{ 'Comment' | translate }}
           </button>
         </div>
       </div>
@@ -33,7 +33,7 @@
   <!-- Show login prompt if not logged in -->
   @if (!(currentUser$ | async)) {
     <div class="login-prompt">
-      <p>Please <a href="/login">login</a> to add a comment</p>
+      <p>{{ 'Please login to add a comment' | translate }}</p>
     </div>
   }
 
@@ -43,15 +43,15 @@
   @if (commentsLoading$ | async) {
     <div class="loading-comments">
       <div class="loading-spinner"></div>
-      <p>Loading comments...</p>
+      <p>{{ 'Loading comments...' | translate }}</p>
     </div>
   }
 
   <!-- Error State -->
   @if (commentsError$ | async; as error) {
     <div class="error-comments">
-      <p>Error loading comments: {{ error }}</p>
-      <button (click)="onRetry()" class="retry-btn">Retry</button>
+      <p>{{ 'Error loading comments:' | translate }} {{ error }}</p>
+      <button (click)="onRetry()" class="retry-btn">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -80,13 +80,13 @@
                     @if (canEdit(comment, currentUser)) {
                       <button class="menu-item edit-item" (click)="onEditComment(comment)">
                         <span class="material-icons">edit</span>
-                        Edit
+                        {{ 'Edit' | translate }}
                       </button>
                     }
                     @if (canDelete(comment, currentUser)) {
                       <button class="menu-item delete-item" (click)="onDeleteComment(comment.id)">
                         <span class="material-icons">delete</span>
-                        Delete
+                        {{ 'Delete' | translate }}
                       </button>
                     }
                   </div>
@@ -102,11 +102,11 @@
             <textarea
               [(ngModel)]="editingContent"
               rows="3"
-              placeholder="Edit your comment...">
+              [placeholder]="'Edit your comment...' | translate">
             </textarea>
             <div class="edit-actions">
-              <button (click)="onSaveEdit()" class="save-btn">Save</button>
-              <button (click)="onCancelEdit()" class="cancel-btn">Cancel</button>
+              <button (click)="onSaveEdit()" class="save-btn">{{ 'Save' | translate }}</button>
+              <button (click)="onCancelEdit()" class="cancel-btn">{{ 'Cancel' | translate }}</button>
             </div>
           </div>
         }
@@ -119,7 +119,6 @@
         }
       </div>
     </div>
-
   }
 
   <!-- No Comments -->
@@ -128,7 +127,7 @@
       <div class="no-comments-icon">
         <span class="material-icons">chat_bubble_outline</span>
       </div>
-      <p>No comments yet. Be the first to comment!</p>
+      <p>{{ 'No comments yet. Be the first to comment!' | translate }}</p>
     </div>
   }
 </div>

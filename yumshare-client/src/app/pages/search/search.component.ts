@@ -13,6 +13,7 @@ import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
 import { AsyncPipe, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-search',
@@ -25,6 +26,7 @@ import { AsyncPipe, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common'
     MatProgressSpinnerModule,
     LowerCasePipe,
     AsyncPipe,
+    TranslatePipe
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],

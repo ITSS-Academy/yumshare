@@ -36,7 +36,7 @@ import {
   selectLikesLoading,
   selectLikesForRecipe
 } from '../../ngrx/likes/likes.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
@@ -52,6 +52,7 @@ import {
     SafePipe,
     LazyImageDirective,
     LoadingComponent
+    ,TranslatePipe
   ],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'

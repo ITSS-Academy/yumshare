@@ -3,7 +3,7 @@
   <div class="recipe-loading-container">
     <app-loading
       size="large"
-      message="Loading recipe..."
+      [message]="'Loading recipe...' | translate"
       centerType="center-container">
     </app-loading>
   </div>
@@ -30,7 +30,7 @@
             <p class="food-description">{{ recipe.description }}</p>
             <div class="block">
               <mat-chip>{{ recipe.difficulty }}</mat-chip>
-              <mat-chip>{{ recipe.total_cooking_time }} min</mat-chip>
+              <mat-chip>{{ recipe.total_cooking_time }} {{ 'min' | translate }}</mat-chip>
               <mat-chip>{{ recipe.country }}</mat-chip>
             </div>
           </div>
@@ -41,8 +41,8 @@
     @if (recipe$ | async; as recipe) {
       <div class="middle">
         <div class="left">
-          <h1 class="title">Ingredients</h1>
-          <p class="serving">Serving: {{ recipe.servings }}</p>
+          <h1 class="title">{{ 'Ingredients' | translate }}</h1>
+          <p class="serving">{{ 'Serving' | translate }}: {{ recipe.servings }}</p>
           <div class="ingredient-list">
             @for (ingredient of recipe.ingredients; track i; let i = $index) {
               <div class="row">
@@ -51,10 +51,10 @@
             }
           </div>
           <div class="user-box">
-            <span class="label">Up by:</span>
+            <span class="label">{{ 'Up by:' | translate }}</span>
             <div class="user-info">
               <div class="avatar" [style.background-image]="'url(' + (recipe.user?.avatar_url || 'assets/default-avatar.png') + ')'"></div>
-              <span class="username">{{ recipe.user?.username || 'Unknown User' }}</span>
+              <span class="username">{{ recipe.user?.username || ('Unknown User' | translate) }}</span>
             </div>
             @if (recipe.user?.id !== (currentUser$ | async)?.uid && (currentUser$ | async)) {
               <mat-checkbox
@@ -62,19 +62,19 @@
                 [(ngModel)]="isFollowed"
                 (change)="onFollowToggle($event)"
                 [disabled]="followLoading$ | async">
-                {{ isFollowed ? 'Followed' : 'Follow' }}
+                {{ isFollowed ? ('Followed' | translate) : ('Follow' | translate) }}
               </mat-checkbox>
             }
             @if (recipe.user?.id !== (currentUser$ | async)?.uid && !(currentUser$ | async)) {
               <button
                 class="login-required-btn"
                 (click)="onLoginRequired()">
-                Đăng nhập để Follow
+                {{ 'Đăng nhập để Follow' | translate }}
               </button>
             }
           </div>
           <div class="post-like">
-            Like for this recipe:
+            {{ 'Like for this recipe:' | translate }}
             <button mat-icon-button (click)="toggleLike()" [disabled]="likeLoading$ | async">
               <mat-icon [style.color]="(isLiked$ | async) ? '#000' : '#e0e0e0'">thumb_up</mat-icon>
             </button>
@@ -83,12 +83,12 @@
         </div>
 
         <div class="right">
-          <h1 class="title2">Process Steps</h1>
+          <h1 class="title2">{{ 'Process Steps' | translate }}</h1>
           @for (step of recipe.steps; track step.id; let i = $index) {
             <div class="instruction">
               <div class="instruction-box">
                 <div class="step">
-                  <h1 class="step-number">{{ 'Step ' + (i + 1) }}</h1>
+                  <h1 class="step-number">{{ 'Step' | translate }} {{ i + 1 }}</h1>
                 </div>
                 <div class="step-detail">
                   <p class="cooking">{{ step.description }}</p>
@@ -111,7 +111,7 @@
       <div class="bottom">
         @if (recipe.video_url || recipe.video) {
           <div class="video">
-            <h1 class="title3">Video Tutorial</h1>
+            <h1 class="title3">{{ 'Video Tutorial' | translate }}</h1>
             @if (recipe.video_url) {
               <iframe
                 class="clip"
@@ -137,9 +137,9 @@
           </div>
         } @else {
           <div class="video">
-            <h1 class="title3">Video Tutorial</h1>
+            <h1 class="title3">{{ 'Video Tutorial' | translate }}</h1>
             <div class="no-video-message">
-              We will update soon
+              {{ 'We will update soon' | translate }}
             </div>
           </div>
         }
@@ -158,7 +158,7 @@
 <!-- No Recipe Found -->
 @if (!(recipeLoading$ | async) && !(recipe$ | async)) {
   <div class="no-recipe">
-    <p>Recipe not found</p>
-    <button (click)="router.navigate(['/'])" class="back-btn">Back to Home</button>
+    <p>{{ 'Recipe not found' | translate }}</p>
+    <button (click)="router.navigate(['/'])" class="back-btn">{{ 'Back to Home' | translate }}</button>
   </div>
 }

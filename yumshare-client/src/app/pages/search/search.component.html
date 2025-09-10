@@ -1,37 +1,39 @@
 <div class="search-container" id="search-container">
-  <h2 id="search-title">Discover Your Favorites</h2>
+  <h2 id="search-title">{{ 'Discover Your Favorites' | translate }}</h2>
 
   <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
-    <input
-      type="text"
-      id="search-input"
-      placeholder="Search by keyword or author: (use 'author:username' for author search)..."
-      [(ngModel)]="keyword"
-      name="keyword"
-      (input)="onKeywordChange()"
-    />
+   <input
+  type="text"
+  id="search-input"
+  [placeholder]="'SearchInputPlaceholder' | translate"
+  [(ngModel)]="keyword"
+  name="keyword"
+  (input)="onKeywordChange()"
+/>
     <select 
       id="category-select" 
       [(ngModel)]="selectedCategory" 
       name="category"
       (change)="onCategoryChange()"
     >
-      <option value="">All Categories</option>
+      <option value="">{{ 'All Categories' | translate }}</option>
       @for (c of categories; track c.id) {
         <option [value]="c.id">{{ c.name }}</option>
       }
     </select>
     <button class="search-btn" id="search-button" type="submit">
       <span class="material-icons">search</span>
+      {{ 'Search' | translate }}
     </button>
     <button class="clear-btn" id="clear-button" type="button" (click)="clearSearch()">
-      Clear
+      {{ 'Clear' | translate }}
     </button>
   </form>
 
   @if (getLoadingState() | async) {
     <div class="loading">
       <mat-spinner diameter="40"></mat-spinner>
+      <span>{{ 'Loading...' | translate }}</span>
     </div>
   }
 
@@ -39,7 +41,7 @@
     <div class="error-container" id="search-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button class="retry-btn" (click)="onSearch()">Retry</button>
+      <button class="retry-btn" (click)="onSearch()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -47,7 +49,7 @@
     <div class="error-container" id="recipes-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button class="retry-btn" (click)="loadInitialRecipes()">Retry</button>
+      <button class="retry-btn" (click)="loadInitialRecipes()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -55,12 +57,18 @@
     @if (stats.totalResults > 0) {
       <div class="results-info" id="results-info">
         @if (stats.currentQuery) {
-          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b></p>
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'results for' | translate }}: <b>{{ stats.currentQuery }}</b>
+          </p>
         } @else {
-          <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'recipes' | translate }}
+          </p>
         }
         @if (stats.totalPages > 1) {
-          <p>Page {{ stats.currentPage }} of {{ stats.totalPages }}</p>
+          <p>
+            {{ 'Page' | translate }} {{ stats.currentPage }} {{ 'of' | translate }} {{ stats.totalPages }}
+          </p>
         }
         @if (stats.isLoading) {
           <mat-spinner diameter="20"></mat-spinner>
@@ -69,8 +77,8 @@
     } @else if (!stats.isLoading && !stats.hasError && stats.currentQuery) {
       <div class="no-results" id="no-results">
         <mat-icon>search_off</mat-icon>
-        <p>No results found for "{{ stats.currentQuery }}"</p>
-        <button class="clear-btn" (click)="clearSearch()">Clear Search</button>
+        <p>{{ 'No results found for' | translate }} "{{ stats.currentQuery }}"</p>
+        <button class="clear-btn" (click)="clearSearch()">{{ 'Clear Search' | translate }}</button>
       </div>
     }
   }
@@ -98,7 +106,7 @@
                 class="dish-description"
                 id="dish-description-{{ recipe.title | lowercase }}-{{ $index }}"
               >
-                {{ recipe.description || 'No description available' }}
+                {{ recipe.description || ('No description available' | translate) }}
               </p>
             </mat-card-content>
             <div class="rating" id="rating-{{ recipe.title | lowercase }}-{{ $index }}">
@@ -120,7 +128,7 @@
                   id="avatar-{{ recipe.title | lowercase }}-{{ $index }}"
                 />
                 <span class="username" id="username-{{ recipe.title | lowercase }}-{{ $index }}">
-                  {{ recipe.author || 'Unknown' }}
+                  {{ recipe.author || ('Unknown' | translate) }}
                 </span>
               </div>
               <div class="actions" id="actions-{{ recipe.title | lowercase }}-{{ $index }}">

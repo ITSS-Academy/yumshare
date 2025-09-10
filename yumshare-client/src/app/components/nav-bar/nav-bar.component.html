@@ -13,6 +13,10 @@
       placeholder="Search"
     />
   </div>
+ <div class="custom-lang-toggle" (click)="switchLang(currentLang === 'en' ? 'vi' : 'en')">
+  <span class="toggle-option" [class.active]="currentLang === 'en'">ENG</span>
+  <span class="toggle-option" [class.active]="currentLang === 'vi'">VIE</span>
+</div>
 
   <div class="actions">
     @if (isLoggedIn) {

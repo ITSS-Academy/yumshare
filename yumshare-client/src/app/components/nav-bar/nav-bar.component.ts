@@ -1,4 +1,3 @@
-
 import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -16,6 +15,10 @@ import * as AuthActions from '../../ngrx/auth/auth.actions';
 import { Subscription } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
+// NGX-TRANSLATE
+import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-nav-bar',
@@ -25,6 +28,8 @@ import { NotificationService } from '../../services/notification/notification.se
     FormsModule,
     CommonModule,
     RouterModule,
+    TranslatePipe,
+    MatSlideToggleModule
     // DarkModeToggleComponent
   ],
   templateUrl: './nav-bar.component.html',
@@ -42,6 +47,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
   messageCount = 0;
   notificationCount = 0;
 
+  currentLang = 'en';
+
   private authSubscription: Subscription | null = null;
   private notificationCountSubscription: Subscription | null = null;
 
@@ -50,8 +57,13 @@ export class NavBarComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private store: Store<{auth: AuthState}>,
     private auth: Auth,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    public translate: TranslateService // public để dùng trong template
+  ) {
+    translate.addLangs(['en', 'vi']);
+    // Use getCurrentLang() and getFallbackLang() as recommended
+    this.currentLang = translate.getCurrentLang() || translate.getFallbackLang() || 'en';
+  }
 
   ngOnInit() {
     this.authSubscription = this.store.select(state => state.auth).subscribe(authState => {
@@ -60,14 +72,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
         this.currentUser = authState.currentUser;
         this.userName = authState.currentUser.displayName || '';
         this.userAvatar = authState.currentUser.photoURL || '';
-        
-        // Tự động đóng dialog login nếu đăng nhập thành công
         this.dialog.closeAll();
-        
-        // Load notification count
         this.loadNotificationCount();
-        
-        // Subscribe to notification count changes
         this.subscribeToNotificationCount();
       } else {
         this.isLoggedIn = false;
@@ -75,13 +81,16 @@ export class NavBarComponent implements OnInit, OnDestroy {
         this.userName = '';
         this.userAvatar = '';
         this.notificationCount = 0;
-        
-        // Unsubscribe from notification count changes
         if (this.notificationCountSubscription) {
           this.notificationCountSubscription.unsubscribe();
           this.notificationCountSubscription = null;
         }
       }
+    });
+
+    // Cập nhật currentLang khi đổi ngôn ngữ ở nơi khác
+    this.translate.onLangChange.subscribe(event => {
+      this.currentLang = event.lang;
     });
   }
 
@@ -102,11 +111,16 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  switchLang(lang: string) {
+    this.translate.use(lang);
+    this.currentLang = lang;
+  }
+
   onSearchInput() { /* realtime suggestions */ }
 
   onMessage() {
     if (this.isLoggedIn && this.currentUser?.uid) {
-      const dialogRef = this.dialog.open(MessageListComponent, {
+      this.dialog.open(MessageListComponent, {
         width: '600px',
         maxWidth: '90vw',
         maxHeight: '80vh',
@@ -125,8 +139,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
         maxHeight: '80vh',
         panelClass: 'notification-dialog'
       });
-      
-      // Reload notification count when dialog closes
       dialogRef.afterClosed().subscribe(() => {
         this.loadNotificationCount();
       });
@@ -135,28 +147,21 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Click behavior: if logged in go to profile, else open login dialog
   openLogin() {
     if (!this.isLoggedIn) {
       this.dialog.open(LoginComponent, { panelClass: 'custom-dialog', autoFocus: false });
     }
   }
 
-
-
   async onLogout() {
     try {
-      // Đăng xuất khỏi Firebase trước
       await this.auth.signOut();
-      // Sau đó clear auth state
       this.store.dispatch(AuthActions.clearAuthState());
     } catch (error) {
       console.error('Logout error:', error);
-      // Nếu có lỗi, vẫn clear auth state
       this.store.dispatch(AuthActions.clearAuthState());
     }
   }
-
 
   onAddRecipe() {
     if (this.isLoggedIn) {
@@ -178,9 +183,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     if (this.currentUser?.uid) {
       this.notificationService.getUserNotifications().subscribe({
         next: (notifications) => {
-          // Total notifications (excluding messages)
           this.notificationCount = notifications.filter(n => !n.is_read && n.type !== 'message').length;
-          // Message notifications only
           this.messageCount = notifications.filter(n => !n.is_read && n.type === 'message').length;
         },
         error: (err) => {
@@ -198,8 +201,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
         this.notificationCount = count;
       }
     );
-    
-    // Subscribe to message count changes
     this.notificationService.messageCount$.subscribe(
       count => {
         this.messageCount = count;
@@ -211,10 +212,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     // Navigate to settings page
   }
 
-
-
   // Method to simulate login (for testing)
-  // helper to simulate - có thể xóa sau khi test xong
   simulateLogin(name: string, avatar: string) {
     this.isLoggedIn = true;
     this.userName = name;

@@ -1,3 +1,6 @@
+<!-- Nút chuyển đổi ngôn ngữ -->
+
+
 <div class="content-wrapper">
   <div class="image-title">
     <div class="carousel">
@@ -11,52 +14,51 @@
     </div>
   </div>
 
-  <h3>Recipe Categories</h3>
+  <h3>{{ 'Recipe Categories' | translate }}</h3>
   <div class="container-image-categories">
-    <h2 class="dish-type-1" (click)="categoryClick('Appetizers')"><span>Appetizers</span></h2>
-    <h2 class="dish-type-2" (click)="categoryClick('Main courses')"><span>Main courses</span></h2>
-    <h2 class="dish-type-3" (click)="categoryClick('Side dishes')"><span>Side dishes</span></h2>
-    <h2 class="dish-type-4" (click)="categoryClick('Soups')"><span>Soups</span></h2>
-    <h2 class="dish-type-5" (click)="categoryClick('Desserts')"><span>Desserts</span></h2>
-    <h2 class="dish-type-6" (click)="categoryClick('Beverages')"><span>Beverages</span></h2>
-    <h2 class="dish-type-7" (click)="categoryClick('Snacks')"><span>Snacks</span></h2>
-    <h2 class="dish-type-8" (click)="categoryClick('Vegan dishes')"><span>Vegan dishes</span></h2>
+    <h2 class="dish-type-1" (click)="categoryClick('Appetizers')"><span>{{ 'Appetizers' | translate }}</span></h2>
+    <h2 class="dish-type-2" (click)="categoryClick('Main Courses')"><span>{{ 'Main Courses' | translate }}</span></h2>
+    <h2 class="dish-type-3" (click)="categoryClick('Side Dishes')"><span>{{ 'Side Dishes' | translate }}</span></h2>
+    <h2 class="dish-type-4" (click)="categoryClick('Soups')"><span>{{ 'Soups' | translate }}</span></h2>
+    <h2 class="dish-type-5" (click)="categoryClick('Desserts')"><span>{{ 'Desserts' | translate }}</span></h2>
+    <h2 class="dish-type-6" (click)="categoryClick('Beverages')"><span>{{ 'Beverages' | translate }}</span></h2>
+    <h2 class="dish-type-7" (click)="categoryClick('Snacks')"><span>{{ 'Snacks' | translate }}</span></h2>
+    <h2 class="dish-type-8" (click)="categoryClick('Vegan Dishes')"><span>{{ 'Vegan Dishes' | translate }}</span></h2>
   </div>
 
   <div class="section-header">
-    <h3>Today's Dish</h3>
+    <h3>{{ "Today's Dish" | translate }}</h3>
     <button class="view-all-btn" (click)="nextTodayDish()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
   <div class="container-card">
       @if (paginatedRecipes) {
-  <app-card [cardData]="paginatedRecipes.data"></app-card>
-}
+        <app-card [cardData]="paginatedRecipes.data"></app-card>
+      }
   </div>
 
   <div class="section-header">
-    <h3>Main courses</h3> 
+    <h3>{{ 'Main Courses' | translate }}</h3> 
     <button class="view-all-btn" (click)="viewAllMainCourses()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
 
-<div class="container-card">
-  @if (mainCourses$ | async; as mainCourses) {
-    @if (mainCourses?.data?.length > 0) {
-      <app-card [cardData]="mainCourses.data"></app-card>
+  <div class="container-card">
+    @if (mainCourses$ | async; as mainCourses) {
+      @if (mainCourses?.data?.length > 0) {
+        <app-card [cardData]="mainCourses.data"></app-card>
+      }
     }
-  }
-</div>
-
+  </div>
 
   <div class="section-header">
-    <h3>Beverages</h3>
+    <h3>{{ 'Beverages' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllBeverages()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
@@ -69,9 +71,9 @@
   </div>
 
   <div class="section-header">
-    <h3>Desserts</h3>
+    <h3>{{ 'Desserts' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllDesserts()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
@@ -84,9 +86,9 @@
   </div>
 
   <div class="section-header">
-    <h3>Snacks</h3>
+    <h3>{{ 'Snacks' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllSnacks()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>

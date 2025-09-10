@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection, ErrorHandler } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, ErrorHandler, importProvidersFrom } from '@angular/core';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { GlobalErrorHandler } from './services/error-handler/global-error-handler.service';
@@ -26,8 +26,26 @@ import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
 import { categoryReducer } from './ngrx/category/category.reducer';
 import { commentReducer } from './ngrx/comment/comment.reducer';
 import { favoriteReducer } from './ngrx/favorite/favorite.reducer';
-
 import { likesReducer } from './ngrx/likes/likes.reducer';
+
+// NGX-TRANSLATE IMPORTS
+import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+// Custom loader cho ngx-translate v17+
+export class CustomTranslateLoader implements TranslateLoader {
+  constructor(private http: HttpClient) {}
+
+  getTranslation(lang: string): Observable<any> {
+    return this.http.get(`/assets/i18n/${lang}.json`);
+  }
+}
+
+// Factory function cho CustomTranslateLoader
+export function HttpLoaderFactory(http: HttpClient) {
+  return new CustomTranslateLoader(http);
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -46,15 +64,26 @@ export const appConfig: ApplicationConfig = {
         httpErrorInterceptor
       ])
     ),
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        loader: {
+          provide: TranslateLoader,
+          useFactory: HttpLoaderFactory,
+          deps: [HttpClient],
+        },
+        fallbackLang: 'en',
+      })
+    ),
+    TranslateService,
     provideEffects([
       authEffects,
       followEffects,
       recipeEffects,
       categoryEffects,
       commentEffects,
-      likesEffects // <-- Thêm likesEffects vào đây
+      likesEffects,
+      favoriteEffects
     ]),
-    provideEffects([authEffects, followEffects, recipeEffects, categoryEffects, commentEffects, favoriteEffects]),
     provideStore({
       auth: authReducer,
       follow: followReducer,
@@ -77,7 +106,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
-    // Temporarily disabled to avoid error spam
     // {
     //   provide: ErrorHandler,
     //   useClass: GlobalErrorHandler
