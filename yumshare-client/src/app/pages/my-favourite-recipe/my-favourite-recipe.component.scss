@@ -548,6 +548,255 @@ mat-form-field {
   }
 }
 
+// Tablet responsive (768px - 1024px)
+@media (max-width: 1024px) and (min-width: 769px) {
+  .container {
+    padding: 0 24px 40px 24px;
+    gap: 20px;
+    max-width: 100%;
+  }
+  
+  .my-recipe-header {
+    height: 220px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .my-recipe-header h1 {
+    font-size: 42px;
+    padding-top: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .my-recipe-header p {
+    font-size: 16px;
+    width: 85%;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  
+  .sort-and-category {
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    margin: 24px 0;
+    padding: 0 20px;
+  }
+  
+  .difficulty, .category {
+    flex: 0 0 auto;
+    min-width: 160px;
+    
+    button {
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 8px;
+    }
+  }
+  
+  .recipe-card {
+    padding: 20px;
+    gap: 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .recipe-image {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .recipe-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+  
+  .recipe-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .recipe-title {
+    font-size: 18px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  
+  .recipe-author {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+  }
+  
+  .recipe-description p {
+    font-size: 14px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  
+  .recipe-meta {
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .recipe-time, .recipe-difficulty {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  
+  .recipe-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .pagination {
+    margin: 32px 0;
+    
+    button {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+  }
+}
+
+// Tablet portrait (768px)
+@media (max-width: 768px) and (min-width: 601px) {
+  .container {
+    padding: 0 20px 32px 20px;
+    gap: 16px;
+  }
+  
+  .my-recipe-header {
+    height: 200px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .my-recipe-header h1 {
+    font-size: 36px;
+    padding-top: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .my-recipe-header p {
+    font-size: 15px;
+    width: 90%;
+    margin: 0 auto;
+    line-height: 1.4;
+  }
+  
+  .sort-and-category {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    margin: 20px 0;
+    padding: 0 16px;
+  }
+  
+  .difficulty, .category {
+    flex: 0 0 auto;
+    min-width: 140px;
+    
+    button {
+      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 6px;
+    }
+  }
+  
+  .recipe-card {
+    padding: 16px;
+    gap: 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .recipe-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .recipe-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
+  
+  .recipe-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .recipe-title {
+    font-size: 16px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  
+  .recipe-author {
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+  }
+  
+  .recipe-description p {
+    font-size: 13px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  
+  .recipe-meta {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .recipe-time, .recipe-difficulty {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  
+  .recipe-date {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  
+  .pagination {
+    margin: 24px 0;
+    
+    button {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+  }
+}
+
 @media (max-width: 900px) {
   .container {
     width: 100%;

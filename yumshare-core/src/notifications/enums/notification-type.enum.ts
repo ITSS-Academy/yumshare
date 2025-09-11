@@ -7,5 +7,6 @@ export enum NotificationType {
   SYSTEM = 'system',
   RECIPE_SHARED = 'recipe_shared',
   NEW_RECIPE = 'new_recipe',
-  MESSAGE = 'message'
+  MESSAGE = 'message',
+  FAVORITE = 'favorite'
 }

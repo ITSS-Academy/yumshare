@@ -9,23 +9,20 @@ export const followUserEffects = createEffect(
   (actions$ = inject(Actions), followService = inject(FollowService)) => {
     return actions$.pipe(
       ofType(FollowActions.followUser),
-      switchMap((action) => {
-        console.log('Follow effect triggered:', action);
-        return from(followService.followUser(action.followerId, action.followingId)).pipe(
-          map((follow) => {
-            console.log('Follow success:', follow);
-            return FollowActions.followUserSuccess({ follow });
-          }),
+      switchMap((action) => 
+        from(followService.followUser(action.followerId, action.followingId)).pipe(
+          map((follow) => FollowActions.followUserSuccess({ follow })),
           catchError((error) => {
             console.error('Follow error:', error);
             return of(FollowActions.followUserFailure({ error: error.message }));
           })
-        );
-      })
+        )
+      )
     );
   },
   { functional: true }
 );
+
 
 // Unfollow User Effects
 export const unfollowUserEffects = createEffect(

@@ -13,6 +13,6 @@ export class History {
   @ManyToOne(() => Recipe, recipe => recipe.id, { onDelete: 'CASCADE' })
   recipe: Recipe;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   viewed_at: Date;
 } 

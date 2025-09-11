@@ -69,7 +69,7 @@ export const updateRecipeFailure = createAction(
 // Update Recipe with Files
 export const updateRecipeWithFiles = createAction(
   '[Recipe] Update Recipe with Files',
-  props<{ id: string; recipeData: FormData }>()
+  props<{ id: string; idToken: string; recipeData: FormData }>()
 );
 
 export const updateRecipeWithFilesSuccess = createAction(

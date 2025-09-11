@@ -15,14 +15,15 @@
       [placeholder]="'Search recipes, users, categories...' | translate"
       class="search-input"
     />
-    <button 
-      mat-icon-button 
-      *ngIf="searchQuery" 
-      (click)="clearSearch()"
-      class="clear-btn"
-      [matTooltip]="'Clear search' | translate">
-      <mat-icon>close</mat-icon>
-    </button>
+    @if (searchQuery) {
+      <button 
+        mat-icon-button 
+        (click)="clearSearch()"
+        class="clear-btn"
+        matTooltip="Clear search">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
     <button 
       mat-icon-button 
       (click)="onSearch()"
@@ -33,25 +34,37 @@
     </button>
     
     <!-- Search Suggestions -->
-    <div class="search-suggestions" *ngIf="showSuggestions">
-      <div class="suggestion-header" *ngIf="!searchQuery">{{ 'Quick Search' | translate }}</div>
-      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Popular recipes')">
-        <mat-icon>trending_up</mat-icon>
-        <span>{{ 'Popular recipes' | translate }}</span>
+    @if (showSuggestions) {
+      <div class="search-suggestions">
+        @if (!searchQuery) {
+          <div class="suggestion-header">Quick Search</div>
+        }
+        @if (!searchQuery) {
+          <div class="suggestion-item" (click)="quickSearch('Popular recipes')">
+            <mat-icon>trending_up</mat-icon>
+            <span>Popular recipes</span>
+          </div>
+        }
+        @if (!searchQuery) {
+          <div class="suggestion-item" (click)="quickSearch('Easy recipes')">
+            <mat-icon>star</mat-icon>
+            <span>Easy recipes</span>
+          </div>
+        }
+        @if (!searchQuery) {
+          <div class="suggestion-item" (click)="quickSearch('Vietnamese cuisine')">
+            <mat-icon>restaurant</mat-icon>
+            <span>Vietnamese cuisine</span>
+          </div>
+        }
+        @if (searchQuery) {
+          <div class="suggestion-item" (click)="onSearch()">
+            <mat-icon>search</mat-icon>
+            <span>Search for "{{ searchQuery }}"</span>
+          </div>
+        }
       </div>
-      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Easy recipes')">
-        <mat-icon>star</mat-icon>
-        <span>{{ 'Easy recipes' | translate }}</span>
-      </div>
-      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Vietnamese cuisine')">
-        <mat-icon>restaurant</mat-icon>
-        <span>{{ 'Vietnamese cuisine' | translate }}</span>
-      </div>
-      <div class="suggestion-item" *ngIf="searchQuery" (click)="onSearch()">
-        <mat-icon>search</mat-icon>
-        <span>{{ 'Search for' | translate }} "{{ searchQuery }}"</span>
-      </div>
-    </div>
+    }
   </div>
   <div class="custom-lang-toggle" (click)="switchLang(currentLang === 'en' ? 'vi' : 'en')">
     <span class="toggle-option" [class.active]="currentLang === 'en'">ENG</span>

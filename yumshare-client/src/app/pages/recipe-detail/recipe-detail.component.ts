@@ -44,7 +44,6 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [
     CommonModule,
     CommentComponent,
-    MatChip,
     MatCheckbox,
     MatButtonModule,
     MatIconModule,
@@ -275,12 +274,17 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   toggleLike(): void {
-    const toggleLikeSub = this.currentUser$.pipe(
-      filter(user => !!user?.uid),
-      take(1)
-    ).subscribe(user => {
+    const toggleLikeSub = this.currentUser$.pipe(take(1)).subscribe(user => {
+      if (!user || !user.uid) {
+        this.snackBar.open('Please Login to like recipe!', 'Login', {
+          duration: 2000,
+          panelClass: ['warning-snackbar']
+        });
+        return;
+      }
+
       this.store.dispatch(LikesActions.toggleLike({
-        userId: user.uid!,
+        userId: user.uid,
         recipeId: this.recipeId
       }));
     });

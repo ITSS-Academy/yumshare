@@ -43,6 +43,4 @@ export class FavoritesController {
   getFavoriteCount(@Param('userId') userId: string) {
     return this.favoritesService.getFavoriteCount(userId);
   }
-
-
 }

@@ -14,6 +14,7 @@ import { SocketService } from '../../services/socket/socket.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import {TranslateService, _} from "@ngx-translate/core";
 import {take} from 'rxjs/operators';
+import { LocalTimePipe } from '../../pipes/local-time.pipe';
 
 @Component({
   selector: 'app-message-list',
@@ -24,7 +25,8 @@ import {take} from 'rxjs/operators';
     MatButtonModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    TranslatePipe
+    TranslatePipe,
+    LocalTimePipe
   ],
   templateUrl: './message-list.component.html',
   styleUrl: './message-list.component.scss'

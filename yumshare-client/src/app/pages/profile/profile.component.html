@@ -3,10 +3,8 @@
   <div class="profile-header">
     <h2>{{ 'Edit Profile' | translate }}</h2>
     <div class="header-actions">
-      <input type="text" class="search-bar" [placeholder]="'Search users...' | translate">
       <button class="delete-account" (click)="showDialog = true">{{ 'Delete account' | translate }}</button>
     </div>
-
     @if (showDialog) {
       <div class="dialog-backdrop">
         <div class="dialog-box">
@@ -26,7 +24,7 @@
     <app-loading 
       size="large"
       [message]="'Loading profile...' | translate"
-      centerType="center-viewport">
+      centerType="default">
     </app-loading>
   }
 
@@ -43,8 +41,34 @@
     <div class="profile-info">
       <div class="avatar-section">
         <div class="avatar-container">
-          <img [src]="avatarUrl || 'https://via.placeholder.com/80'" alt="Avatar" class="avatar">
-          <input type="file" accept="image/*" (change)="onAvatarChange($event)" class="avatar-input">
+          <div class="avatar-wrapper">
+            <img [src]="avatarUrl || 'https://via.placeholder.com/80'" alt="Avatar" class="avatar">
+            @if (isUploadingAvatar) {
+              <div class="upload-overlay">
+                <mat-spinner diameter="30"></mat-spinner>
+                <span>Uploading...</span>
+              </div>
+            }
+          </div>
+          <input 
+            type="file" 
+            id="avatar-input"
+            accept="image/*" 
+            (change)="onAvatarChange($event)" 
+            class="avatar-input"
+            style="display: none;">
+          <button 
+            mat-stroked-button 
+            color="primary" 
+            (click)="onSelectAvatar()"
+            [disabled]="isUploadingAvatar"
+            class="change-avatar-btn">
+            @if (isUploadingAvatar) {
+              <mat-spinner diameter="16"></mat-spinner>
+            } @else {
+              <mat-icon>photo_camera</mat-icon>
+            }
+          </button>
         </div>
         <div>
           <h3>{{ profileForm.value.name }}</h3>
@@ -57,9 +81,9 @@
               (blur)="stopEditBio()"
               (keydown)="onBioKeyDown($event)"
             ></textarea>
-            <span class="edit-icon" (click)="toggleBioEdit()">
+            <!-- <span class="edit-icon" (click)="toggleBioEdit()">
               <img style="height: 15px; padding-left: 10px" src="https://cdn.pixabay.com/photo/2019/04/08/20/26/pencil-4112898_960_720.png" alt="">
-            </span>
+            </span> -->
           </div>
         </div>
       </div>
@@ -104,7 +128,15 @@
     <!-- Followers/Following Tabs -->
     <div class="social-tabs">
       <button class="tab-button" [class.active]="activeTab === 'followers'" (click)="setActiveTab('followers'); loadFollowers()">{{ 'Followers' | translate }} ({{ followerCount$ | async }})</button>
-      <button class="tab-button" [class.active]="activeTab === 'following'" (click)="setActiveTab('following'); loadFollowing()">{{ 'Following' | translate }} ({{ followingCount$ | async }})</button>
+      <button class="tab-button" [class.active]="activeTab === 'following'" (click)="setActiveTab('following'); loadFollowing()">
+         {{ 'Following' | translate }} (
+        @if (followIsLoading$ | async) {
+          <span class="loading-spinner-small"></span>
+        } @else {
+          {{ followingCount$ | async }}
+        }
+        )
+      </button>
     </div>
 
     <!-- Followers/Following Content -->
@@ -134,25 +166,30 @@
             <div class="virtual-scroll-container">
               <cdk-virtual-scroll-viewport [itemSize]="followItemSize" class="follow-viewport">
                 @for (follow of (followers$ | async) || []; track trackByFollowId($index, follow)) {
-                <div class="social-item">
-                  <img [src]="follow.follower?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
-                  <div class="user-info">
-                    <span class="user-name">{{ follow.follower?.username || ('Unknown User' | translate) }}</span>
-                    <span class="user-bio">{{ follow.follower?.bio || ('No bio available' | translate) }}</span>
+                  <div class="social-item">
+                    <img [src]="follow.follower?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.follower?.username || ('Unknown User' | translate) }}</span>
+                      <span class="user-bio">{{ follow.follower?.bio || ('No bio available' | translate) }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="follow-btn"
+                        (click)="followUser(follow.follower?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        @if (followIsLoading$ | async) {
+                          <span class="loading-spinner"></span>
+                          Following...
+                        } @else {
+                          Follow
+                        }
+                      </button>
+                    </div>
                   </div>
-                  <div class="user-actions">
-                    <button 
-                      class="follow-btn"
-                      (click)="followUser(follow.follower?.id || '')"
-                      [disabled]="followIsLoading$ | async">
-                      {{ 'Follow' | translate }}
-                    </button>
-                  </div>
-                </div>
                 }
                 @if (!(followers$ | async) || (followers$ | async)?.length === 0) {
                   <div class="no-data">
-                    <p>{{ 'No followers yet' | translate }}</p>
+                    <p>No followers yet</p>
                   </div>
                 }
               </cdk-virtual-scroll-viewport>
@@ -195,25 +232,30 @@
             <div class="virtual-scroll-container">
               <cdk-virtual-scroll-viewport [itemSize]="followItemSize" class="follow-viewport">
                 @for (follow of (following$ | async) || []; track trackByFollowId($index, follow)) {
-                <div class="social-item">
-                  <img [src]="follow.following?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
-                  <div class="user-info">
-                    <span class="user-name">{{ follow.following?.username || ('Unknown User' | translate) }}</span>
-                    <span class="user-bio">{{ follow.following?.bio || ('No bio available' | translate) }}</span>
+                  <div class="social-item">
+                    <img [src]="follow.following?.avatar_url || 'https://via.placeholder.com/40'" alt="Avatar" class="small-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ follow.following?.username || ('Unknown User' | translate) }}</span>
+                      <span class="user-bio">{{ follow.following?.bio || ('No bio available' | translate) }}</span>
+                    </div>
+                    <div class="user-actions">
+                      <button 
+                        class="unfollow-btn"
+                        (click)="unfollowUser(follow.following?.id || '')"
+                        [disabled]="followIsLoading$ | async">
+                        @if (followIsLoading$ | async) {
+                          <span class="loading-spinner"></span>
+                          Unfollowing...
+                        } @else {
+                          Unfollow
+                        }
+                      </button>
+                    </div>
                   </div>
-                  <div class="user-actions">
-                    <button 
-                      class="unfollow-btn"
-                      (click)="unfollowUser(follow.following?.id || '')"
-                      [disabled]="followIsLoading$ | async">
-                      {{ 'Unfollow' | translate }}
-                    </button>
-                  </div>
-                </div>
                 }
                 @if (!(following$ | async) || (following$ | async)?.length === 0) {
                   <div class="no-data">
-                    <p>{{ 'Not following anyone yet' | translate }}</p>
+                    <p>Not following anyone yet</p>
                   </div>
                 }
               </cdk-virtual-scroll-viewport>

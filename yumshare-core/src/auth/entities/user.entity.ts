@@ -26,9 +26,23 @@ export class User {
   @Column({ type: 'timestamp with time zone', nullable: true })
   last_seen: Date;
 
-  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ 
+    type: 'timestamp with time zone', 
+    default: () => "timezone('Asia/Ho_Chi_Minh', now())",
+    transformer: {
+      to: (value: Date) => value,
+      from: (value: Date) => value ? new Date(value.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })) : value
+    }
+  })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ 
+    type: 'timestamp with time zone', 
+    default: () => "timezone('Asia/Ho_Chi_Minh', now())",
+    transformer: {
+      to: (value: Date) => value,
+      from: (value: Date) => value ? new Date(value.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })) : value
+    }
+  })
   updated_at: Date;
 }

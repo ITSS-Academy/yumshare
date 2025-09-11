@@ -38,14 +38,11 @@ export class CommentsService {
     });
     if (!user || !recipe) throw new Error('User or Recipe not found');
     
-    // Create comment with proper Vietnam timezone
-    const vietnamTime = this.timezoneService.getCurrentVietnamTime();
+    // Create comment - timestamps will be handled automatically by TypeORM
     const comment = this.commentRepository.create({
       user,
       recipe,
-      content: createCommentDto.content,
-      created_at: vietnamTime,
-      updated_at: vietnamTime
+      content: createCommentDto.content
     });
     
     const savedComment = await this.commentRepository.save(comment);
@@ -89,8 +86,8 @@ export class CommentsService {
     // Transform timestamps to ensure proper timezone handling
     const transformedComments = result.data.map(comment => ({
       ...comment,
-      created_at: this.timezoneService.toVietnamTime(comment.created_at),
-      updated_at: this.timezoneService.toVietnamTime(comment.updated_at)
+      created_at: comment.created_at,
+      updated_at: comment.updated_at
     })) as Comment[];
 
     const listResult = new ListResult(transformedComments, result.total, result.page, result.size);
@@ -154,8 +151,8 @@ export class CommentsService {
     // Transform timestamps to ensure proper timezone handling
     const transformedComments = comments.map(comment => ({
       ...comment,
-      created_at: this.timezoneService.toVietnamTime(comment.created_at),
-      updated_at: this.timezoneService.toVietnamTime(comment.updated_at)
+      created_at: comment.created_at,
+      updated_at: comment.updated_at
     })) as Comment[];
 
     return new ListResult(transformedComments, total, page, size);
@@ -170,12 +167,8 @@ export class CommentsService {
     
     if (!comment) return null;
     
-    // Update with proper Vietnam timezone
-    const vietnamTime = this.timezoneService.getCurrentVietnamTime();
-    Object.assign(comment, {
-      ...updateCommentDto,
-      updated_at: vietnamTime
-    });
+    // Update comment - updated_at will be handled automatically by TypeORM
+    Object.assign(comment, updateCommentDto);
     
     // Save the updated comment
     await this.commentRepository.save(comment);
@@ -194,5 +187,73 @@ export class CommentsService {
     if (!comment) return null;
     await this.commentRepository.remove(comment);
     return { deleted: true };
+  }
+
+  async debugRecipe(recipeId: string) {
+    const recipe = await this.recipeRepository.findOne({ 
+      where: { id: recipeId },
+      relations: ['user']
+    });
+    
+    if (!recipe) {
+      return { error: 'Recipe not found' };
+    }
+    
+    return {
+      recipeId: recipe.id,
+      title: recipe.title,
+      ownerId: recipe.user?.id,
+      ownerUsername: recipe.user?.username,
+      ownerEmail: recipe.user?.email,
+      hasUser: !!recipe.user
+    };
+  }
+
+  async testNotification(userId: string, recipeId: string) {
+    const recipe = await this.recipeRepository.findOne({ 
+      where: { id: recipeId },
+      relations: ['user']
+    });
+    
+    if (!recipe) {
+      return { error: 'Recipe not found' };
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      return { error: 'User not found' };
+    }
+
+    this.logger.log(`Testing notification: User ${userId} commenting on recipe ${recipeId} owned by ${recipe.user.id}`);
+
+    if (recipe.user.id !== userId) {
+      try {
+        const notification = await this.notificationsService.create({
+          user_id: recipe.user.id,
+          type: NotificationType.COMMENT,
+          content: `${user.username || user.email} commented on your recipe "${recipe.title}"`,
+          metadata: {
+            recipe_id: recipe.id,
+            comment_id: 'test-comment-id'
+          }
+        });
+        return { 
+          success: true, 
+          notificationId: notification.id,
+          message: 'Notification created successfully'
+        };
+      } catch (error) {
+        this.logger.error('Error creating test notification:', error);
+        return { 
+          success: false, 
+          error: error.message 
+        };
+      }
+    } else {
+      return { 
+        success: false, 
+        message: 'User is commenting on their own recipe, no notification needed' 
+      };
+    }
   }
 }

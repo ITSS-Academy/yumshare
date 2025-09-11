@@ -248,4 +248,36 @@ export class AuthService {
       );
     }
   }
+
+  async uploadAvatar(id: string, file: Express.Multer.File): Promise<User> {
+    try {
+      // Upload image to Supabase Storage
+      const uploadResult = await this.supabaseService.uploadImage(file, `avatars/${id}`);
+      
+      // Update user with new avatar URL
+      const { data, error } = await this.supabaseService.getClient()
+        .from('users')
+        .update({ avatar_url: uploadResult.mainUrl })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error || !data) {
+        throw new HttpException(
+          'User not found or avatar update failed',
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to upload avatar',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
 }

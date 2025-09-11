@@ -19,9 +19,9 @@ export class Rating {
   @Column({ type: 'text', nullable: true })
   comment: string; // Added comment field
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 }

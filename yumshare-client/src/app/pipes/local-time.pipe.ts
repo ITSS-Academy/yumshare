@@ -32,30 +32,26 @@ export class LocalTimePipe implements PipeTransform {
       
       // Check if date is valid
       if (isNaN(date.getTime())) {
-        // console.error('Invalid date:', value);
+      
         return '';
       }
       
-      // Debug: Log the original and converted dates
-      // console.log('Original value:', value);
-      // console.log('Converted date:', date);
-      // console.log('Local time:', date.toLocaleString('vi-VN'));
       
-      // Format based on type
+      
+      // Format based on type - no timezone conversion since database already stores Vietnam time
       switch (format) {
         case 'shortTime':
           return date.toLocaleTimeString('vi-VN', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Ho_Chi_Minh'
+            timeZone: 'UTC',
+            hour12: false
           });
         case 'shortDate':
           return date.toLocaleDateString('vi-VN', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric',
-            timeZone: 'Asia/Ho_Chi_Minh'
+            year: 'numeric'
           });
         case 'full':
           return date.toLocaleString('vi-VN', {
@@ -64,15 +60,13 @@ export class LocalTimePipe implements PipeTransform {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Ho_Chi_Minh'
+            hour12: false
           });
         default:
           return date.toLocaleTimeString('vi-VN', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Ho_Chi_Minh'
+            hour12: false
           });
       }
     } catch (error) {

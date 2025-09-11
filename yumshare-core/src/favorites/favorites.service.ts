@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Favorite } from './entities/favorite.entity';
@@ -7,6 +7,8 @@ import { User } from '../auth/entities/user.entity';
 import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
 import { QueryOptsDto } from '../common/dto/query-opts.dto';
 import { ListResult } from '../common/types/list-result.type';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Injectable()
 export class FavoritesService {
@@ -17,7 +19,11 @@ export class FavoritesService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Recipe)
     private readonly recipeRepository: Repository<Recipe>,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
+
+  private readonly logger = new Logger(FavoritesService.name);
 
   async addToFavorites(createFavoriteDto: CreateFavoriteDto) {
     // Check if user exists
@@ -26,8 +32,11 @@ export class FavoritesService {
       throw new BadRequestException('User not found');
     }
 
-    // Check if recipe exists
-    const recipe = await this.recipeRepository.findOne({ where: { id: createFavoriteDto.recipe_id } });
+    // Check if recipe exists with user relation
+    const recipe = await this.recipeRepository.findOne({ 
+      where: { id: createFavoriteDto.recipe_id },
+      relations: ['user']
+    });
     if (!recipe) {
       throw new BadRequestException('Recipe not found');
     }
@@ -43,7 +52,28 @@ export class FavoritesService {
 
     // Add to favorites
     const favorite = this.favoriteRepository.create(createFavoriteDto);
-    return this.favoriteRepository.save(favorite);
+    const savedFavorite = await this.favoriteRepository.save(favorite);
+
+    // Create notification for recipe owner (if not favoriting own recipe)
+    if (recipe.user.id !== createFavoriteDto.user_id) {
+      try {
+        await this.notificationsService.create({
+          user_id: recipe.user.id,
+          type: NotificationType.SYSTEM, // Temporarily use SYSTEM until database enum is updated
+          content: `${user.username || user.email} added your recipe "${recipe.title}" to favorites`,
+          metadata: {
+            recipe_id: recipe.id,
+            favorite_id: savedFavorite.id,
+            notification_type: 'favorite' // Add this to distinguish from other system notifications
+          }
+        });
+      } catch (error) {
+        this.logger.error('Error creating favorite notification:', error);
+        // Don't throw error to avoid breaking favorite creation
+      }
+    }
+
+    return savedFavorite;
   }
 
   async removeFromFavorites(userId: string, recipeId: string) {
@@ -123,5 +153,4 @@ export class FavoritesService {
   async getFavoriteCount(userId: string): Promise<number> {
     return this.favoriteRepository.count({ where: { user_id: userId } });
   }
-  
 }

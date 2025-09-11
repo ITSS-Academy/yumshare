@@ -116,8 +116,12 @@ export class RecipeService {
   }
 
   // Update recipe with files
-  updateRecipeWithFiles(id: string, recipeData: FormData): Observable<Recipe> {
-    return this.http.put<Recipe>(`${this.apiUrl}/recipes/${id}/with-files`, recipeData);
+  updateRecipeWithFiles(id: string, idToken: string, recipeData: FormData): Observable<Recipe> {
+    return this.http.put<Recipe>(`${this.apiUrl}/recipes/${id}/with-files`, recipeData, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
   }
 
   // Delete recipe

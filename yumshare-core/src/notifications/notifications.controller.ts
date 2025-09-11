@@ -22,9 +22,9 @@ export class NotificationsController {
     return this.notificationsService.findAll();
   }
 
-  @Put('mark-all-read')
-  markAllAsRead() {
-    return this.notificationsService.markAllAsRead();
+  @Put('user/:userId/mark-all-read')
+  markAllAsRead(@Param('userId') userId: string) {
+    return this.notificationsService.markAllAsRead(userId);
   }
 
   @Get('user/:userId')

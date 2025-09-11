@@ -24,7 +24,23 @@ export class NotificationsService {
 
   async create(createDto: CreateNotificationDto) {
     const user = await this.userRepository.findOne({ where: { id: createDto.user_id } });
-    if (!user) throw new Error('User not found');
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    // Check for duplicate notification based on content and metadata
+    const existingNotification = await this.notificationRepository.findOne({
+      where: {
+        user: { id: createDto.user_id },
+        type: createDto.type,
+        content: createDto.content,
+        metadata: createDto.metadata
+      }
+    });
+
+    if (existingNotification) {
+      return existingNotification;
+    }
     
     const notification = this.notificationRepository.create({
       user,
@@ -36,14 +52,16 @@ export class NotificationsService {
     const savedNotification = await this.notificationRepository.save(notification);
     
     // Gửi real-time notification
-    this.notificationGateway.sendNotificationToUser(createDto.user_id, {
+    const notificationData = {
       id: savedNotification.id,
       type: savedNotification.type,
       content: savedNotification.content,
       is_read: savedNotification.is_read,
-      created_at: savedNotification.created_at,
+      created_at: savedNotification.created_at, // Sử dụng thời gian từ database (đã được convert)
       user_id: createDto.user_id
-    });
+    };
+    
+    this.notificationGateway.sendNotificationToUser(createDto.user_id, notificationData);
     
     return savedNotification;
   }
@@ -94,9 +112,19 @@ export class NotificationsService {
     return { deleted: true };
   }
 
-  async markAllAsRead() {
-    await this.notificationRepository.update({ is_read: false }, { is_read: true });
-    return this.notificationRepository.find({ relations: ['user'] });
+  async markAllAsRead(userId: string) {
+    await this.notificationRepository.update(
+      { user: { id: userId }, is_read: false }, 
+      { is_read: true }
+    );
+    return this.notificationRepository.find({ 
+      where: { user: { id: userId } },
+      relations: ['user'] 
+    });
+  }
+
+  async getOnlineUsers() {
+    return this.notificationGateway.getOnlineUsers();
   }
 
   /**
@@ -119,7 +147,7 @@ export class NotificationsService {
         const notificationDto: CreateNotificationDto = {
           user_id: followerId,
           type: NotificationType.NEW_RECIPE,
-          content: `${recipeData.authorName} đã đăng công thức mới: "${recipeData.title}"`,
+          content: `${recipeData.authorName} posted a new recipe: "${recipeData.title}"`,
           metadata: {
             recipe_id: recipeData.id,
             author_id: authorId,

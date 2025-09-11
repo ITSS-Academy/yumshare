@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DeleteConfirmDialogComponent } from '../../../../components/delete-confirm-dialog/delete-confirm-dialog.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { Comment } from '../../../../models/comment.model';
@@ -163,7 +164,8 @@ export class CommentComponent implements OnInit, OnDestroy {
       }
 
       // Kiểm tra xem user có phải là người tạo comment không
-      if (mineProfile.id !== comment.user_id) {
+      const commentUserId = comment.user_id || comment.user?.id;
+      if (mineProfile.id !== commentUserId) {
         this.snackBar.open('You do not have permission to edit this comment!', 'Close', { 
           duration: 3000,
           panelClass: ['warning-snackbar']
@@ -238,7 +240,8 @@ export class CommentComponent implements OnInit, OnDestroy {
         }
 
         // Kiểm tra xem user có phải là người tạo comment không
-        if (mineProfile.id !== comment.user_id) {
+        const commentUserId = comment.user_id || comment.user?.id;
+        if (mineProfile.id !== commentUserId) {
           this.snackBar.open('You do not have permission to delete this comment!', 'Close', { 
             duration: 3000,
             panelClass: ['warning-snackbar']
@@ -246,15 +249,28 @@ export class CommentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        if (confirm('Are you sure you want to delete this comment?')) {
-          this.store.dispatch(CommentActions.deleteComment({ id: commentId }));
+        // Show delete confirmation dialog
+        const dialogRef = this.dialog.open(DeleteConfirmDialogComponent, {
+          width: '400px',
+          data: {
+            title: 'Delete Comment',
+            message: 'Are you sure you want to delete this comment? This action cannot be undone.',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+          }
+        });
 
-          // Emit event to parent component
-          this.commentDeleted.emit(commentId);
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.store.dispatch(CommentActions.deleteComment({ id: commentId }));
 
-          // Close menu after delete
-          this.activeMenuId = null;
-        }
+            // Emit event to parent component
+            this.commentDeleted.emit(commentId);
+
+            // Close menu after delete
+            this.activeMenuId = null;
+          }
+        });
       });
     });
   }
@@ -287,11 +303,13 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
   canEdit(comment: Comment, mineProfile: User | null): boolean {
-    return mineProfile?.id === comment.user_id;
+    const commentUserId = comment.user_id || comment.user?.id;
+    return mineProfile?.id === commentUserId;
   }
 
   canDelete(comment: Comment, mineProfile: User | null): boolean {
-    return mineProfile?.id === comment.user_id;
+    const commentUserId = comment.user_id || comment.user?.id;
+    return mineProfile?.id === commentUserId;
   }
 
   isEditing(commentId: string): boolean {
@@ -302,13 +320,10 @@ export class CommentComponent implements OnInit, OnDestroy {
     try {
       const now = new Date();
 
-      // Convert database UTC time to local time
+      // Database already stores Vietnam time, no need to convert
       let commentDate: Date;
       if (typeof date === 'string') {
-        // Database time is UTC, convert to local
-        // If the string doesn't have 'Z' suffix, add it to indicate UTC
-        const dateStr = date.includes('Z') ? date : date + 'Z';
-        commentDate = new Date(dateStr);
+        commentDate = new Date(date);
       } else {
         commentDate = new Date(date);
       }
@@ -394,11 +409,20 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
   private onDocumentClick(event: MouseEvent): void {
-    const target = event.target as Node;
-    const commentMenu = document.querySelector('.comment-menu');
-
+    const target = event.target as HTMLElement;
+    
+    // Check if click is outside any comment menu
+    const commentMenus = document.querySelectorAll('.comment-menu');
+    let clickedInsideMenu = false;
+    
+    commentMenus.forEach(menu => {
+      if (menu.contains(target)) {
+        clickedInsideMenu = true;
+      }
+    });
+    
     // Close menu when clicking outside
-    if (commentMenu && !commentMenu.contains(target)) {
+    if (!clickedInsideMenu) {
       this.activeMenuId = null;
     }
   }

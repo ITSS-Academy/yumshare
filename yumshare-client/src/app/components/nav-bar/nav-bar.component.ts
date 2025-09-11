@@ -12,7 +12,9 @@ import { DarkModeToggleComponent } from '../dark-mode-toggle/dark-mode-toggle.co
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { AuthModel } from '../../models/auth.model';
+import { User } from '../../models';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
+import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 import { Subscription, Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
@@ -41,7 +43,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   userName = '';
   userAvatar = '';
-  currentUser: AuthModel | null = null;
+  mineProfile: User | null = null;
 
   searchQuery = '';
   showSuggestions = false;
@@ -73,24 +75,23 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Subscribe to authentication state
     this.subscriptions.push(
-      this.store.select(state => state.auth).subscribe(authState => {
-        if (authState.currentUser && authState.currentUser.uid) {
-          this.isLoggedIn = true;
-          this.currentUser = authState.currentUser;
-          this.userName = authState.currentUser.displayName || '';
-          this.userAvatar = authState.currentUser.photoURL || '';
-          
+      this.store.select(AuthSelectors.selectIsAuthenticatedByProfile).subscribe(isAuthenticated => {
+        this.isLoggedIn = isAuthenticated;
+        if (isAuthenticated) {
           // Tự động đóng dialog login nếu Login thành công
           this.dialog.closeAll();
-          
-          // Notification counts are now handled by NgRx observables
-        } else {
-          this.isLoggedIn = false;
-          this.currentUser = null;
-          this.userName = '';
-          this.userAvatar = '';
         }
+      })
+    );
+
+    // Subscribe to mine profile
+    this.subscriptions.push(
+      this.store.select(AuthSelectors.selectMineProfile).subscribe(mineProfile => {
+        this.mineProfile = mineProfile;
+        this.userName = mineProfile?.username || '';
+        this.userAvatar = mineProfile?.avatar_url || '';
       })
     );
 
@@ -161,7 +162,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   onMessage() {
-    if (this.isLoggedIn && this.currentUser?.uid) {
+    if (this.isLoggedIn && this.mineProfile?.id) {
       const dialogRef = this.dialog.open(MessageListComponent, {
         width: '600px',
         maxWidth: '90vw',
@@ -174,7 +175,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
   
   onNotification() {
-    if (this.isLoggedIn && this.currentUser?.uid) {
+    if (this.isLoggedIn && this.mineProfile?.id) {
       const dialogRef = this.dialog.open(NotificationListComponent, {
         width: '600px',
         maxWidth: '90vw',

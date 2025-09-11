@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { User } from '../auth/entities/user.entity';
 import { Recipe } from '../recipes/entities/recipe.entity/recipe.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Injectable()
 export class LikesService {
@@ -15,7 +17,11 @@ export class LikesService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Recipe)
     private readonly recipeRepository: Repository<Recipe>,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
+
+  private readonly logger = new Logger(LikesService.name);
 
   async likeRecipe(createLikeDto: CreateLikeDto) {
     // Check if user exists
@@ -24,8 +30,11 @@ export class LikesService {
       throw new BadRequestException('User not found');
     }
 
-    // Check if recipe exists
-    const recipe = await this.recipeRepository.findOne({ where: { id: createLikeDto.recipe_id } });
+    // Check if recipe exists with user relation
+    const recipe = await this.recipeRepository.findOne({ 
+      where: { id: createLikeDto.recipe_id },
+      relations: ['user']
+    });
     if (!recipe) {
       throw new BadRequestException('Recipe not found');
     }
@@ -41,7 +50,27 @@ export class LikesService {
 
     // Create like
     const like = this.likeRepository.create(createLikeDto);
-    return this.likeRepository.save(like);
+    const savedLike = await this.likeRepository.save(like);
+
+    // Create notification for recipe owner (if not liking own recipe)
+    if (recipe.user.id !== createLikeDto.user_id) {
+      try {
+        await this.notificationsService.create({
+          user_id: recipe.user.id,
+          type: NotificationType.LIKE,
+          content: `${user.username || user.email} liked your recipe "${recipe.title}"`,
+          metadata: {
+            recipe_id: recipe.id,
+            like_id: savedLike.id
+          }
+        });
+      } catch (error) {
+        this.logger.error('Error creating like notification:', error);
+        // Don't throw error to avoid breaking like creation
+      }
+    }
+
+    return savedLike;
   }
 
   async unlikeRecipe(userId: string, recipeId: string) {

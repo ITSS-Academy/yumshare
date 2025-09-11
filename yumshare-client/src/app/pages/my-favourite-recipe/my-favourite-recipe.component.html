@@ -48,7 +48,7 @@
         <div class="virtual-scroll-container">
           <cdk-virtual-scroll-viewport [itemSize]="itemSize" class="favorite-viewport">
             @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
-            <div class="recipe-card">
+            <div class="recipe-card" (click)="onNavigateToRecipeDetail(favorite.recipe?.id)">
               <!-- Left: recipe image -->
               <div class="recipe-image">
                 <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
@@ -65,7 +65,7 @@
                   </div>
                   <div class="example-button-row">
                     <div class="example-flex-container">
-                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite, $event)">
                         <mat-icon class="filled">favorite</mat-icon>
                       </button>
                     </div>
@@ -96,7 +96,7 @@
         <!-- Regular scroll for small favorite lists -->
         <div class="regular-favorite-list">
           @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
-            <div class="recipe-card">
+            <div class="recipe-card" (click)="onNavigateToRecipeDetail(favorite.recipe?.id)">
               <!-- Left: recipe image -->
               <div class="recipe-image">
                 <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
@@ -113,7 +113,7 @@
                   </div>
                   <div class="example-button-row">
                     <div class="example-flex-container">
-                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite, $event)">
                         <mat-icon class="filled">favorite</mat-icon>
                       </button>
                     </div>

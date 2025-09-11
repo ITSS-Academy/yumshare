@@ -5,18 +5,28 @@ export class TimezoneService {
   private readonly VIETNAM_TIMEZONE = 'Asia/Ho_Chi_Minh';
 
   /**
-   * Convert a date to Vietnam timezone
+   * Convert a date to Vietnam timezone string for display
    */
-  toVietnamTime(date: Date | string): Date {
+  toVietnamTimeString(date: Date | string): string {
     const dateObj = new Date(date);
-    return new Date(dateObj.toLocaleString('en-US', { timeZone: this.VIETNAM_TIMEZONE }));
+    return dateObj.toLocaleString('vi-VN', {
+      timeZone: this.VIETNAM_TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   }
 
   /**
-   * Get current time in Vietnam timezone
+   * Get current time in Vietnam timezone (for database storage)
    */
   getCurrentVietnamTime(): Date {
-    return new Date(new Date().toLocaleString('en-US', { timeZone: this.VIETNAM_TIMEZONE }));
+    // Return Vietnam time for database storage
+    const now = new Date();
+    return new Date(now.toLocaleString('en-US', { timeZone: this.VIETNAM_TIMEZONE }));
   }
 
   /**

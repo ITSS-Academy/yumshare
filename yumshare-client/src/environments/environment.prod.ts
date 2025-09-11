@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api' // Production API URL (relative path)
+  apiUrl: 'https://api.yumshare.vn' // Custom domain for API
 };

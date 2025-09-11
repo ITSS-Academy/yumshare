@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { User } from '../../../auth/entities/user.entity';
 import { Recipe } from 'src/recipes/entities/recipe.entity/recipe.entity';
 
@@ -26,29 +26,21 @@ export class Comment {
 
   @CreateDateColumn({ 
     type: 'timestamp with time zone',
+    default: () => "timezone('Asia/Ho_Chi_Minh', now())",
     transformer: {
       to: (value: Date) => value,
-      from: (value: Date) => value
+      from: (value: Date) => value ? new Date(value.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })) : value
     }
   })
   created_at: Date;
 
   @UpdateDateColumn({ 
     type: 'timestamp with time zone',
+    default: () => "timezone('Asia/Ho_Chi_Minh', now())",
     transformer: {
       to: (value: Date) => value,
-      from: (value: Date) => value
+      from: (value: Date) => value ? new Date(value.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })) : value
     }
   })
   updated_at: Date;
-
-  @BeforeInsert()
-  setCreatedAt() {
-    this.created_at = new Date();
-  }
-
-  @BeforeUpdate()
-  setUpdatedAt() {
-    this.updated_at = new Date();
-  }
 }

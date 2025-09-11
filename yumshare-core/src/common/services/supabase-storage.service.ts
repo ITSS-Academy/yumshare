@@ -147,7 +147,7 @@ export class SupabaseStorageService {
           });
         
         if (error) {
-          console.error('Supabase upload error:', error);
+          
           throw new BadRequestException(`Upload failed: ${error.message}`);
         }
         uploadData = data;

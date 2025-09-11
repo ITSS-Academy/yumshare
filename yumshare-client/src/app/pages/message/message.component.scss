@@ -2,13 +2,13 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100%;
+  height: 100vh; /* Full viewport height */
   background: var(--background);
   overflow: hidden;
 }
 
 .user {
-  width: 300px;
+  width: 20rem; /* Standardized to rem */
   height: 100%;
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -18,14 +18,12 @@
 
 .chat-area {
   flex: 1;
-  height: 500px;
+  height: 100vh; /* Use viewport height */
   display: flex;
   flex-direction: column;
   min-width: 0;
   background: var(--background);
-  overflow-y: auto; /* Bật cuộn theo chiều dọc */
-  scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
-  -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE/Edge */
+  overflow: hidden; /* Prevent overflow, let child components handle scrolling */
 }
 
 .empty-chat {
@@ -37,14 +35,20 @@
   color: var(--text-muted);
   background: var(--surface);
   text-align: center;
-  margin: 20px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-light);
+  margin: 0; /* Remove margin for full space usage */
+  border-radius: 0; /* Remove border radius for full-screen */
+  box-shadow: none; /* Remove shadow for full-screen feel */
 
   .empty-chat-icon {
-    font-size: 64px;
     margin-bottom: 24px;
     opacity: 0.5;
+    
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: var(--text-muted);
+    }
   }
 
   h2 {
@@ -61,30 +65,26 @@
   }
 }
 
-/* Responsive cho màn nhỏ */
-@media (max-width: 920px) {
+// ===== RESPONSIVE DESIGN =====
+@import '../../shared/styles/responsive.scss';
+
+/* Mobile responsive (≤ 767px) */
+@include mobile-and-tablet {
   .chat-container {
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
 
     .user {
       width: 100%;
-      height: 100%;
+      height: 50vh;
       border-right: none;
       border-bottom: 1px solid var(--border);
-    }
-    ::ng-deep .chat-window-container {
-      height: 37rem !important;
     }
 
     .chat-area {
       width: 100%;
-      height: 100%;
-    }
-
-    /* Mặc định chỉ hiện user list */
-    .chat-area {
-      display: none;
+      height: 50vh;
+      display: none; /* Mặc định chỉ hiện user list */
     }
 
     /* Khi có chat được chọn thì ẩn user list, hiện chat */
@@ -94,18 +94,40 @@
       }
       .chat-area {
         display: flex;
+        height: 100vh;
       }
+    }
+  }
+}
+
+/* Tablet responsive (768px - 1023px) */
+@include desktop-only {
+  .chat-container {
+    flex-direction: row;
+    height: 100vh;
+
+    .user {
+      width: 40%;
+      height: 100vh;
+      border-right: 1px solid var(--border);
+      border-bottom: none;
+    }
+
+    .chat-area {
+      width: 60%;
+      height: 100vh;
+      display: flex !important;
     }
   }
 }
 
 @media (min-width: 921px) {
   .chat-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    box-shadow: var(--shadow-heavy);
-    border-radius: 8px;
+    max-width: 100%; /* Use full width */
+    margin: 0;
+    box-shadow: none; /* Remove shadow for full-screen feel */
+    border-radius: 0; /* Remove border radius for full-screen */
     overflow: hidden;
-    height: 100%;
+    height: 100vh; /* Full viewport height */
   }
 }

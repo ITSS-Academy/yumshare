@@ -85,8 +85,8 @@
       <!-- Empty State -->
       @if (!loading && chats.length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">💬</div>
-          <h3>{{ 'No conversations yet' | translate }}</h3>
+          <div class="empty-icon"><mat-icon>chat_bubble_outline</mat-icon></div>
+           <h3>{{ 'No conversations yet' | translate }}</h3>
           <p>{{ 'Start a new conversation by searching for users' | translate }}</p>
         </div>
       }

@@ -184,7 +184,7 @@ export const logFavoriteActions = createEffect(
         FavoriteActions.loadFavoriteCount
       ),
       tap((action) => {
-        console.log(`Favorite Action: ${action.type}`, action);
+        // Log favorite actions if needed for debugging
       })
     );
   },
@@ -201,7 +201,7 @@ export const logFavoriteSuccess = createEffect(
         FavoriteActions.toggleFavoriteSuccess
       ),
       tap((action) => {
-        console.log(`Favorite Success: ${action.type}`, action);
+        // Log favorite success actions if needed for debugging
       })
     );
   },

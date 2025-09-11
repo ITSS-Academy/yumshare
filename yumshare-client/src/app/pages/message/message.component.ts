@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { ChatService } from '../../services/chat/chat.service';
 import { Chat, CreateMessageDto } from '../../models/chat.model';
 import { User } from '../../models/user.model';
@@ -141,18 +142,10 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   loadMineProfile(): void {
     const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
-      console.log('Mine profile received in message component:', profile);
-      
       if (profile && profile.id) {
         this.mineProfile = profile;
-        console.log('Profile loaded successfully in message component:', {
-          id: this.mineProfile.id,
-          username: this.mineProfile.username,
-          email: this.mineProfile.email
-        });
       } else {
         this.mineProfile = null;
-        console.log('No profile found in auth state for message component');
       }
     });
     
@@ -160,18 +153,26 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.loadMineProfile();
     this.setupWebSocketListeners();
-    if (this.mineProfile?.id) {
-      this.loadChats();
-      this.joinChat();
-    }
+    
+    // Wait for profile to load before loading chats
+    const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
+      if (profile && profile.id) {
+        this.mineProfile = profile;
+        this.loadChats();
+        this.joinChat();
+      }
+    });
+    this.subscriptions.push(profileSubscription);
 
     // Check for chat ID in route parameters
-    this.route.params.subscribe(params => {
+    const routeSubscription = this.route.params.subscribe(params => {
       if (params['id']) {
         this.selectChatById(params['id']);
       }
     });
+    this.subscriptions.push(routeSubscription);
   }
 
   ngOnDestroy() {
@@ -184,19 +185,12 @@ export class MessageComponent implements OnInit, OnDestroy {
     // Listen for new messages
     this.subscriptions.push(
       this.chatService.newMessage$.subscribe(message => {
-        console.log('WebSocket received message:', {
-          id: message.id,
-          content: message.content,
-          sender_id: message.sender_id,
-          isCurrentUser: message.sender_id === this.mineProfile?.id,
-          currentMessagesCount: this.messages.length
-        });
+        // WebSocket received message
 
         if (message && this.selectedChat && message.chat_id === this.selectedChat?.id) {
           // Check if message already exists by ID first
           const existingMessageById = this.messages.find(m => m.id === message.id);
           if (existingMessageById) {
-            console.log('Message already exists by ID, skipping:', message.id);
             return;
           }
 
@@ -211,7 +205,6 @@ export class MessageComponent implements OnInit, OnDestroy {
             });
 
             if (isOptimisticDuplicate) {
-              console.log('Skipping duplicate of optimistic message:', message.content);
               return;
             }
 
@@ -222,17 +215,14 @@ export class MessageComponent implements OnInit, OnDestroy {
               Math.abs(new Date(m.created_at).getTime() - new Date(message.created_at).getTime()) < 5000
             );
             if (duplicateByContent) {
-              console.log('Skipping duplicate message by content:', message.content);
               return;
             }
 
             // Only add if it's a new message from current user (shouldn't happen with current setup)
-            console.log('Adding new message from current user via WebSocket:', message.id);
             this.messages.push(message);
           } else {
             // Add message from other user
             this.messages.push(message);
-            console.log('Added message from other user:', message.id);
           }
 
           // Update chat list
@@ -251,7 +241,6 @@ export class MessageComponent implements OnInit, OnDestroy {
       this.chatService.userTyping$.subscribe(data => {
         if (data && this.selectedChat && data.chatId === this.selectedChat.id) {
           // Handle typing indicator
-          console.log(`${data.userId} is typing: ${data.isTyping}`);
         }
       })
     );
@@ -272,27 +261,29 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   private joinChat() {
-    this.chatService.joinChat(this.mineProfile?.id || '');
+    if (!this.mineProfile?.id) {
+      return;
+    }
+    this.chatService.joinChat(this.mineProfile.id);
   }
 
   private loadChats() {
+    if (!this.mineProfile?.id) {
+      return;
+    }
+
     this.loading = true;
-    this.chatService.getUserChats(this.mineProfile?.id || '').subscribe({
+    this.chatService.getUserChats(this.mineProfile.id).subscribe({
       next: (chats) => {
-        console.log('Loaded chats:', chats);
-        console.log('Chat details:', chats.map(chat => ({
-          id: chat.id,
-          user1_id: chat.user1_id,
-          user2_id: chat.user2_id,
-          user1: chat.user1 ? { id: chat.user1.id, username: chat.user1.username } : null,
-          user2: chat.user2 ? { id: chat.user2.id, username: chat.user2.username } : null
-        })));
         this.chats = chats;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading chats:', error);
         this.loading = false;
+        // Don't show error if user is not authenticated
+        if (error.status !== 401 && error.status !== 403) {
+          console.error('Failed to load chats');
+        }
       }
     });
   }
@@ -313,7 +304,6 @@ export class MessageComponent implements OnInit, OnDestroy {
       this.selectChat(chat);
     } else {
       // If chat not found in current list, try to load it
-      console.log('Chat not found in current list, loading...');
       // You might want to add a method to load a specific chat by ID
     }
   }
@@ -557,7 +547,6 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   // Handle message sending from child component
   handleSendMessage(messageContent: string) {
-    console.log('handleSendMessage called with:', messageContent);
 
     if (!messageContent.trim() || !this.selectedChat) return;
 
@@ -582,11 +571,9 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     // Track this optimistic message
     this.optimisticMessageIds.add(tempId);
-    console.log('Added optimistic message:', tempId, 'Total optimistic messages:', this.optimisticMessageIds.size);
 
     // Add optimistic message to UI immediately
     this.messages.push(optimisticMessage);
-    console.log('Added optimistic message to UI. Total messages:', this.messages.length);
 
     // Update chat list
     const chatIndex = this.chats.findIndex(c => c.id === this.selectedChat?.id);
@@ -597,10 +584,8 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
 
     // Send message via REST API (primary method)
-    console.log('Sending message via REST API...');
     this.chatService.sendMessage(messageData).subscribe({
       next: (serverMessage) => {
-        console.log('REST API response received:', serverMessage.id);
 
         // Replace optimistic message with server message
         const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
@@ -613,7 +598,6 @@ export class MessageComponent implements OnInit, OnDestroy {
           });
 
           this.optimisticMessageIds.delete(tempId);
-          console.log('Updated optimistic message with server data. Total messages:', this.messages.length);
 
           // Update chat list with server message
           if (chatIndex !== -1) {
@@ -635,7 +619,6 @@ export class MessageComponent implements OnInit, OnDestroy {
         if (tempMessageIndex !== -1) {
           this.messages.splice(tempMessageIndex, 1);
           this.optimisticMessageIds.delete(tempId);
-          console.log('Removed optimistic message due to error. Total messages:', this.messages.length);
         }
       }
     });

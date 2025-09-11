@@ -32,9 +32,9 @@ export class RecipeStep {
   @JoinColumn({ name: 'recipe_id' })
   recipe: Recipe;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 }

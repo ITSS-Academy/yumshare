@@ -69,8 +69,6 @@ export class AppComponent implements OnInit, OnDestroy {
           phoneNumber: auth.phoneNumber
         };
 
-        console.log('🔐 Storing user and token:', { user, tokenLength: idToken?.length });
-        
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
         
@@ -93,8 +91,12 @@ export class AppComponent implements OnInit, OnDestroy {
         
         // Connect to socket and join user rooms
         this.socketService.connect();
-        this.socketService.joinUserRoom(auth.uid); // For notifications
-        this.socketService.joinChatRoom(auth.uid); // For chat
+        
+        // Wait a bit for connection to establish before joining rooms
+        setTimeout(() => {
+          this.socketService.joinUserRoom(auth.uid); // For notifications
+          this.socketService.joinChatRoom(auth.uid); // For chat
+        }, 1000);
       } else {
         // Xoá flag khi logout để lần sau login lại sẽ hiện
         localStorage.removeItem('loginSnackbarShown');
@@ -127,7 +129,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private updateSidebarMode() {
-    this.isMobile = window.innerWidth < 768;
+    this.isMobile = window.innerWidth <= 767; // Changed from < 768 to <= 767
 
     if (this.isMobile) {
       // mobile mặc định đóng sidebar
@@ -201,10 +203,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private checkScreenSize() {
-    this.isMobile = window.innerWidth <= 768;
+    this.isMobile = window.innerWidth <= 767; // Changed from <= 768 to <= 767
 
     window.addEventListener('resize', () => {
-      this.isMobile = window.innerWidth <= 768;
+      this.isMobile = window.innerWidth <= 767; // Changed from <= 768 to <= 767
     });
+  }
+
+  isMessagePage(): boolean {
+    return this.router.url.includes('/message');
   }
 }
