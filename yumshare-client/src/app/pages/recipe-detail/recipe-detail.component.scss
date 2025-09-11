@@ -1,3 +1,64 @@
+// ===== RECIPE DETAIL COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
+/* Virtual Scrolling Container */
+.virtual-scroll-container {
+  width: 100%;
+  height: 300px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: var(--spacing-sm) 0;
+}
+
+.ingredient-viewport,
+.step-viewport {
+  height: 100%;
+  width: 100%;
+}
+
+// CDK Virtual Scroll specific styles
+.cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+}
+
+.cdk-virtual-scroll-viewport {
+  height: 100%;
+}
+
+/* Regular Scroll Containers */
+.regular-ingredient-list,
+.regular-step-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  margin: var(--spacing-sm) 0;
+  
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--surface-variant);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+    
+    &:hover {
+      background: var(--text-secondary);
+    }
+  }
+}
+
 /* Base typography using Material Design 3 tokens */
 h1 {
   font: var(--mat-sys-headline-large);
@@ -427,14 +488,40 @@ p {
   justify-content: center;
 }
 
-.video iframe.clip {
+/* Video container styles - responsive for both iframe and video */
+.video iframe.clip,
+.video video.clip {
   width: 100%;
   max-width: 700px;
   aspect-ratio: 16 / 9;
   height: auto;
   border-radius: 1rem;
   display: flex;
-  margin: 0.5rem;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video iframe.clip:hover,
+.video video.clip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Video-specific optimizations */
+.video video.clip {
+  background: #000;
+  object-fit: contain;
+}
+
+/* Loading state for videos */
+.video video.clip[preload="metadata"] {
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 .bottom-under{
   width: 100%;
@@ -801,10 +888,12 @@ p {
     gap: 0.25rem;
     margin-top: 0.5rem;
   }
-  .video iframe.clip {
+  .video iframe.clip,
+  .video video.clip {
     width: 100% !important;
     height: auto !important;
     border-radius: 0.5rem;
+    max-width: 100% !important;
   }
 }
 

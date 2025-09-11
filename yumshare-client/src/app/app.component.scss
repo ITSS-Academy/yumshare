@@ -1,3 +1,6 @@
+// ===== APP COMPONENT - USING DESIGN SYSTEM =====
+@use './shared/mixins' as *;
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -9,11 +12,11 @@
 .sidebar-container {
   width: 17.5rem;
   min-width: 17.5rem;
-  background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
   flex-shrink: 0;
-  transition: all 0.3s ease;
-  border-radius: 0 16px 16px 0;
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   height: 100vh;
   overflow-y: auto;
 }
@@ -64,7 +67,7 @@
   will-change: scroll-position;
   min-height: 0;
   background: var(--background);
-  padding: 1rem;
+  padding: var(--spacing-md);
 }
 
 // Footer styling - now inside content-container
@@ -171,20 +174,20 @@ app-footer {
 
 .sidebar-toggle-btn {
   position: absolute;
-  top: 1rem;
+  top: var(--spacing-md);
   right: -1.25rem;
   z-index: 1100;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: var(--radius-round);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-light);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: right 0.3s;
+  transition: right var(--animation-duration-fast) var(--animation-easing);
 }
 
 .sidebar-container.sidebar-mini .sidebar-toggle-btn {
@@ -209,5 +212,5 @@ app-footer {
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--animation-duration-fast) var(--animation-easing);
 }

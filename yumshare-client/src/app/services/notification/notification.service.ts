@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Notification } from '../../models/notification.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { selectCurrentUser } from '../../ngrx/auth/auth.selectors';
@@ -103,8 +104,12 @@ export class NotificationService {
   /**
    * Đánh dấu tất cả notifications đã đọc
    */
-  markAllAsRead(): Observable<Notification[]> {
-    return this.http.put<Notification[]>(`${this.apiUrl}/notifications/mark-all-read`, {}).pipe(
+  markAllAsRead(userId?: string): Observable<Notification[]> {
+    const url = userId 
+      ? `${this.apiUrl}/notifications/user/${userId}/mark-all-read`
+      : `${this.apiUrl}/notifications/mark-all-read`;
+    
+    return this.http.put<Notification[]>(url, {}).pipe(
       tap(() => {
         // Set count to 0 when marking all as read
         this.notificationCountSubject.next(0);
@@ -160,5 +165,49 @@ export class NotificationService {
         });
       }
     });
+  }
+
+  /**
+   * Get paginated notifications for NgRx
+   */
+  getUserNotificationsPaginated(
+    userId: string, 
+    page: number = 1, 
+    size: number = 20, 
+    filter: any = {}, 
+    sortBy: string = 'created_at', 
+    sortOrder: 'ASC' | 'DESC' = 'DESC'
+  ): Observable<PaginatedResponse<Notification>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortOrder', sortOrder);
+
+    // Add filter parameters
+    if (filter.type) params = params.set('type', filter.type);
+    if (filter.isRead !== undefined) params = params.set('isRead', filter.isRead.toString());
+    if (filter.dateRange?.start) params = params.set('startDate', filter.dateRange.start.toISOString());
+    if (filter.dateRange?.end) params = params.set('endDate', filter.dateRange.end.toISOString());
+
+    return this.http.get<PaginatedResponse<Notification>>(`${this.apiUrl}/notifications/user/${userId}`, { params });
+  }
+
+  /**
+   * Get notification counts for NgRx
+   */
+  getNotificationCounts(userId: string): Observable<{ unreadCount: number; messageCount: number; totalCount: number }> {
+    return this.http.get<{ unreadCount: number; messageCount: number; totalCount: number }>(`${this.apiUrl}/notifications/user/${userId}/counts`);
+  }
+
+  /**
+   * Delete all notifications for a user
+   */
+  deleteAllNotifications(userId?: string): Observable<any> {
+    const url = userId 
+      ? `${this.apiUrl}/notifications/user/${userId}/delete-all`
+      : `${this.apiUrl}/notifications/delete-all`;
+    
+    return this.http.delete(url);
   }
 }

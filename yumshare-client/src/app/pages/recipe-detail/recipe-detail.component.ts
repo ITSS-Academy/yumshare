@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
 import { LoadingComponent } from '../../components/loading/loading.component';
 import { CommentComponent } from './component/comment/comment.component';
@@ -49,6 +50,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatIconModule,
     MatProgressSpinnerModule,
     FormsModule,
+    ScrollingModule,
     SafePipe,
     LazyImageDirective,
     LoadingComponent
@@ -59,8 +61,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class RecipeDetailComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
-  private destroy$ = new Subject<void>();
-
+  
+  // Virtual scrolling properties
+  ingredientItemSize = 40; // Height of each ingredient item
+  stepItemSize = 150; // Height of each step item
+  
   // Recipe data
   recipe$: Observable<Recipe | null>;
   recipeLoading$: Observable<boolean>;
@@ -123,13 +128,29 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         this.loadRecipeData();
         this.loadComments();
         this.checkFollowStatus();
-        this.loadLikes(); // load like khi vào recipe
+        
+        // Load likes with delay to ensure user auth is ready
+        setTimeout(() => {
+          this.loadLikes();
+        }, 100);
 
         // Update selectors for likes with new recipeId
         this.likeCount$ = this.store.select(selectRecipeLikeCount(this.recipeId));
         this.likeLoading$ = this.store.select(selectLikesLoading);
         this.likes$ = this.store.select(selectLikesForRecipe(this.recipeId));
         this.isLiked$ = this.store.select(selectIsRecipeLikedByUser(this.recipeId));
+        
+        // Debug: Subscribe to isLiked$ to see state changes (remove when stable)
+        // const debugSub = this.isLiked$.subscribe(isLiked => {
+        //   console.log(`[RecipeDetail] isLiked for recipe ${this.recipeId}:`, isLiked);
+        // });
+        // this.subscriptions.push(debugSub);
+        
+        // Debug: Subscribe to like count changes (remove when stable)
+        // const countDebugSub = this.likeCount$.subscribe(count => {
+        //   console.log(`[RecipeDetail] like count for recipe ${this.recipeId}:`, count);
+        // });
+        // this.subscriptions.push(countDebugSub);
       }
     });
     this.subscriptions.push(routeSub);
@@ -139,6 +160,18 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
       this.isFollowed = isFollowing;
     });
     this.subscriptions.push(followSub);
+    
+    // Subscribe to current user changes and reload likes when user changes
+    const userChangeSub = this.currentUser$.subscribe(user => {
+      if (user?.uid && this.recipeId) {
+        // console.log('[RecipeDetail] User changed, reloading likes for:', user.uid);
+        // Small delay to ensure previous requests complete
+        setTimeout(() => {
+          this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
+        }, 200);
+      }
+    });
+    this.subscriptions.push(userChangeSub);
 
     // Handle recipe errors
     const recipeErrorSub = this.recipeError$.subscribe(error => {
@@ -159,8 +192,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.destroy$.next();
-    this.destroy$.complete();
+   
 
     this.store.dispatch(RecipeActions.clearRecipeState());
     this.store.dispatch(CommentActions.clearCommentState());
@@ -175,13 +207,19 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadLikes(): void {
+    // Load like count and likes list first
     this.store.dispatch(LikesActions.loadRecipeLikeCount({ recipeId: this.recipeId }));
     this.store.dispatch(LikesActions.loadRecipeLikes({ recipeId: this.recipeId }));
-    this.currentUser$.pipe(take(1)).subscribe(user => {
-      if (user?.uid) {
-        this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
-      }
+    
+    // Wait for current user to be available, then check if liked
+    const loadLikesSub = this.currentUser$.pipe(
+      filter(user => !!user?.uid), // Only proceed when user is available
+      take(1)
+    ).subscribe(user => {
+      // console.log('[RecipeDetail] Loading likes for user:', user.uid, 'recipe:', this.recipeId);
+      this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
     });
+    this.subscriptions.push(loadLikesSub);
   }
 
   private checkFollowStatus(): void {
@@ -204,9 +242,9 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   onFollowToggle(event: MatCheckboxChange): void {
     if (!this.recipeId) return;
 
-    this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
+    const followToggleSub = this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
       if (!currentUser || !currentUser.uid) {
-        this.snackBar.open('Vui lòng đăng nhập để follow người dùng!', 'Đăng nhập', {
+        this.snackBar.open('Please Login to follow user!', 'Login', {
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
@@ -214,7 +252,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.recipe$.pipe(take(1)).subscribe((recipe: Recipe | null) => {
+      const recipeSub = this.recipe$.pipe(take(1)).subscribe((recipe: Recipe | null) => {
         if (recipe && recipe.user && recipe.user.id) {
           if (currentUser.uid !== recipe.user!.id) {
             if (event.checked) {
@@ -231,11 +269,13 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
           }
         }
       });
+      this.subscriptions.push(recipeSub);
     });
+    this.subscriptions.push(followToggleSub);
   }
 
   toggleLike(): void {
-    this.currentUser$.pipe(
+    const toggleLikeSub = this.currentUser$.pipe(
       filter(user => !!user?.uid),
       take(1)
     ).subscribe(user => {
@@ -244,10 +284,11 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         recipeId: this.recipeId
       }));
     });
+    this.subscriptions.push(toggleLikeSub);
   }
 
   onLoginRequired(): void {
-    this.snackBar.open('Vui lòng đăng nhập để sử dụng tính năng này!', 'Đăng nhập', {
+    this.snackBar.open('Please Login to follow user!', 'Login', {
       duration: 4000,
       panelClass: ['warning-snackbar']
     });
@@ -259,12 +300,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDeleteRecipe(): void {
-    if (this.recipeId && confirm('Are you sure you want to delete this recipe?')) {
-      this.store.dispatch(RecipeActions.deleteRecipe({ id: this.recipeId }));
-      this.router.navigate(['/']);
-    }
-  }
+  // onDeleteRecipe(): void {
+  //   if (this.recipeId && confirm('Are you sure you want to delete this recipe?')) {
+  //     this.store.dispatch(RecipeActions.deleteRecipe({ id: this.recipeId, idToken: this.authState.idToken }));
+  //     this.router.navigate(['/']);
+  //   }
+  // }
 
   onCommentAdded(comment: Comment): void {
     this.loadComments();
@@ -299,9 +340,79 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     return difficulty?.charAt(0).toUpperCase() + difficulty?.slice(1).toLowerCase() || 'Unknown';
   }
 
-  getYouTubeEmbedUrl(url: string): string {
+  /**
+   * Get optimized video URL based on video type (Supabase, YouTube, Direct)
+   */
+  getVideoEmbedUrl(url: string): string {
     if (!url) return '';
 
+    // Check if it's a Supabase Storage URL
+    if (this.isSupabaseStorageUrl(url)) {
+      return this.getSupabaseVideoUrl(url);
+    }
+    
+    // Check if it's a YouTube URL
+    if (this.isYouTubeUrl(url)) {
+      return this.getYouTubeEmbedUrl(url);
+    }
+    
+    // Check if it's a direct video file
+    if (this.isDirectVideoUrl(url)) {
+      return this.getDirectVideoUrl(url);
+    }
+
+    return url;
+  }
+
+  /**
+   * Check if URL is from Supabase Storage
+   */
+  private isSupabaseStorageUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co') && 
+             urlObj.pathname.includes('/storage/') &&
+             this.isVideoFile(url);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check if URL is a YouTube URL
+   */
+  private isYouTubeUrl(url: string): boolean {
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  }
+
+  /**
+   * Check if URL is a direct video file
+   */
+  private isDirectVideoUrl(url: string): boolean {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  }
+
+  /**
+   * Check if URL points to a video file
+   */
+  private isVideoFile(url: string): boolean {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  }
+
+  /**
+   * Get Supabase video URL (direct playback, no autoplay)
+   */
+  private getSupabaseVideoUrl(url: string): string {
+    // Supabase video - return original URL for direct video playback
+    return url;
+  }
+
+  /**
+   * Get YouTube embed URL (iframe with autoplay=0)
+   */
+  private getYouTubeEmbedUrl(url: string): string {
     let videoId = '';
 
     if (url.includes('youtube.com/watch?v=')) {
@@ -313,9 +424,56 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     }
 
     if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
+      // YouTube - no autoplay, with controls
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1&controls=1&loop=0&mute=0`;
     }
 
     return url;
+  }
+
+  /**
+   * Get direct video URL (native video element)
+   */
+  private getDirectVideoUrl(url: string): string {
+    // Direct video file - return original URL for native video playback
+    return url;
+  }
+
+  /**
+   * Determine video element type based on URL
+   */
+  getVideoElementType(url: string): 'iframe' | 'video' {
+    if (this.isYouTubeUrl(url)) {
+      return 'iframe';
+    }
+    return 'video';
+  }
+
+  /**
+   * Get video attributes based on video type
+   */
+  getVideoAttributes(url: string): any {
+    if (this.isYouTubeUrl(url)) {
+      return {
+        frameborder: '0',
+        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+        allowfullscreen: true
+      };
+    }
+    
+    return {
+      controls: true,
+      preload: 'metadata',
+      playsinline: true
+    };
+  }
+
+  // TrackBy functions for virtual scrolling performance
+  trackByIngredient(index: number, ingredient: string): string {
+    return `${index}-${ingredient}`;
+  }
+
+  trackByStep(index: number, step: any): string {
+    return step.id || `${index}-${step.description}`;
   }
 }

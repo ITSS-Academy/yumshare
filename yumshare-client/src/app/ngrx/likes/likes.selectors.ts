@@ -43,7 +43,11 @@ export const selectLikesForRecipe = (recipeId: string) => createSelector(
 
 export const selectIsRecipeLikedByUser = (recipeId: string) => createSelector(
   selectLikesState,
-  (state) => !!state.likedByUser[recipeId]
+  (state) => {
+    const liked = state.likedByUser[recipeId];
+    // Explicitly check for true, undefined means not checked yet
+    return liked === true;
+  }
 );
 
 // Computed selectors

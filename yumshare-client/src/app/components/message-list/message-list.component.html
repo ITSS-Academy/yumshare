@@ -1,14 +1,14 @@
-<div class="notification-container">
+<div class="message-container">
   <!-- Header -->
-  <div class="notification-header">
-    <h3>Messages</h3>
+  <div class="message-header">
+    <h3>{{ 'Messages' | translate }}</h3>
     <div class="header-actions">
       <button 
         mat-button 
         color="primary" 
         (click)="markAllAsRead()"
         [disabled]="getUnreadCount() === 0">
-        Mark all as read
+        {{ 'Mark all as read' | translate }}
       </button>
     </div>
   </div>
@@ -17,7 +17,7 @@
   @if (loading) {
     <div class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading messages...</p>
+      <p>{{ 'Loading messages...' | translate }}</p>
     </div>
   }
 
@@ -27,7 +27,7 @@
       <mat-icon color="warn">error</mat-icon>
       <p>{{ error }}</p>
       <button mat-button color="primary" (click)="loadMessageNotifications()">
-        Retry
+        {{ 'Retry' | translate }}
       </button>
     </div>
   }
@@ -36,16 +36,16 @@
   @if (!loading && !error && notifications.length === 0) {
     <div class="empty-container">
       <mat-icon>message</mat-icon>
-      <p>No messages yet</p>
-      <small>You'll see message notifications here when someone sends you a message</small>
+      <p>{{ 'No messages yet' | translate }}</p>
+      <small>{{ "You'll see message notifications here when someone sends you a message" | translate }}</small>
     </div>
   }
 
   <!-- Messages List -->
   @if (!loading && !error && notifications.length > 0) {
-    <div class="notifications-list">
+    <div class="messages-list">
       @for (notification of notifications; track notification.id) {
-        <div class="notification-item" 
+        <div class="message-item" 
              [class.unread]="!notification.is_read"
              (click)="onMessageClick(notification)">
           
@@ -56,13 +56,13 @@
 
           <!-- Message Content -->
           <div class="notification-content">
-            <p class="notification-text">{{ notification.content }}</p>
+            <p class="notification-text">{{ notification.content | translate }}</p>
             <div class="notification-meta">
               <span class="notification-time">
                 {{ notification.created_at | date:'short' }}
               </span>
               @if (!notification.is_read) {
-                <mat-chip color="primary" selected>New</mat-chip>
+                <mat-chip color="primary" selected>{{ 'New' | translate }}</mat-chip>
               }
             </div>
           </div>
@@ -74,7 +74,7 @@
                 mat-icon-button 
                 color="primary"
                 (click)="markAsRead(notification); $event.stopPropagation()"
-                matTooltip="Mark as read">
+                [matTooltip]="'Mark as read' | translate">
                 <mat-icon>check</mat-icon>
               </button>
             }
@@ -82,7 +82,7 @@
               mat-icon-button 
               color="warn"
               (click)="deleteNotification(notification.id); $event.stopPropagation()"
-              matTooltip="Delete message">
+              [matTooltip]="'Delete message' | translate">
               <mat-icon>delete</mat-icon>
             </button>
           </div>

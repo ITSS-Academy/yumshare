@@ -49,30 +49,72 @@ export class ChatsService {
   }
 
   async getUserChats(userId: string) {
+    // Load chats without messages to reduce Cached Egress
     const chats = await this.chatRepository.find({
       where: [
         { user1_id: userId },
         { user2_id: userId }
       ],
-      relations: ['user1', 'user2', 'messages'],
+      relations: ['user1', 'user2'],
+      select: {
+        id: true,
+        user1_id: true,
+        user2_id: true,
+        created_at: true,
+        updated_at: true,
+        user1: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        user2: {
+          id: true,
+          username: true,
+          avatar_url: true
+        }
+      },
       order: { updated_at: 'DESC' }
     });
 
-    // Ensure user data is properly loaded and formatted
+    // Add last message info without loading all messages
     const processedChats: any[] = [];
     for (const chat of chats) {
-      const processedChat = await this.forceLoadUserData(chat);
-      processedChats.push(processedChat);
+      const lastMessage = await this.messageRepository.findOne({
+        where: { chat_id: chat.id },
+        order: { created_at: 'DESC' },
+        select: ['id', 'content', 'created_at', 'sender_id', 'is_read']
+      });
+      
+      processedChats.push({
+        ...chat,
+        lastMessage
+      });
     }
     
     return processedChats;
   }
 
-  async getChatMessages(chatId: string) {
+  async getChatMessages(chatId: string, page: number = 1, limit: number = 50) {
+    const skip = (page - 1) * limit;
+    
     return this.messageRepository.find({
       where: { chat_id: chatId },
       relations: ['sender'],
-      order: { created_at: 'ASC' }
+      select: {
+        id: true,
+        content: true,
+        created_at: true,
+        is_read: true,
+        sender_id: true,
+        sender: {
+          id: true,
+          username: true,
+          avatar_url: true
+        }
+      },
+      order: { created_at: 'ASC' },
+      skip,
+      take: limit
     });
   }
 
@@ -185,9 +227,8 @@ export class ChatsService {
 
   async updateUserStatus(userId: string, isOnline: boolean) {
     // This method should update user's online status
-    // You might want to use the AuthService here or create a separate method
-    // For now, we'll just log it
-    console.log(`User ${userId} is now ${isOnline ? 'online' : 'offline'}`);
+    // Update user online status
+    // TODO: Implement proper user status tracking
   }
 
 

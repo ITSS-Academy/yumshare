@@ -1,31 +1,30 @@
-<div class="content-container">
+<div class="content-container" #contentContainer>
   <div class="my-recipe-header">
-    <h1>My Favourite Recipes</h1>
-    <p>Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your
-      favourites. Enjoy exploring and saving your best-loved dishes!</p>
+    <h1>{{ 'My Favourite Recipes' | translate }}</h1>
+    <p>{{ "Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your favourites. Enjoy exploring and saving your best-loved dishes!" | translate }}</p>
   </div>
 
   <div class="sort-and-category">
     <div class="difficulty">
       <button mat-button [matMenuTriggerFor]="Difficulty">
-        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedDifficulty | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Difficulty="matMenu">
-        <button mat-menu-item (click)="clearDifficultyFilter()">All Difficulties</button>
-        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
-        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
-        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+        <button mat-menu-item (click)="clearDifficultyFilter()">{{ 'All Difficulties' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Easy')">{{ 'Easy' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">{{ 'Medium' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">{{ 'Hard' | translate }}</button>
       </mat-menu>
     </div>
 
     <div class="category">
       <button mat-button [matMenuTriggerFor]="Category">
-        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedCategory | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Category="matMenu">
-        <button mat-menu-item (click)="clearCategoryFilter()">All Categories</button>
+        <button mat-menu-item (click)="clearCategoryFilter()">{{ 'All Categories' | translate }}</button>
         @for (category of activeCategories$ | async; track category.id) {
-          <button mat-menu-item (click)="setCategory(category)">{{ category.name }}</button>
+          <button mat-menu-item (click)="setCategory(category)">{{ category.name | translate }}</button>
         }
       </mat-menu>
     </div>
@@ -35,98 +34,133 @@
     @if (favoritesLoading$ | async) {
       <div class="loading-container">
         <mat-spinner></mat-spinner>
-        <p>Đang tải danh sách yêu thích...</p>
+        <p>{{ 'Loading your favorite recipes...' | translate }}</p>
       </div>
     } @else if (isEmpty$ | async) {
       <div class="empty-state">
         <mat-icon class="empty-icon">favorite_border</mat-icon>
-        <h3>Chưa có công thức yêu thích nào</h3>
-        <p>Hãy khám phá và thêm những công thức bạn yêu thích vào danh sách này!</p>
+        <h3>{{ 'No favorite recipes yet' | translate }}</h3>
+        <p>{{ 'Explore and add your favorite recipes to this list!' | translate }}</p>
       </div>
     } @else {
-      @for (favorite of displayedRecipes$ | async; track favorite.id) {
-        <div class="recipe-card">
-          <!-- Bên trái: ảnh món ăn -->
-          <div class="recipe-image">
-            <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
-                 [alt]="favorite.recipe?.title || 'Recipe Image'">
-          </div>
-
-          <!-- Bên phải: nội dung -->
-          <div class="recipe-content">
-            <!-- Trên: tiêu đề + tác giả -->
-            <div class="recipe-header">
-              <div class="name-and-author">
-                <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
-                <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+      @if ((displayedRecipes$ | async)?.length > 15) {
+        <!-- Use Virtual Scrolling for large favorite lists -->
+        <div class="virtual-scroll-container">
+          <cdk-virtual-scroll-viewport [itemSize]="itemSize" class="favorite-viewport">
+            @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
+            <div class="recipe-card">
+              <!-- Left: recipe image -->
+              <div class="recipe-image">
+                <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
+                     [alt]="favorite.recipe?.title || 'Recipe Image'">
               </div>
-              <div class="example-button-row">
-                <div class="example-flex-container">
-                  <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
-                    <mat-icon class="filled">favorite</mat-icon>
-                  </button>
+
+              <!-- Right: content -->
+              <div class="recipe-content">
+                <!-- Top: title + author -->
+                <div class="recipe-header">
+                  <div class="name-and-author">
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || ('Untitled Recipe' | translate) }}</h3>
+                    <p class="recipe-author">{{ 'by' | translate }} {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || ('Unknown Author' | translate) }}</p>
+                  </div>
+                  <div class="example-button-row">
+                    <div class="example-flex-container">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                        <mat-icon class="filled">favorite</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Middle: description -->
+                <div class="recipe-description">
+                  <p>{{ favorite.recipe?.description || ('No description available' | translate) }}</p>
+                </div>
+
+                <!-- Additional info -->
+                <div class="recipe-meta">
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} {{ 'min' | translate }}</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || ('Unknown' | translate) }}</span>
+                </div>
+
+                <!-- Creation date -->
+                <div class="recipe-footer">
+                  <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
                 </div>
               </div>
             </div>
+            }
+          </cdk-virtual-scroll-viewport>
+        </div>
+      } @else {
+        <!-- Regular scroll for small favorite lists -->
+        <div class="regular-favorite-list">
+          @for (favorite of displayedRecipes$ | async; track trackByFavoriteId($index, favorite)) {
+            <div class="recipe-card">
+              <!-- Left: recipe image -->
+              <div class="recipe-image">
+                <img [src]="favorite.recipe?.image_url || 'assets/default-recipe.jpg'" 
+                     [alt]="favorite.recipe?.title || 'Recipe Image'">
+              </div>
 
-            <!-- Giữa: mô tả -->
-            <div class="recipe-description">
-              <p>{{ favorite.recipe?.description || 'Không có mô tả' }}</p>
-            </div>
+              <!-- Right: content -->
+              <div class="recipe-content">
+                <!-- Top: title + author -->
+                <div class="recipe-header">
+                  <div class="name-and-author">
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || ('Untitled Recipe' | translate) }}</h3>
+                    <p class="recipe-author">{{ 'by' | translate }} {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || ('Unknown Author' | translate) }}</p>
+                  </div>
+                  <div class="example-button-row">
+                    <div class="example-flex-container">
+                      <button mat-icon-button class="favourite-btn" (click)="toggleFavourite(favorite)">
+                        <mat-icon class="filled">favorite</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            <!-- Dưới: ngày đăng -->
-            <div class="recipe-footer">
-              <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
+                <!-- Middle: description -->
+                <div class="recipe-description">
+                  <p>{{ favorite.recipe?.description || ('No description available' | translate) }}</p>
+                </div>
+
+                <!-- Additional info -->
+                <div class="recipe-meta">
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} {{ 'min' | translate }}</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || ('Unknown' | translate) }}</span>
+                </div>
+
+                <!-- Creation date -->
+                <div class="recipe-footer">
+                  <span class="recipe-date">{{ favorite.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
     }
   </div>
 
-  @if (!(isEmpty$ | async)) {
-    <div class="pages-navigation">
-      <div class="example-button-row">
-        <div class="example-flex-container">
-          <div class="example-button-container">
-            <button mat-mini-fab aria-label="First page" (click)="goToFirst()"
-              [disabled]="pageIndex === 0">&lt;&lt;</button>
-            <button mat-mini-fab aria-label="Previous page" (click)="goToPrev()"
-              [disabled]="pageIndex === 0">&lt;</button>
-            
-            @if (pageNumbers$ | async; as pageNumbers) {
-              @if (pageNumbers[0] > 0) {
-                <button mat-mini-fab (click)="goToPage(0)">1</button>
-                @if (pageNumbers[0] > 1) {
-                  <span>...</span>
-                }
-              }
-              
-              @for (page of pageNumbers; track page) {
-                <button mat-mini-fab [class.active]="page === pageIndex" (click)="goToPage(page)">
-                  {{ page + 1 }}
-                </button>
-              }
-              
-              @if (totalPages$ | async; as totalPages) {
-                @if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) {
-                  @if (pageNumbers[pageNumbers.length - 1] < totalPages - 2) {
-                    <span>...</span>
-                  }
-                  <button mat-mini-fab (click)="goToPage(totalPages - 1)">{{ totalPages }}</button>
-                }
-              }
-            }
-            
-            @if (totalPages$ | async; as totalPages) {
-              <button mat-mini-fab aria-label="Next page" (click)="goToNext()"
-                [disabled]="pageIndex === totalPages - 1">&gt;</button>
-              <button mat-mini-fab aria-label="Last page" (click)="goToLast()"
-                [disabled]="pageIndex === totalPages - 1">&gt;&gt;</button>
-            }
-          </div>
-        </div>
-      </div>
+  @if (!(isEmpty$ | async) && (totalPages$ | async) && (totalPages$ | async)! > 1) {
+    <div class="pagination" id="pagination">
+      <button id="first-page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+      <button id="prev-page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+      @for (p of visiblePages; track p) {
+        <button
+          id="page-btn-{{ p }}"
+          (click)="goToPage(p)"
+          [class.active]="p === currentPage"
+        >
+          {{ p }}
+        </button>
+      }
+      @if (showEllipsis) {
+        <span id="ellipsis">…</span>
+      }
+      <button id="next-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+      <button id="last-page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
     </div>
   }
 </div>

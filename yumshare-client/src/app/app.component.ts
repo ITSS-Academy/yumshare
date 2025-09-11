@@ -73,7 +73,8 @@ export class AppComponent implements OnInit, OnDestroy {
         
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
-
+        
+        console.log('idToken', idToken);
         // Hiển thị snackbar chỉ khi chưa từng hiển thị trong session này
         if (!localStorage.getItem('loginSnackbarShown')) {
           this._snackBar.openFromComponent(SnackbarComponent, {

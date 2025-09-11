@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardContent } from "@angular/material/card";
-import { ShareModule } from "../../shares/share.module";
+import { ShareModule } from "../../shared/share.module";
 
 @Component({
   selector: 'app-recipe-card-skeleton',

@@ -29,9 +29,9 @@
           <div class="righttt">
             <p class="food-description">{{ recipe.description }}</p>
             <div class="block">
-              <mat-chip>{{ recipe.difficulty }}</mat-chip>
+              <mat-chip>{{ recipe.difficulty | translate }}</mat-chip>
               <mat-chip>{{ recipe.total_cooking_time }} {{ 'min' | translate }}</mat-chip>
-              <mat-chip>{{ recipe.country }}</mat-chip>
+              <mat-chip>{{ recipe.country | translate }}</mat-chip>
             </div>
           </div>
         </div>
@@ -44,9 +44,25 @@
           <h1 class="title">{{ 'Ingredients' | translate }}</h1>
           <p class="serving">{{ 'Serving' | translate }}: {{ recipe.servings }}</p>
           <div class="ingredient-list">
-            @for (ingredient of recipe.ingredients; track i; let i = $index) {
-              <div class="row">
-                <p>{{ ingredient }}</p>
+            <!-- Use Virtual Scrolling for large ingredient lists -->
+            @if (recipe.ingredients.length > 15) {
+              <div class="virtual-scroll-container">
+                <cdk-virtual-scroll-viewport [itemSize]="ingredientItemSize" class="ingredient-viewport">
+                  @for (ingredient of recipe.ingredients; track trackByIngredient($index, ingredient); let i = $index) {
+                    <div class="row">
+                      <p>{{ ingredient }}</p>
+                    </div>
+                  }
+                </cdk-virtual-scroll-viewport>
+              </div>
+            } @else {
+              <!-- Regular scroll for small ingredient lists -->
+              <div class="regular-ingredient-list">
+                @for (ingredient of recipe.ingredients; track trackByIngredient($index, ingredient); let i = $index) {
+                  <div class="row">
+                    <p>{{ ingredient }}</p>
+                  </div>
+                }
               </div>
             }
           </div>
@@ -69,7 +85,7 @@
               <button
                 class="login-required-btn"
                 (click)="onLoginRequired()">
-                {{ 'Đăng nhập để Follow' | translate }}
+                {{ "Đăng nhập để Follow" | translate }}
               </button>
             }
           </div>
@@ -84,23 +100,53 @@
 
         <div class="right">
           <h1 class="title2">{{ 'Process Steps' | translate }}</h1>
-          @for (step of recipe.steps; track step.id; let i = $index) {
-            <div class="instruction">
-              <div class="instruction-box">
-                <div class="step">
-                  <h1 class="step-number">{{ 'Step' | translate }} {{ i + 1 }}</h1>
-                </div>
-                <div class="step-detail">
-                  <p class="cooking">{{ step.description }}</p>
-                  @if (step.image_url) {
-                    <div appLazyImage
-                         [appLazyImage]="step.image_url"
-                         [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
-                         class="step-image-container">
+          <!-- Use Virtual Scrolling for large step lists -->
+          @if (recipe.steps.length > 8) {
+            <div class="virtual-scroll-container">
+              <cdk-virtual-scroll-viewport [itemSize]="stepItemSize" class="step-viewport">
+                @for (step of recipe.steps; track trackByStep($index, step); let i = $index) {
+                  <div class="instruction">
+                    <div class="instruction-box">
+                      <div class="step">
+                        <h1 class="step-number">{{ 'Step' | translate }} {{ i + 1 }}</h1>
+                      </div>
+                      <div class="step-detail">
+                        <p class="cooking">{{ step.description }}</p>
+                        @if (step.image_url) {
+                          <div appLazyImage 
+                               [appLazyImage]="step.image_url"
+                               [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                               class="step-image-container">
+                          </div>
+                        }
+                      </div>
                     </div>
-                  }
+                  </div>
+                }
+              </cdk-virtual-scroll-viewport>
+            </div>
+          } @else {
+            <!-- Regular scroll for small step lists -->
+            <div class="regular-step-list">
+              @for (step of recipe.steps; track trackByStep($index, step); let i = $index) {
+                <div class="instruction">
+                  <div class="instruction-box">
+                    <div class="step">
+                      <h1 class="step-number">{{ 'Step' | translate }} {{ i + 1 }}</h1>
+                    </div>
+                    <div class="step-detail">
+                      <p class="cooking">{{ step.description }}</p>
+                      @if (step.image_url) {
+                        <div appLazyImage 
+                             [appLazyImage]="step.image_url"
+                             [appLazyImageOptions]="{ quality: 0.8, maxWidth: 500, maxHeight: 300, generateThumbnail: true, thumbnailSize: 250 }"
+                             class="step-image-container">
+                        </div>
+                      }
+                    </div>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           }
         </div>
@@ -112,27 +158,57 @@
         @if (recipe.video_url || recipe.video) {
           <div class="video">
             <h1 class="title3">{{ 'Video Tutorial' | translate }}</h1>
+            
             @if (recipe.video_url) {
-              <iframe
-                class="clip"
-                width="650"
-                height="400"
-                [src]="getYouTubeEmbedUrl(recipe.video_url) | safe"
-                title="Recipe Video Tutorial"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-              </iframe>
+              @if (getVideoElementType(recipe.video_url) === 'iframe') {
+                <iframe
+                  class="clip"
+                  width="650"
+                  height="400"
+                  [src]="getVideoEmbedUrl(recipe.video_url) | safe"
+                  [title]="'Recipe Video Tutorial' | translate"
+                  [attr.frameborder]="getVideoAttributes(recipe.video_url).frameborder"
+                  [attr.allow]="getVideoAttributes(recipe.video_url).allow"
+                  [attr.allowfullscreen]="getVideoAttributes(recipe.video_url).allowfullscreen">
+                </iframe>
+              } @else {
+                <video
+                  class="clip"
+                  width="650"
+                  height="400"
+                  [src]="getVideoEmbedUrl(recipe.video_url)"
+                  [controls]="getVideoAttributes(recipe.video_url).controls"
+                  [preload]="getVideoAttributes(recipe.video_url).preload"
+                  [playsinline]="getVideoAttributes(recipe.video_url).playsinline"
+                  [title]="'Recipe Video Tutorial' | translate">
+                </video>
+              }
             }
+            
             @if (recipe.video) {
-              <video
-                class="clip"
-                width="650"
-                height="400"
-                [src]="recipe.video"
-                controls
-                title="Recipe Video Tutorial">
-              </video>
+              @if (getVideoElementType(recipe.video) === 'iframe') {
+                <iframe
+                  class="clip"
+                  width="650"
+                  height="400"
+                  [src]="getVideoEmbedUrl(recipe.video) | safe"
+                  [title]="'Recipe Video Tutorial' | translate"
+                  [attr.frameborder]="getVideoAttributes(recipe.video).frameborder"
+                  [attr.allow]="getVideoAttributes(recipe.video).allow"
+                  [attr.allowfullscreen]="getVideoAttributes(recipe.video).allowfullscreen">
+                </iframe>
+              } @else {
+                <video
+                  class="clip"
+                  width="650"
+                  height="400"
+                  [src]="getVideoEmbedUrl(recipe.video)"
+                  [controls]="getVideoAttributes(recipe.video).controls"
+                  [preload]="getVideoAttributes(recipe.video).preload"
+                  [playsinline]="getVideoAttributes(recipe.video).playsinline"
+                  [title]="'Recipe Video Tutorial' | translate">
+                </video>
+              }
             }
           </div>
         } @else {

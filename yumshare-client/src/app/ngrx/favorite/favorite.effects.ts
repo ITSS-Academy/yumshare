@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { selectCurrentUserId } from './index';
 
 // Load User Favorites Effect
-export const loadUserFavorites = createEffect(
+export const loadUserFavoritesEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.loadUserFavorites),
@@ -24,7 +24,7 @@ export const loadUserFavorites = createEffect(
 );
 
 // Load All User Favorites Effect
-export const loadAllUserFavorites = createEffect(
+export const loadAllUserFavoritesEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.loadAllUserFavorites),
@@ -40,7 +40,7 @@ export const loadAllUserFavorites = createEffect(
 );
 
 // Add to Favorites Effect
-export const addToFavorites = createEffect(
+export const addToFavoritesEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.addToFavorites),
@@ -56,7 +56,7 @@ export const addToFavorites = createEffect(
 );
 
 // Remove from Favorites Effect
-export const removeFromFavorites = createEffect(
+export const removeFromFavoritesEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.removeFromFavorites),
@@ -72,7 +72,7 @@ export const removeFromFavorites = createEffect(
 );
 
 // Toggle Favorite Effect
-export const toggleFavorite = createEffect(
+export const toggleFavoriteEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.toggleFavorite),
@@ -88,7 +88,7 @@ export const toggleFavorite = createEffect(
 );
 
 // Check Favorite Status Effect
-export const checkFavoriteStatus = createEffect(
+export const checkFavoriteStatusEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.checkFavoriteStatus),
@@ -104,7 +104,7 @@ export const checkFavoriteStatus = createEffect(
 );
 
 // Load Favorite Count Effect
-export const loadFavoriteCount = createEffect(
+export const loadFavoriteCountEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.loadFavoriteCount),
@@ -120,7 +120,7 @@ export const loadFavoriteCount = createEffect(
 );
 
 // Check Has Favorites Effect
-export const checkHasFavorites = createEffect(
+export const checkHasFavoritesEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.checkHasFavorites),
@@ -136,7 +136,7 @@ export const checkHasFavorites = createEffect(
 );
 
 // Get User Favorite Recipe IDs Effect
-export const getUserFavoriteRecipeIds = createEffect(
+export const getUserFavoriteRecipeIdsEffect = createEffect(
   (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
     return actions$.pipe(
       ofType(FavoriteActions.getUserFavoriteRecipeIds),
@@ -208,6 +208,26 @@ export const logFavoriteSuccess = createEffect(
   { functional: true, dispatch: false }
 );
 
+// Load Favorites for Multiple Recipes Effect (Optimized)
+export const loadFavoritesForRecipesEffect = createEffect(
+  (actions$ = inject(Actions), favoriteService = inject(FavoriteService)) => {
+    return actions$.pipe(
+      ofType(FavoriteActions.loadFavoritesForRecipes),
+      switchMap(({ userId, recipeIds }) =>
+        favoriteService.getAllUserFavorites(userId).pipe(
+          map((favorites) => {
+            // Extract recipe IDs from favorites
+            const favoriteRecipeIds = favorites.map(fav => fav.recipe_id);
+            return FavoriteActions.loadFavoritesForRecipesSuccess({ favoriteRecipeIds });
+          }),
+          catchError((error) => of(FavoriteActions.loadFavoritesForRecipesFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
+
 // Error logging effects
 export const logFavoriteErrors = createEffect(
   (actions$ = inject(Actions)) => {
@@ -218,7 +238,8 @@ export const logFavoriteErrors = createEffect(
         FavoriteActions.toggleFavoriteFailure,
         FavoriteActions.loadUserFavoritesFailure,
         FavoriteActions.checkFavoriteStatusFailure,
-        FavoriteActions.loadFavoriteCountFailure
+        FavoriteActions.loadFavoriteCountFailure,
+        FavoriteActions.loadFavoritesForRecipesFailure
       ),
       tap((action) => {
         console.error(`Favorite Error: ${action.type}`, action);

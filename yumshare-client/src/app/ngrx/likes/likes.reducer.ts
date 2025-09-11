@@ -7,7 +7,6 @@ export const likesReducer = createReducer(
   initialLikesState,
 
   on(LikesActions.loadRecipeLikeCount, (state) => {
-    console.log('[LikesReducer] loadRecipeLikeCount', state);
     return {
       ...state,
       loading: true,
@@ -15,7 +14,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.loadRecipeLikeCountSuccess, (state, { recipeId, count }) => {
-    console.log('[LikesReducer] loadRecipeLikeCountSuccess', { recipeId, count });
     return {
       ...state,
       counts: { ...state.counts, [recipeId]: count },
@@ -23,7 +21,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.loadRecipeLikeCountFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] loadRecipeLikeCountFailure', { recipeId, error });
     return {
       ...state,
       loading: false,
@@ -32,7 +29,6 @@ export const likesReducer = createReducer(
   }),
 
   on(LikesActions.loadRecipeLikes, (state) => {
-    console.log('[LikesReducer] loadRecipeLikes', state);
     return {
       ...state,
       loading: true,
@@ -40,7 +36,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.loadRecipeLikesSuccess, (state, { recipeId, likes }) => {
-    console.log('[LikesReducer] loadRecipeLikesSuccess', { recipeId, likes });
     return {
       ...state,
       recipeLikes: { ...state.recipeLikes, [recipeId]: likes },
@@ -48,7 +43,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.loadRecipeLikesFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] loadRecipeLikesFailure', { recipeId, error });
     return {
       ...state,
       loading: false,
@@ -57,7 +51,6 @@ export const likesReducer = createReducer(
   }),
 
   on(LikesActions.checkIfLiked, (state) => {
-    console.log('[LikesReducer] checkIfLiked', state);
     return {
       ...state,
       loading: true,
@@ -65,7 +58,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.checkIfLikedSuccess, (state, { recipeId, liked }) => {
-    console.log('[LikesReducer] checkIfLikedSuccess', { recipeId, liked });
     return {
       ...state,
       likedByUser: { ...state.likedByUser, [recipeId]: liked },
@@ -73,7 +65,6 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.checkIfLikedFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] checkIfLikedFailure', { recipeId, error });
     return {
       ...state,
       loading: false,
@@ -82,7 +73,6 @@ export const likesReducer = createReducer(
   }),
 
   on(LikesActions.likeRecipe, (state) => {
-    console.log('[LikesReducer] likeRecipe', state);
     return {
       ...state,
       loading: true,
@@ -90,15 +80,15 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.likeRecipeSuccess, (state, { recipeId }) => {
-    console.log('[LikesReducer] likeRecipeSuccess', { recipeId });
+    const newLikedByUser = { ...state.likedByUser };
+    newLikedByUser[recipeId] = true; // Explicitly set to true
     return {
       ...state,
-      likedByUser: { ...state.likedByUser, [recipeId]: true },
+      likedByUser: newLikedByUser,
       loading: false,
     };
   }),
   on(LikesActions.likeRecipeFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] likeRecipeFailure', { recipeId, error });
     return {
       ...state,
       loading: false,
@@ -107,7 +97,6 @@ export const likesReducer = createReducer(
   }),
 
   on(LikesActions.unlikeRecipe, (state) => {
-    console.log('[LikesReducer] unlikeRecipe', state);
     return {
       ...state,
       loading: true,
@@ -115,15 +104,15 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.unlikeRecipeSuccess, (state, { recipeId }) => {
-    console.log('[LikesReducer] unlikeRecipeSuccess', { recipeId });
+    const newLikedByUser = { ...state.likedByUser };
+    newLikedByUser[recipeId] = false; // Explicitly set to false
     return {
       ...state,
-      likedByUser: { ...state.likedByUser, [recipeId]: false },
+      likedByUser: newLikedByUser,
       loading: false,
     };
   }),
   on(LikesActions.unlikeRecipeFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] unlikeRecipeFailure', { recipeId, error });
     return {
       ...state,
       loading: false,
@@ -133,7 +122,6 @@ export const likesReducer = createReducer(
 
   // Toggle Like
   on(LikesActions.toggleLike, (state) => {
-    console.log('[LikesReducer] toggleLike', state);
     return {
       ...state,
       loading: true,
@@ -141,15 +129,15 @@ export const likesReducer = createReducer(
     };
   }),
   on(LikesActions.toggleLikeSuccess, (state, { userId, recipeId, liked }) => {
-    console.log('[LikesReducer] toggleLikeSuccess', { userId, recipeId, liked });
+    const newLikedByUser = { ...state.likedByUser };
+    newLikedByUser[recipeId] = liked; // Explicitly set the boolean value
     return {
       ...state,
-      likedByUser: { ...state.likedByUser, [recipeId]: liked },
+      likedByUser: newLikedByUser,
       loading: false,
     };
   }),
   on(LikesActions.toggleLikeFailure, (state, { recipeId, error }) => {
-    console.log('[LikesReducer] toggleLikeFailure', { recipeId, error });
     return {
       ...state,
       loading: false,

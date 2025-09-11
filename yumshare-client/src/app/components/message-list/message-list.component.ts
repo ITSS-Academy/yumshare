@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import {Component, Input, OnInit, OnDestroy, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,9 @@ import { Subscription } from 'rxjs';
 import { Notification, NotificationType } from '../../models/notification.model';
 import { NotificationService } from '../../services/notification/notification.service';
 import { SocketService } from '../../services/socket/socket.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import {TranslateService, _} from "@ngx-translate/core";
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-message-list',
@@ -20,7 +23,8 @@ import { SocketService } from '../../services/socket/socket.service';
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './message-list.component.html',
   styleUrl: './message-list.component.scss'
@@ -30,6 +34,8 @@ export class MessageListComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   private subscription = new Subscription();
+  private translate = inject(TranslateService);
+
 
   constructor(
     private notificationService: NotificationService,
@@ -43,7 +49,7 @@ export class MessageListComponent implements OnInit, OnDestroy {
     if (this.notifications.length === 0) {
       this.loadMessageNotifications();
     }
-    
+
     // Listen for real-time message notifications
     this.subscription.add(
       this.socketService.notification$.subscribe(notification => {
@@ -62,12 +68,20 @@ export class MessageListComponent implements OnInit, OnDestroy {
   loadMessageNotifications(): void {
     this.loading = true;
     this.error = null;
-    
+
     this.subscription.add(
       this.notificationService.getUserNotifications().subscribe({
         next: (data) => {
-          this.notifications = data.filter(n => n.type === NotificationType.MESSAGE);
-          this.loading = false;
+          this.translate.get(_('sent_you_a_message')).pipe(take(1)).subscribe((res: string) => {
+            this.notifications = data
+              .filter(n => n.type === NotificationType.MESSAGE)
+              .map(n => ({
+                ...n,
+                content: n.content.replace('sent you a message', res)
+              }));
+            this.loading = false;
+            console.log('Loaded message notifications:', this.notifications);
+          });
         },
         error: (err) => {
           this.error = 'Failed to load messages';
@@ -130,7 +144,7 @@ export class MessageListComponent implements OnInit, OnDestroy {
     this.markAsRead(notification);
     // Close dialog before navigation
     this.dialogRef?.close();
-    
+
     // Navigate to chat
     if (notification.metadata?.['chat_id']) {
       this.router.navigate(['/chat', notification.metadata['chat_id']]);
@@ -145,7 +159,7 @@ export class MessageListComponent implements OnInit, OnDestroy {
 
   private showToastNotification(notification: Notification): void {
     const message = notification.content;
-    
+
     this.snackBar.open(message, 'View', {
       duration: 5000,
       horizontalPosition: 'right',

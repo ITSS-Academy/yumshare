@@ -1,0 +1,463 @@
+// Shared styles for recipe list components (my-recipe and my-favourite-recipe)
+// This file contains common styles to avoid code duplication
+
+// Virtual Scrolling Container
+.virtual-scroll-container {
+  width: 100%;
+  height: 400px; // Fixed height for virtual scrolling
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.follow-viewport {
+  height: 100%;
+  width: 100%;
+}
+
+// CDK Virtual Scroll specific styles
+.cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.cdk-virtual-scroll-viewport {
+  height: 100%;
+}
+
+/* Regular Follow List */
+.regular-follow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 16px 0;
+  
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--surface-variant);
+    border-radius: 8px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+    
+    &:hover {
+      background: var(--text-secondary);
+    }
+  }
+}
+
+.pages-navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  // background: var(--primary-lightest);
+}
+
+.pages-navigation button {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.pages-navigation button.active {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+.pages-navigation button:hover:not(.active) {
+  background: var(--surface-variant);
+}
+
+.recipe-card {
+  flex-shrink: 0;
+  width: 94%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: Noto Sans, sans-serif;
+  display: flex;
+}
+
+.recipe-image {
+  width: 150px;
+  height: 150px;
+  flex: 0 0 auto;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.recipe-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.recipe-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipe-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.recipe-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.difficulty-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  
+  &.easy {
+    color: var(--success);
+    background: rgba(76, 175, 80, 0.1);
+  }
+  
+  &.medium {
+    color: var(--warning);
+    background: rgba(255, 152, 0, 0.1);
+  }
+  
+  &.hard {
+    color: var(--error);
+    background: rgba(244, 67, 54, 0.1);
+  }
+  
+  &:not(.easy):not(.medium):not(.hard) {
+    color: var(--primary);
+    background: rgba(136, 197, 51, 0.1);
+  }
+}
+
+.recipe-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.recipe-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.recipe-header {
+  width: 100%;
+  flex: 0 0 auto;
+  height: 200px;
+  background-color: var(--primary);
+  display: block;
+  border-radius: 16px;
+}
+
+.recipe-header h1 {
+  color: white;
+  text-align: center;
+  padding-top: 60px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.recipe-header p {
+  color: white;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 8px 0 0 0;
+  opacity: 0.9;
+}
+
+.home-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-variant);
+}
+
+.content-container {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  // background-color: var(--primary-lightest) !important;
+}
+
+.material-symbols-outlined {
+  background: none !important;
+  border: none !important;
+  color: var(--primary) !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+}
+
+.material-symbols-outlined:hover {
+  background: var(--primary-lightest) !important;
+  transform: scale(1.1) !important;
+}
+
+.favourite-btn .mat-icon.filled {
+  color: var(--primary) !important;
+  background: transparent !important;
+}
+
+.favourite-btn .mat-icon.outlined {
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+.favourite-btn .mat-icon.filled {
+  animation: heartbeat 0.6s ease-in-out;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  gap: 16px;
+  
+  .empty-icon {
+    font-size: 64px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin: 0 0 8px 0;
+  }
+  
+  p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+    max-width: 400px;
+  }
+}
+
+.del-btn {
+  width: 32px;
+  height: 32px;
+  margin-left: 8px;
+  margin-right: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-variant);
+  color: var(--error);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.del-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.del-btn:hover:not(:disabled) {
+  background: var(--error-light);
+}
+
+.delete-menu-item .delete-icon,
+.delete-menu-item .delete-text {
+  color: var(--error) !important;
+  font-weight: bold;
+}
+
+.center-dialog .mat-dialog-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90vw;
+}
+
+.dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.dialog-content {
+  font-size: 1rem;
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dialog-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dialog-actions .confirm {
+  background: var(--error);
+  color: var(--error-on);
+}
+
+.dialog-actions .confirm:hover {
+  background: var(--error-dark);
+}
+
+.dialog-actions .cancel {
+  background: var(--surface-variant);
+  color: var(--text-primary);
+}
+
+.dialog-actions .cancel:hover {
+  background: var(--border);
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .recipe-card {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .recipe-image {
+    width: 100%;
+    height: 180px;
+    flex: none;
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+  
+  .recipe-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .recipe-content {
+    padding: 16px;
+  }
+  
+  .recipe-title {
+    font-size: 1.1rem;
+  }
+  
+  .recipe-description {
+    font-size: 0.85rem;
+  }
+  
+  .recipe-meta {
+    gap: 8px;
+  }
+  
+  .difficulty-badge {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+  
+  .recipe-stats {
+    font-size: 0.8rem;
+  }
+  
+  .recipe-header h1 {
+    font-size: 2rem;
+    padding-top: 50px;
+  }
+  
+  .recipe-header p {
+    font-size: 1rem;
+  }
+  
+  .pages-navigation {
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .pages-navigation button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

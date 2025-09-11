@@ -151,7 +151,7 @@ export class RecipesService {
     
     const [recipes, total] = await this.recipeRepository.findAndCount({
       where: { category_id: categoryId },
-      relations: ['user', 'category', 'steps'],
+      relations: ['user', 'category'],
       order: { [orderBy]: order },
       skip,
       take: size,
@@ -161,17 +161,48 @@ export class RecipesService {
   }
 
   async findByUserId(userId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Recipe>> {
-    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const { 
+      page = 1, 
+      size = 10, 
+      orderBy = 'created_at', 
+      order = 'DESC',
+      category,
+      difficulty,
+      rating
+    } = queryOpts;
     
     const skip = (page - 1) * size;
     
-    const [recipes, total] = await this.recipeRepository.findAndCount({
-      where: { user: { id: userId } },
-      relations: ['user', 'category', 'steps'],
-      order: { [orderBy]: order },
-      skip,
-      take: size,
-    });
+    let qb = this.recipeRepository
+      .createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.user', 'user')
+      .leftJoinAndSelect('recipe.category', 'category')
+      .where('user.id = :userId', { userId });
+
+    // Category filter
+    if (category) {
+      if (/^[0-9a-fA-F-]{36}$/.test(category)) {
+        qb = qb.andWhere('category.id = :categoryId', { categoryId: category });
+      } else {
+        qb = qb.andWhere('category.name ILIKE :categoryName', { categoryName: `%${category}%` });
+      }
+    }
+
+    // Difficulty filter
+    if (difficulty) {
+      qb = qb.andWhere('recipe.difficulty = :difficulty', { difficulty });
+    }
+
+    // Rating filter (if ratings table exists)
+    if (rating) {
+      qb = qb.andWhere('EXISTS (SELECT 1 FROM ratings r WHERE r.recipe_id = recipe.id AND r.rating >= :rating)', { rating });
+    }
+
+    const [recipes, total] = await qb
+      .orderBy(`recipe.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
 
     return new ListResult(recipes, total, page, size);
   }
@@ -194,8 +225,7 @@ export class RecipesService {
     let qb = this.recipeRepository
       .createQueryBuilder('recipe')
       .leftJoinAndSelect('recipe.user', 'user')
-      .leftJoinAndSelect('recipe.category', 'category')
-      .leftJoinAndSelect('recipe.steps', 'steps');
+      .leftJoinAndSelect('recipe.category', 'category');
 
     // Search query
     if (query) {
@@ -269,7 +299,6 @@ export class RecipesService {
           try {
             // Delete old video from Supabase Storage
             await this.supabaseStorageService.deleteVideo(oldVideoUrl);
-            console.log(`Deleted old video from Supabase Storage: ${oldVideoUrl}`);
           } catch (error) {
             console.error('Failed to delete old video from Supabase Storage:', error);
             // Continue with update even if deletion fails
@@ -286,7 +315,6 @@ export class RecipesService {
           try {
             // Delete old image from Supabase Storage
             await this.supabaseStorageService.deleteImage(oldImageUrl);
-            console.log(`Deleted old image from Supabase Storage: ${oldImageUrl}`);
           } catch (error) {
             console.error('Failed to delete old image from Supabase Storage:', error);
             // Continue with update even if deletion fails
@@ -346,7 +374,6 @@ export class RecipesService {
       if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
         try {
           await this.supabaseStorageService.deleteImage(recipe.image_url);
-          console.log(`Deleted image from Supabase Storage: ${recipe.image_url}`);
         } catch (error) {
           console.error('Failed to delete image from Supabase Storage:', error);
         }
@@ -355,7 +382,6 @@ export class RecipesService {
       if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
         try {
           await this.supabaseStorageService.deleteVideo(recipe.video_url);
-          console.log(`Deleted video from Supabase Storage: ${recipe.video_url}`);
         } catch (error) {
           console.error('Failed to delete video from Supabase Storage:', error);
         }
@@ -385,7 +411,6 @@ export class RecipesService {
     if (recipe.image_url && this.isSupabaseStorageUrl(recipe.image_url)) {
       try {
         await this.supabaseStorageService.deleteImage(recipe.image_url);
-        console.log(`Deleted existing image from Supabase Storage: ${recipe.image_url}`);
       } catch (error) {
         console.error('Failed to delete existing image from Supabase Storage:', error);
         // Continue with upload even if deletion fails
@@ -408,7 +433,6 @@ export class RecipesService {
     if (recipe.video_url && this.isSupabaseStorageUrl(recipe.video_url)) {
       try {
         await this.supabaseStorageService.deleteVideo(recipe.video_url);
-        console.log(`Deleted existing video from Supabase Storage: ${recipe.video_url}`);
       } catch (error) {
         console.error('Failed to delete existing video from Supabase Storage:', error);
         // Continue with upload even if deletion fails
@@ -464,6 +488,20 @@ export class RecipesService {
       where: { id: recipeId },
       relations: ['user', 'steps'],
       order: { steps: { step_number: 'ASC' } }
+    });
+  }
+
+  async getRecipeSteps(recipeId: string) {
+    return this.recipeStepRepository.find({
+      where: { recipe_id: recipeId },
+      order: { step_number: 'ASC' }
+    });
+  }
+
+  async getMultipleRecipeSteps(recipeIds: string[]) {
+    return this.recipeStepRepository.find({
+      where: { recipe_id: { $in: recipeIds } as any },
+      order: { recipe_id: 'ASC', step_number: 'ASC' }
     });
   }
 

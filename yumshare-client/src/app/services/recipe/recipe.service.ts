@@ -102,8 +102,12 @@ export class RecipeService {
   }
 
   // Check edit permission for recipe
-  checkEditPermission(id: string): Observable<{canEdit: boolean, message: string, recipe?: Recipe}> {
-    return this.http.get<{canEdit: boolean, message: string, recipe?: Recipe}>(`${this.apiUrl}/recipes/${id}/check-edit-permission`);
+  checkEditPermission(id: string, idToken: string): Observable<{canEdit: boolean, message: string, recipe?: Recipe}> {
+    return this.http.get<{canEdit: boolean, message: string, recipe?: Recipe}>(`${this.apiUrl}/recipes/${id}/check-edit-permission`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
   }
 
   // Update recipe
@@ -117,7 +121,12 @@ export class RecipeService {
   }
 
   // Delete recipe
-  deleteRecipe(id: string): Observable<void> {
+  deleteRecipe(id: string, idToken: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/recipes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    });
     return this.http.delete<void>(`${this.apiUrl}/recipes/${id}`);
   }
 
@@ -184,24 +193,94 @@ export class RecipeService {
     return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes`, { params });
   }
 
+  //get recipe by user_id
+  getRecipeByUserId(userId: string, queryOptions?: any): Observable<PaginatedResponse<Recipe>> {
+    let params = new HttpParams();
+    
+    // Add pagination params
+    if (queryOptions?.page) params = params.set('page', queryOptions.page.toString());
+    if (queryOptions?.size) params = params.set('size', queryOptions.size.toString());
+    if (queryOptions?.orderBy) params = params.set('orderBy', queryOptions.orderBy);
+    if (queryOptions?.order) params = params.set('order', queryOptions.order);
+    
+    // Add filter params
+    if (queryOptions?.category) params = params.set('category', queryOptions.category);
+    if (queryOptions?.difficulty) params = params.set('difficulty', queryOptions.difficulty);
+    if (queryOptions?.rating) params = params.set('rating', queryOptions.rating.toString());
+    if (queryOptions?.query) params = params.set('query', queryOptions.query);
+    
+    return this.http.get<PaginatedResponse<Recipe>>(`${this.apiUrl}/recipes/user/${userId}`, { params });
+  }
+
+  // Get recipe steps for a single recipe
+  getRecipeSteps(recipeId: string): Observable<RecipeStep[]> {
+    return this.http.get<RecipeStep[]>(`${this.apiUrl}/recipes/${recipeId}/steps`);
+  }
+
+
+  // Get recipe steps for multiple recipes
+  getMultipleRecipeSteps(recipeIds: string[]): Observable<RecipeStep[]> {
+    const params = new HttpParams().set('recipeIds', recipeIds.join(','));
+    return this.http.get<RecipeStep[]>(`${this.apiUrl}/recipes/steps`, { params });
+  }
   // Get recipes by category main courses
-  getRecipesByCategoryMainCourses(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryMainCourses(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get recipes by category beverages
-  getRecipesByCategoryBeverages(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryBeverages(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
   
   // Get recipes by category desserts
-  getRecipesByCategoryDesserts(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategoryDesserts(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get recipes by category snacks
-  getRecipesByCategorySnacks(categoryId: string): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`);
+  getRecipesByCategorySnacks(categoryId: string): Observable<PaginatedResponse<Recipe>> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes/category/${categoryId}`).pipe(
+      map(recipes => ({
+        data: recipes,
+        total: recipes.length,
+        current_page: 1,
+        total_pages: 1,
+        end_page: 1,
+        has_next: false,
+        has_prev: false
+      }))
+    );
   }
 
   // Get all recipes

@@ -1,20 +1,19 @@
 <div class="user-list-container">
   <!-- Header -->
   <div class="user-list-header">
-    <h2>Messages</h2>
+    <h2>{{ 'Messages' | translate }}</h2>
     <!-- Debug: Current time -->
     <div class="debug-time">
-      Hiện tại: {{ getCurrentTime() }}
+      {{ 'Time now:' | translate }} {{ getCurrentTime() }}
     </div>
     <div class="search-container">
       <input 
         type="text" 
-        placeholder="Search users..." 
+        [placeholder]="'Search users...' | translate" 
         [(ngModel)]="searchQuery"
         (input)="onSearchChange()"
         class="search-input"
       />
-    
     </div>
   </div>
 
@@ -22,7 +21,7 @@
   @if (showSearchResults) {
     <div class="search-results">
       <div class="search-header">
-        <h3>Search Results</h3>
+        <h3>{{ 'Search Results' | translate }}</h3>
         <button (click)="closeSearch()" class="close-btn">×</button>
       </div>
       <div class="user-list">
@@ -79,7 +78,7 @@
       @if (loading) {
         <div class="loading">
           <div class="spinner"></div>
-          <span>Loading chats...</span>
+          <span>{{ 'Loading chats...' | translate }}</span>
         </div>
       }
       
@@ -87,8 +86,8 @@
       @if (!loading && chats.length === 0) {
         <div class="empty-state">
           <div class="empty-icon">💬</div>
-          <h3>No conversations yet</h3>
-          <p>Start a new conversation by searching for users</p>
+          <h3>{{ 'No conversations yet' | translate }}</h3>
+          <p>{{ 'Start a new conversation by searching for users' | translate }}</p>
         </div>
       }
     </div>

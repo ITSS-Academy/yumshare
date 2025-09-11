@@ -85,7 +85,7 @@ export const updateRecipeWithFilesFailure = createAction(
 // Delete Recipe
 export const deleteRecipe = createAction(
   '[Recipe] Delete Recipe',
-  props<{ id: string }>()
+  props<{ id: string; idToken: string }>()
 );
 
 export const deleteRecipeSuccess = createAction(
@@ -125,17 +125,17 @@ export const searchRecipesFailure = createAction(
 );
 
 // Get All Recipes
-// export const loadAllRecipes = createAction('[Recipe] Load All Recipes');
+export const loadAllRecipes = createAction('[Recipe] Load All Recipes');
 
-// export const loadAllRecipesSuccess = createAction(
-//   '[Recipe] Load All Recipes Success',
-//   props<{ recipes: PaginatedResponse<Recipe> }>()
-// );
+export const loadAllRecipesSuccess = createAction(
+  '[Recipe] Load All Recipes Success',
+  props<{ recipes: PaginatedResponse<Recipe> }>()
+);
 
-// export const loadAllRecipesFailure = createAction(
-//   '[Recipe] Load All Recipes Failure',
-//   props<{ error: string }>()
-// );
+export const loadAllRecipesFailure = createAction(
+  '[Recipe] Load All Recipes Failure',
+  props<{ error: string }>()
+);
 
 // Get Recipes by Category
 export const getRecipesByCategory = createAction(
@@ -160,6 +160,25 @@ export const getRecipesByCategoryFailure = createAction(
   props<{ error: string }>()
 );
 
+// Load Recipes by User
+export const loadRecipesByUser = createAction(
+  '[Recipe] Load Recipes by User',
+  props<{ 
+    userId: string;
+    queryOptions?: any;
+  }>()
+);
+
+export const loadRecipesByUserSuccess = createAction(
+  '[Recipe] Load Recipes by User Success',
+  props<{ recipes: PaginatedResponse<Recipe> }>()
+);
+
+export const loadRecipesByUserFailure = createAction(
+  '[Recipe] Load Recipes by User Failure',
+  props<{ error: string }>()
+);
+
 // Get Recipes by Category Main Courses
 export const getRecipesByCategoryMainCourses = createAction(
   '[Recipe] Get Recipes by Category Main Courses',
@@ -168,7 +187,7 @@ export const getRecipesByCategoryMainCourses = createAction(
 
 export const getRecipesByCategoryMainCoursesSuccess = createAction(
   '[Recipe] Get Recipes by Category Main Courses Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryMainCoursesFailure = createAction(
@@ -184,7 +203,7 @@ export const getRecipesByCategoryBeverages = createAction(
 
 export const getRecipesByCategoryBeveragesSuccess = createAction(
   '[Recipe] Get Recipes by Category Beverages Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryBeveragesFailure = createAction(
@@ -200,7 +219,7 @@ export const getRecipesByCategoryDesserts = createAction(
 
 export const getRecipesByCategoryDessertsSuccess = createAction(
   '[Recipe] Get Recipes by Category Desserts Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategoryDessertsFailure = createAction(
@@ -216,7 +235,7 @@ export const getRecipesByCategorySnacks = createAction(
 
 export const getRecipesByCategorySnacksSuccess = createAction(
   '[Recipe] Get Recipes by Category Snacks Success',
-  props<{ recipeCategory: Recipe[] }>()
+  props<{ recipeCategory: PaginatedResponse<Recipe> }>()
 );
 
 export const getRecipesByCategorySnacksFailure = createAction(
@@ -288,7 +307,5 @@ export const loadPaginatedRecipesFailure = createAction(
   props<{ error: string }>()
 );
 
-export function loadAllRecipes(): any {
-  throw new Error('Function not implemented.');
-}
+
 

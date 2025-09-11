@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
-import { ShareModule } from "../../shares/share.module";
+import { ShareModule } from "../../shared/share.module";
 @Component({
   selector: 'app-snackbar',
   imports: [ShareModule],

@@ -60,17 +60,55 @@ export class FavoritesService {
   }
 
   async getUserFavorites(userId: string, queryOpts: QueryOptsDto = {}): Promise<ListResult<Favorite>> {
-    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const { 
+      page = 1, 
+      size = 10, 
+      orderBy = 'created_at', 
+      order = 'DESC',
+      category,
+      difficulty,
+      query
+    } = queryOpts;
     
     const skip = (page - 1) * size;
     
-    const [favorites, total] = await this.favoriteRepository.findAndCount({
-      where: { user_id: userId },
-      relations: ['recipe', 'recipe.user', 'recipe.category'],
-      order: { [orderBy]: order },
-      skip,
-      take: size,
-    });
+    let qb = this.favoriteRepository
+      .createQueryBuilder('favorite')
+      .leftJoinAndSelect('favorite.recipe', 'recipe')
+      .leftJoinAndSelect('recipe.user', 'user')
+      .leftJoinAndSelect('recipe.category', 'category')
+      .where('favorite.user_id = :userId', { userId });
+
+    // Search query
+    if (query) {
+      qb = qb.andWhere(
+        '(recipe.title ILIKE :query OR recipe.description ILIKE :query OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(recipe.ingredients) x WHERE x ILIKE :query))',
+        { query: `%${query}%` }
+      );
+    }
+
+    // Category filter
+    if (category) {
+      if (/^[0-9a-fA-F-]{36}$/.test(category)) {
+        qb = qb.andWhere('category.id = :categoryId', { categoryId: category });
+      } else {
+        qb = qb.andWhere('category.name ILIKE :categoryName', { categoryName: `%${category}%` });
+      }
+    }
+
+    // Difficulty filter
+    if (difficulty) {
+      qb = qb.andWhere('recipe.difficulty = :difficulty', { difficulty });
+    }
+
+    // Rating filter
+   
+
+    const [favorites, total] = await qb
+      .orderBy(`favorite.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
     
     return new ListResult(favorites, total, page, size);
   }

@@ -18,14 +18,18 @@ import * as categoryEffects from './ngrx/category/category.effects';
 import * as commentEffects from './ngrx/comment/comment.effects';
 import * as likesEffects from './ngrx/likes/likes.effects';
 import * as favoriteEffects from './ngrx/favorite/favorite.effects';
+import * as notificationEffects from './ngrx/notification/notification.effects';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideClientHydration } from '@angular/platform-browser';
 import { recipeReducer } from '../app/ngrx/recipe/recipe.reducer';
 import { categoryReducer } from './ngrx/category/category.reducer';
 import { commentReducer } from './ngrx/comment/comment.reducer';
 import { favoriteReducer } from './ngrx/favorite/favorite.reducer';
+import { notificationReducer } from './ngrx/notification/notification.reducer';
+
 import { likesReducer } from './ngrx/likes/likes.reducer';
 
 // NGX-TRANSLATE IMPORTS
@@ -75,6 +79,7 @@ export const appConfig: ApplicationConfig = {
       })
     ),
     TranslateService,
+
     provideEffects([
       authEffects,
       followEffects,
@@ -82,8 +87,9 @@ export const appConfig: ApplicationConfig = {
       categoryEffects,
       commentEffects,
       likesEffects,
-      favoriteEffects
+      favoriteEffects, notificationEffects,// <-- Thêm likesEffects vào đây
     ]),
+
     provideStore({
       auth: authReducer,
       follow: followReducer,
@@ -93,6 +99,7 @@ export const appConfig: ApplicationConfig = {
       comment: commentReducer,
       likes: likesReducer,
       favorite: favoriteReducer,
+      notification: notificationReducer,
     }),
     provideFirebaseApp(() =>
       initializeApp({
@@ -106,6 +113,8 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
+    provideClientHydration(),
+    // Temporarily disabled to avoid error spam
     // {
     //   provide: ErrorHandler,
     //   useClass: GlobalErrorHandler

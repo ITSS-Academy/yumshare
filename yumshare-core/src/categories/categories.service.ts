@@ -35,37 +35,39 @@ export class CategoriesService {
   async findAll(queryOpts: QueryOptsDto = {}): Promise<ListResult<Category>> {
     const { page = 1, size = 20 } = queryOpts;
     
-    // Use optimized query service for better performance
-    const result = await this.optimizedQueryService.executeOptimizedQuery(
-      this.categoryRepository,
-      queryOpts,
-      {
-        relations: [],
-        maxRelations: 0,
-        selectFields: ['id', 'name', 'description', 'sort_order', 'is_active'],
-        enableCache: false
-      }
-    );
+    try {
+      // Use direct repository query for better reliability
+      const skip = (page - 1) * size;
+      
+      const [categories, total] = await this.categoryRepository.findAndCount({
+        where: { is_active: true },
+        order: { sort_order: 'ASC', name: 'ASC' },
+        skip,
+        take: size,
+      });
 
-    const listResult = new ListResult(result.data, result.total, result.page, result.size);
-    
-    this.logger.log(`Categories fetched: ${result.data.length} results, total: ${result.total}, page: ${result.page}`);
-    
-    return listResult;
+      const listResult = new ListResult(categories, total, page, size);
+      
+      this.logger.log(`Categories fetched: ${categories.length} results, total: ${total}, page: ${page}`);
+      
+      return listResult;
+    } catch (error) {
+      this.logger.error('Error fetching categories:', error);
+      // Return empty result on error
+      return new ListResult([], 0, page, size);
+    }
   }
 
   findAllWithRecipes() {
     return this.categoryRepository.find({
       where: { is_active: true },
-      relations: ['recipes'],
       order: { sort_order: 'ASC', name: 'ASC' }
     });
   }
 
   findOne(id: string) {
     return this.categoryRepository.findOne({ 
-      where: { id },
-      relations: ['recipes']
+      where: { id }
     });
   }
 
@@ -124,6 +126,37 @@ export class CategoriesService {
       .getRawMany();
 
     return categories;
+  }
+
+  async getCategoryRecipeCount(categoryId: string): Promise<number> {
+    return this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoin('category.recipes', 'recipe')
+      .where('category.id = :categoryId', { categoryId })
+      .getCount();
+  }
+
+  async getCategoryRecipes(categoryId: string, queryOpts: QueryOptsDto = {}) {
+    const { page = 1, size = 10, orderBy = 'created_at', order = 'DESC' } = queryOpts;
+    const skip = (page - 1) * size;
+    
+    const [recipes, total] = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.recipes', 'recipe')
+      .leftJoinAndSelect('recipe.user', 'user')
+      .where('category.id = :categoryId', { categoryId })
+      .orderBy(`recipe.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
+
+    return {
+      category: recipes[0] || null,
+      recipes: recipes[0]?.recipes || [],
+      total,
+      page,
+      size
+    };
   }
 
   async searchCategories(queryOpts: QueryOptsDto): Promise<ListResult<Category>> {

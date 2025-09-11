@@ -12,7 +12,6 @@ export class LikesApiService {
 
   likeRecipe(userId: string, recipeId: string): Observable<Like> {
     // ĐÚNG: gửi đúng tên trường snake_case cho backend
-    console.log('Like payload:', { user_id: userId, recipe_id: recipeId });
     return this.http.post<Like>(`${this.apiUrl}`, { user_id: userId, recipe_id: recipeId });
   }
 

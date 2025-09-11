@@ -1,8 +1,9 @@
+
 import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
 import { NotificationListComponent } from '../notification-list/notification-list.component';
@@ -12,14 +13,13 @@ import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { AuthModel } from '../../models/auth.model';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
-// NGX-TRANSLATE
-import { TranslateService } from '@ngx-translate/core';
+import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
+import { TranslateService } from '@ngx-translate/core';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -44,50 +44,58 @@ export class NavBarComponent implements OnInit, OnDestroy {
   currentUser: AuthModel | null = null;
 
   searchQuery = '';
-  messageCount = 0;
-  notificationCount = 0;
+  showSuggestions = false;
+  messageCount$!: Observable<number>;
+  notificationCount$!: Observable<number>;
+  currentLang: string = 'en';
 
-  currentLang = 'en';
-
-  private authSubscription: Subscription | null = null;
-  private notificationCountSubscription: Subscription | null = null;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private router: Router, 
     private dialog: MatDialog,
     private store: Store<{auth: AuthState}>,
     private auth: Auth,
-    private notificationService: NotificationService,
     public translate: TranslateService // public để dùng trong template
+
   ) {
     translate.addLangs(['en', 'vi']);
-    // Use getCurrentLang() and getFallbackLang() as recommended
-    this.currentLang = translate.getCurrentLang() || translate.getFallbackLang() || 'en';
+
+    // Initialize currentLang using recommended methods
+    this.currentLang =
+      translate.getCurrentLang() ||
+      translate.getFallbackLang() ||
+      'en';
+
+    // Initialize observables
+    this.messageCount$ = this.store.select(NotificationSelectors.selectMessageCount);
+    this.notificationCount$ = this.store.select(NotificationSelectors.selectUnreadCount);
   }
 
   ngOnInit() {
-    this.authSubscription = this.store.select(state => state.auth).subscribe(authState => {
-      if (authState.currentUser && authState.currentUser.uid) {
-        this.isLoggedIn = true;
-        this.currentUser = authState.currentUser;
-        this.userName = authState.currentUser.displayName || '';
-        this.userAvatar = authState.currentUser.photoURL || '';
-        this.dialog.closeAll();
-        this.loadNotificationCount();
-        this.subscribeToNotificationCount();
-      } else {
-        this.isLoggedIn = false;
-        this.currentUser = null;
-        this.userName = '';
-        this.userAvatar = '';
-        this.notificationCount = 0;
-        if (this.notificationCountSubscription) {
-          this.notificationCountSubscription.unsubscribe();
-          this.notificationCountSubscription = null;
+    this.subscriptions.push(
+      this.store.select(state => state.auth).subscribe(authState => {
+        if (authState.currentUser && authState.currentUser.uid) {
+          this.isLoggedIn = true;
+          this.currentUser = authState.currentUser;
+          this.userName = authState.currentUser.displayName || '';
+          this.userAvatar = authState.currentUser.photoURL || '';
+          
+          // Tự động đóng dialog login nếu Login thành công
+          this.dialog.closeAll();
+          
+          // Notification counts are now handled by NgRx observables
+        } else {
+          this.isLoggedIn = false;
+          this.currentUser = null;
+          this.userName = '';
+          this.userAvatar = '';
         }
-      }
-    });
+      })
+    );
 
+    // Setup keyboard shortcuts
+    this.setupKeyboardShortcuts();
     // Cập nhật currentLang khi đổi ngôn ngữ ở nơi khác
     this.translate.onLangChange.subscribe(event => {
       this.currentLang = event.lang;
@@ -95,12 +103,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
-    if (this.notificationCountSubscription) {
-      this.notificationCountSubscription.unsubscribe();
-    }
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
   }
 
   onToggleSidebar() { this.toggleSidebar.emit(); }
@@ -108,19 +112,57 @@ export class NavBarComponent implements OnInit, OnDestroy {
   onSearch() {
     if (this.searchQuery?.trim()) {
       this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
+      this.showSuggestions = false;
     }
   }
 
-  switchLang(lang: string) {
-    this.translate.use(lang);
-    this.currentLang = lang;
+  onSearchInput() {
+    // Show suggestions when typing
+    this.showSuggestions = this.searchQuery.length > 0;
   }
 
-  onSearchInput() { /* realtime suggestions */ }
+  clearSearch() {
+    this.searchQuery = '';
+    this.showSuggestions = false;
+  }
+
+  quickSearch(term: string) {
+    this.searchQuery = term;
+    this.onSearch();
+  }
+
+  onSearchFocus() {
+    this.showSuggestions = true;
+  }
+
+  onSearchBlur() {
+    // Delay hiding suggestions to allow clicking on them
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200);
+  }
+
+  private setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (event) => {
+      // Ctrl+K to focus search
+      if (event.ctrlKey && event.key === 'k') {
+        event.preventDefault();
+        const searchInput = document.querySelector('.search input') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+      
+      // Escape to clear search
+      if (event.key === 'Escape' && this.searchQuery) {
+        this.clearSearch();
+      }
+    });
+  }
 
   onMessage() {
     if (this.isLoggedIn && this.currentUser?.uid) {
-      this.dialog.open(MessageListComponent, {
+      const dialogRef = this.dialog.open(MessageListComponent, {
         width: '600px',
         maxWidth: '90vw',
         maxHeight: '80vh',
@@ -139,29 +181,35 @@ export class NavBarComponent implements OnInit, OnDestroy {
         maxHeight: '80vh',
         panelClass: 'notification-dialog'
       });
-      dialogRef.afterClosed().subscribe(() => {
-        this.loadNotificationCount();
-      });
+      
+      // Notification counts are now handled by NgRx
     } else {
       this.openLogin();
     }
   }
 
+  // Click behavior: if logged in go to profile, else open login dialog
   openLogin() {
     if (!this.isLoggedIn) {
       this.dialog.open(LoginComponent, { panelClass: 'custom-dialog', autoFocus: false });
     }
   }
+ 
+
 
   async onLogout() {
     try {
+      // Đăng xuất khỏi Firebase trước
       await this.auth.signOut();
+      // Sau đó clear auth state
       this.store.dispatch(AuthActions.clearAuthState());
     } catch (error) {
       console.error('Logout error:', error);
+      // Nếu có lỗi, vẫn clear auth state
       this.store.dispatch(AuthActions.clearAuthState());
     }
   }
+
 
   onAddRecipe() {
     if (this.isLoggedIn) {
@@ -179,45 +227,23 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });
   }
 
-  private loadNotificationCount(): void {
-    if (this.currentUser?.uid) {
-      this.notificationService.getUserNotifications().subscribe({
-        next: (notifications) => {
-          this.notificationCount = notifications.filter(n => !n.is_read && n.type !== 'message').length;
-          this.messageCount = notifications.filter(n => !n.is_read && n.type === 'message').length;
-        },
-        error: (err) => {
-          console.error('Error loading notification count:', err);
-          this.notificationCount = 0;
-          this.messageCount = 0;
-        }
-      });
-    }
-  }
-
-  private subscribeToNotificationCount(): void {
-    this.notificationCountSubscription = this.notificationService.notificationCount$.subscribe(
-      count => {
-        this.notificationCount = count;
-      }
-    );
-    this.notificationService.messageCount$.subscribe(
-      count => {
-        this.messageCount = count;
-      }
-    );
-  }
+  // Notification counts are now handled by NgRx observables
 
   onSettings() {
     // Navigate to settings page
   }
+ switchLang(lang: string) {
+    this.translate.use(lang);
+    this.currentLang = lang;
+  }
+
 
   // Method to simulate login (for testing)
+  // helper to simulate - có thể xóa sau khi test xong
   simulateLogin(name: string, avatar: string) {
     this.isLoggedIn = true;
     this.userName = name;
     this.userAvatar = avatar;
-    this.messageCount = 3;
-    this.notificationCount = 2;
+    // Notification counts are now handled by NgRx
   }
 }

@@ -1,10 +1,7 @@
-h1{
-  headline-large: var(--mat-sys-headline-large-weight) var(--mat-sys-headline-large-size) / var(--mat-sys-headline-large-line-height) var(--mat-sys-headline-large-font),
-}
-p{
-  title-medium: var(--mat-sys-title-medium-weight) var(--mat-sys-title-medium-size) / var(--mat-sys-title-medium-line-height) var(--mat-sys-title-medium-font),
-}
-.container-right{
+// ===== FAQ COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
+.container-right {
   width: 100%;
   height: auto;
   display: flex;
@@ -12,53 +9,8 @@ p{
   align-items: center;
   justify-content: center;
 }
-/* Toast thông báo ở giữa màn hình */
-.center-toast {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  background: rgba(0,0,0,0.2);
-}
 
-.toast-content {
-  background: #fff;
-  padding: 32px 48px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  font-size: 1.2rem;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  animation: fadeInScale 0.3s;
-}
-
-// .close-btn {
-//   background: #e74c3c;
-//   color: #fff;
-//   border: none;
-//   border-radius: 50%;
-//   width: 32px;
-//   height: 32px;
-//   font-size: 1.4rem;
-//   cursor: pointer;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   transition: background 0.2s;
-// }
-// .close-btn:hover {
-//   background: #c0392b;
-// }
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.8);}
-  to { opacity: 1; transform: scale(1);}
-}
-.top{
+.top {
   width: 100%;
   min-height: 55vh;
   height: auto;
@@ -67,7 +19,7 @@ p{
   align-items: flex-end;
   justify-content: center;
   background-image: url("https://img.freepik.com/premium-photo/beef-steak-with-rosemary-pepper-black-table-with-copy-space_118631-https://img.freepik.com/free-photo/gourmet-meal-rustic-wood-table-indoors-generated-by-ai_188544-24622.jpg?semt=ais_hybrid&w=740&q=80");
-  background-size: cover ;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   color: white;
@@ -75,17 +27,22 @@ p{
   margin-bottom: 0;
   padding-bottom: 4%;
 }
-.t1{
+
+.t1 {
   margin-top: 5%;
   margin-right: 32%;
   margin-bottom: 0;
 }
-.headtext1{
+
+
+
+.headtext1 {
   width: 40%;
   margin-top: 0;
   margin-right: 3.5%;
 }
-.middle{
+
+.middle {
   width: 100%;
   min-height: auto;
   height: auto;
@@ -99,18 +56,19 @@ p{
   background-repeat: no-repeat;
   color: black;
 }
+
 .box {
   width: 95%;
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: var(--spacing-lg) auto;
   background-color: #0e0e0d;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  border-radius: 20px;
-  padding: 2rem 1rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border-radius: var(--radius-xxl);
+  padding: var(--spacing-lg) var(--spacing-md);
+  box-shadow: var(--shadow-medium);
   position: relative;
   overflow: hidden;
 }
@@ -226,16 +184,16 @@ p{
   content: "";
 }
 .group1:hover .chat1 p::before {
-  content: "Explore hundreds of world-class recipes, from everyday meals to fine dining";
+  content: var(--faq-hover-1, "Explore hundreds of world-class recipes, from everyday meals to fine dining");
 }
 .group2:hover .chat2 p::before {
-  content: "Clear guidance for every dish so you can cook with confidence";
+  content: var(--faq-hover-2, "Clear guidance for every dish so you can cook with confidence");
 }
 .group3:hover .chat3 p::before {
-  content: "Find exactly what you want in seconds with our intelligent search.";
+  content: var(--faq-hover-3, "Find exactly what you want in seconds with our intelligent search.");
 }
 .group4:hover .chat4 p::before {
-  content: "Connect, share, and learn with food lovers worldwide.";
+  content: var(--faq-hover-4, "Connect, share, and learn with food lovers worldwide.");
 }
 .group1 .nut, .group2 .nut, .group3 .nut, .group4 .nut {
   z-index: 3;
@@ -302,8 +260,8 @@ p{
   border-top-left-radius: 14px;
   border-top-right-radius: 14px;
 }
-.submit-button{
-  background-color: #88C533;
+.submit-button {
+  @include button-primary;
 }
 .type-in::placeholder {
   color: #999;
@@ -429,8 +387,9 @@ p{
     line-height: 1.4;
   }
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
 
   .contact-pic {
@@ -504,8 +463,9 @@ p{
     line-height: 1.4;
   }
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
   .contact-pic {
     display: none;
@@ -578,8 +538,9 @@ p{
     line-height: 1.4;
   }
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
   .contact-pic {
     display: none;
@@ -651,8 +612,9 @@ p{
     line-height: 1.4;
   }
   .bottom button {
+    @include button-primary;
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
   .contact-pic {
     display: none;
@@ -685,4 +647,10 @@ p{
     align-items: center;
 
   }
+}
+
+@media (min-width: 1438px){
+  .lang-vi .t1{
+  margin-right: 28% !important;
+}
 }

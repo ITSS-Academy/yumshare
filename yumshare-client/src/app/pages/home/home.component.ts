@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ShareModule } from '../../shares/share.module';
-import { CardComponent } from '../../components/card/card.component';
-
-import { Router } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { RecipeState } from '../../ngrx/recipe';
+import { ShareModule } from '../../shared/share.module';
+import {CardComponent} from '../../components/card/card.component';
+import {Router} from '@angular/router';
+import {select, Store} from '@ngrx/store';
+import {RecipeState} from '../../ngrx/recipe';
 import { Observable, Subscription } from 'rxjs';
 import { Category, Recipe } from '../../models';
 import * as categoryActions from '../../ngrx/category/category.actions';
@@ -27,8 +26,6 @@ import { TranslatePipe } from '@ngx-translate/core';
     ShareModule,
     CardComponent,
     TranslatePipe
-    // Để dùng TranslatePipe trong template
-    // Không cần TranslateModule, TranslatePipe ở đây nếu đã cấu hình ở app.config.ts
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -37,17 +34,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   category$!: Observable<Category[]>;
   paginatedRecipes$!: Observable<any>;
   paginatedRecipes: any;
-
-  mainCourses$!: Observable<Recipe[] | null>;
+  
+  mainCourses$!: Observable<{ data: Recipe[], total: number } | null>;
   mainCourses: Recipe[] = [];
 
-  beverages$!: Observable<Recipe[] | null>;
+  beverages$!: Observable<{ data: Recipe[], total: number } | null>;
   beverages: Recipe[] = [];
 
-  desserts$!: Observable<Recipe[] | null>;
+  desserts$!: Observable<{ data: Recipe[], total: number } | null>;
   desserts: Recipe[] = [];
 
-  snacks$!: Observable<Recipe[] | null>;
+  snacks$!: Observable<{ data: Recipe[], total: number } | null>;
   snacks: Recipe[] = [];
 
   subscriptions: Subscription[] = [];
@@ -89,67 +86,82 @@ export class HomeComponent implements OnInit, OnDestroy {
     }, 3000);
 
     this.subscriptions.push(
-      this.category$.subscribe()
-    );
-
-    this.subscriptions.push(
-      this.paginatedRecipes$.subscribe(paginatedRecipes => {
-        this.paginatedRecipes = paginatedRecipes;
-        if (this.paginatedRecipes && Array.isArray(this.paginatedRecipes.data)) {
-          this.paginatedRecipes.data.forEach((recipe: any) => {
-            if (recipe && recipe.id) {
-              this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
-            }
-          });
-        } else if (this.paginatedRecipes) {
-          this.paginatedRecipes.data = [];
-        }
+      this.category$.subscribe(categories => {
+        // Categories loaded successfully
       })
     );
 
-    this.subscriptions.push(
-      this.mainCourses$.subscribe(data => {
-        this.mainCourses = data || [];
-        this.mainCourses.forEach((recipe: any) => {
-          if (recipe && recipe.id) {
-            this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
-          }
-        });
-      })
-    );
+   this.subscriptions.push(
+    this.paginatedRecipes$.subscribe(paginatedRecipes => {
+      this.paginatedRecipes = paginatedRecipes;
+      if (this.paginatedRecipes && !Array.isArray(this.paginatedRecipes.data)) {
+        this.paginatedRecipes.data = [];
+      }
+    })
+  );
+  this.subscriptions.push(
+  this.mainCourses$.subscribe(data => {
+    // Handle different data structures
+    if (Array.isArray(data?.data)) {
+      this.mainCourses = data.data;
+    } else if (Array.isArray(data)) {
+      this.mainCourses = data;
+    } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+      // Handle nested object: {data: {data: [...]}}
+      this.mainCourses = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+    } else {
+      this.mainCourses = [];
+    }
+    })
+  );
 
-    this.subscriptions.push(
-      this.beverages$.subscribe(data => {
-        this.beverages = data || [];
-        this.beverages.forEach((recipe: any) => {
-          if (recipe && recipe.id) {
-            this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
-          }
-        });
-      })
-    );
+  this.subscriptions.push(
+    this.beverages$.subscribe(data => {
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.beverages = data.data;
+      } else if (Array.isArray(data)) {
+        this.beverages = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.beverages = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.beverages = [];
+      }
+    })
+  );
 
-    this.subscriptions.push(
-      this.desserts$.subscribe(data => {
-        this.desserts = data || [];
-        this.desserts.forEach((recipe: any) => {
-          if (recipe && recipe.id) {
-            this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
-          }
-        });
-      })
-    );
+  this.subscriptions.push(
+    this.desserts$.subscribe(data => {
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.desserts = data.data;
+      } else if (Array.isArray(data)) {
+        this.desserts = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.desserts = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.desserts = [];
+      }
+    })
+  );
 
-    this.subscriptions.push(
-      this.snacks$.subscribe(data => {
-        this.snacks = data || [];
-        this.snacks.forEach((recipe: any) => {
-          if (recipe && recipe.id) {
-            this.store.dispatch(loadRecipeLikeCount({ recipeId: recipe.id }));
-          }
-        });
-      })
-    );
+  this.subscriptions.push(
+    this.snacks$.subscribe(data => {
+      // Handle different data structures
+      if (Array.isArray(data?.data)) {
+        this.snacks = data.data;
+      } else if (Array.isArray(data)) {
+        this.snacks = data;
+      } else if (data?.data && typeof data.data === 'object' && 'data' in data.data) {
+        // Handle nested object: {data: {data: [...]}}
+        this.snacks = Array.isArray((data.data as any).data) ? (data.data as any).data : [];
+      } else {
+        this.snacks = [];
+      }
+    })
+  );
   }
 
   ngOnDestroy() {
@@ -188,8 +200,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/search']).then();
   }
 
-  categoryClick(category: string) {
-    this.router.navigate(['/search'], { queryParams: { category } }).then();
+  categoryClick(category: Category) {
+    this.router.navigate(['/search']).then();
   }
 
   // Hàm chuyển đổi ngôn ngữ runtime (nếu cần)

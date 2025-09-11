@@ -7,8 +7,8 @@
           <mat-icon>restaurant</mat-icon>
         </div>
         <div class="step-content">
-          <h3>Basic Information</h3>
-          <p>Name, description & image</p>
+          <h3>{{ 'Basic Information' | translate }}</h3>
+          <p>{{ 'Name, description & image' | translate }}</p>
         </div>
         <div class="step-number">1</div>
       </div>
@@ -20,8 +20,8 @@
           <mat-icon>list_alt</mat-icon>
         </div>
         <div class="step-content">
-          <h3>Ingredients & Steps</h3>
-          <p>Recipe content & instructions</p>
+          <h3>{{ 'Ingredients & Steps' | translate }}</h3>
+          <p>{{ 'Recipe content & instructions' | translate }}</p>
         </div>
         <div class="step-number">2</div>
       </div>
@@ -33,8 +33,8 @@
           <mat-icon>category</mat-icon>
         </div>
         <div class="step-content">
-          <h3>Categories & Tags</h3>
-          <p>Classification & difficulty</p>
+          <h3>{{ 'Categories & Tags' | translate }}</h3>
+          <p>{{ 'Classification & difficulty' | translate }}</p>
         </div>
         <div class="step-number">3</div>
       </div>
@@ -46,8 +46,8 @@
           <mat-icon>video_library</mat-icon>
         </div>
         <div class="step-content">
-          <h3>Video & Review</h3>
-          <p>Upload video & finalize</p>
+          <h3>{{ 'Video & Review' | translate }}</h3>
+          <p>{{ 'Upload video & finalize' | translate }}</p>
         </div>
         <div class="step-number">4</div>
       </div>
@@ -62,16 +62,16 @@
         <div class="image-upload-card">
           <div class="card-header">
             <mat-icon>photo_camera</mat-icon>
-            <h3>Recipe Image</h3>
+            <h3>{{ 'Recipe Image' | translate }}</h3>
           </div>
 
           @if (imagePreview) {
             <div class="image-preview">
-              <img [src]="imagePreview" alt="Recipe Image">
+              <img [src]="imagePreview" [alt]="'Recipe Image' | translate">
               <div class="image-overlay">
                 <button class="change-image-btn" (click)="onImageClick()">
                   <mat-icon>edit</mat-icon>
-                  Change Image
+                  {{ 'Change Image' | translate }}
                 </button>
               </div>
             </div>
@@ -81,9 +81,9 @@
                 <div class="upload-icon">
                   <mat-icon>add_photo_alternate</mat-icon>
                 </div>
-                <h4>Upload Recipe Image</h4>
-                <p>Click to browse or drag & drop</p>
-                <span class="upload-hint">JPG, PNG up to 5MB</span>
+                <h4>{{ 'Upload Recipe Image' | translate }}</h4>
+                <p>{{ 'Click to browse or drag & drop' | translate }}</p>
+                <span class="upload-hint">{{ 'JPG, PNG up to 5MB' | translate }}</span>
               </div>
             </div>
           }
@@ -91,7 +91,7 @@
           <input type="file" #imageInput (change)="onImageSelected($event)" accept="image/*" hidden>
           <button class="upload-btn" (click)="onImageClick()">
             <mat-icon>cloud_upload</mat-icon>
-            Upload Image
+            {{ 'Upload Image' | translate }}
           </button>
         </div>
       </div>
@@ -100,29 +100,41 @@
         <div class="recipe-details-card">
           <div class="card-header">
             <mat-icon>edit_note</mat-icon>
-            <h3>Recipe Details</h3>
+            <h3>{{ 'Recipe Details' | translate }}</h3>
           </div>
 
           <div class="form-group">
             <label class="form-label">
               <mat-icon>restaurant</mat-icon>
-              Recipe Name *
+              {{ 'Recipe Name *' | translate }}
             </label>
             <input type="text"
                    formControlName="title"
-                   placeholder="Enter your recipe name..."
-                   class="form-input recipe-name">
+                   [placeholder]="'Enter your recipe name...' | translate"
+                   class="form-input recipe-name"
+                   [class.error]="recipeForm.get('title')?.invalid && recipeForm.get('title')?.touched">
+            @if (recipeForm.get('title')?.invalid && recipeForm.get('title')?.touched) {
+              <div class="error-message">
+                @if (recipeForm.get('title')?.errors?.['required']) {
+                  {{ 'Recipe name is required' | translate }}
+                } @else if (recipeForm.get('title')?.errors?.['minlength']) {
+                  {{ 'Recipe name must be at least 3 characters long' | translate }}
+                } @else if (recipeForm.get('title')?.errors?.['maxlength']) {
+                  {{ 'Recipe name must be less than 100 characters' | translate }}
+                }
+              </div>
+            }
           </div>
 
           <div class="user-profile">
-            @if (currentUser) {
+            @if (mineProfile) {
               <div class="profile-info">
                 <div class="profile-avatar">
-                  <span class="avatar-text">{{ (currentUser.displayName || 'U')[0] }}</span>
+                  <img [src]="mineProfile.avatar_url" [alt]="mineProfile.username" class="avatar-image">
                 </div>
                 <div class="profile-details">
-                  <h4>{{ currentUser.displayName || 'User' }}</h4>
-                  <p>{{ currentUser.email }}</p>
+                  <h4>{{ mineProfile.username || ('User' | translate) }}</h4>
+                  <p>{{ mineProfile.email }}</p>
                 </div>
               </div>
             } @else {
@@ -131,8 +143,8 @@
                   <mat-icon>warning</mat-icon>
                 </div>
                 <div class="profile-details">
-                  <h4 class="warning-text">Please Login</h4>
-                  <p>Authentication required to create recipe</p>
+                  <h4 class="warning-text">{{ 'Please Login' | translate }}</h4>
+                  <p>{{ 'Authentication required to create recipe' | translate }}</p>
                 </div>
               </div>
             }
@@ -141,11 +153,23 @@
           <div class="form-group">
             <label class="form-label">
               <mat-icon>description</mat-icon>
-              Description *
+              {{ 'Description *' | translate }}
             </label>
             <textarea formControlName="description"
-                      placeholder="Describe your recipe, cooking tips, and what makes it special..."
-                      class="form-textarea"></textarea>
+                      [placeholder]="'Describe your recipe, cooking tips, and what makes it special...' | translate"
+                      class="form-textarea"
+                      [class.error]="recipeForm.get('description')?.invalid && recipeForm.get('description')?.touched"></textarea>
+            @if (recipeForm.get('description')?.invalid && recipeForm.get('description')?.touched) {
+              <div class="error-message">
+                @if (recipeForm.get('description')?.errors?.['required']) {
+                  {{ 'Recipe description is required' | translate }}
+                } @else if (recipeForm.get('description')?.errors?.['minlength']) {
+                  {{ 'Recipe description must be at least 10 characters long' | translate }}
+                } @else if (recipeForm.get('description')?.errors?.['maxlength']) {
+                  {{ 'Recipe description must be less than 1000 characters' | translate }}
+                }
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -157,7 +181,7 @@
       <div class="right-actions">
         <button class="action-btn primary-btn" (click)="nextStep()">
           <mat-icon>arrow_forward</mat-icon>
-          Next: Ingredients & Steps
+          {{ 'Next: Ingredients & Steps' | translate }}
         </button>
       </div>
     </div>
@@ -169,29 +193,55 @@
       <div class="ingredients-card">
         <div class="card-header">
           <mat-icon>shopping_basket</mat-icon>
-          <h3>Ingredients</h3>
+          <h3>{{ 'Ingredients' | translate }}</h3>
         </div>
 
         <div class="form-group">
           <label class="form-label">
             <mat-icon>group</mat-icon>
-            Servings *
+            {{ 'Servings *' | translate }}
           </label>
           <input type="number"
                  formControlName="servings"
                  placeholder="4"
                  class="form-input serving-input"
+                 [class.error]="recipeForm.get('servings')?.invalid && recipeForm.get('servings')?.touched"
                  min="1">
+          @if (recipeForm.get('servings')?.invalid && recipeForm.get('servings')?.touched) {
+            <div class="error-message">
+              @if (recipeForm.get('servings')?.errors?.['required']) {
+                {{ 'Servings is required' | translate }}
+              } @else if (recipeForm.get('servings')?.errors?.['min']) {
+                {{ 'Servings must be at least 1' | translate }}
+              } @else if (recipeForm.get('servings')?.errors?.['max']) {
+                {{ 'Servings cannot exceed 50' | translate }}
+              }
+            </div>
+          }
         </div>
 
         <div class="ingredients-list" #ingredientsListContainer>
           <div formArrayName="ingredients">
             @for (ingredient of ingredients.controls; track $index; let i = $index) {
               <div class="ingredient-item">
-                <input type="text"
-                       [formControl]="getIngredientControl(i)"
-                       placeholder="Ingredient name..."
-                       class="form-input ingredient-input">
+                <div class="ingredient-input-container">
+                  <input type="text"
+                         [formControl]="getIngredientControl(i)"
+                         [placeholder]="'Ingredient name...' | translate"
+                         class="form-input ingredient-input"
+                         [class.error]="getIngredientControl(i).invalid && getIngredientControl(i).touched">
+                  @if (getIngredientControl(i).invalid && getIngredientControl(i).touched) {
+                    <div class="error-message">
+                      @if (getIngredientControl(i).errors?.['required']) {
+                        {{ 'Ingredient name is required' | translate }}
+                      } @else if (getIngredientControl(i).errors?.['minlength']) {
+                        {{ 'Ingredient name must be at least 2 characters long' | translate }}
+                      } @else if (getIngredientControl(i).errors?.['maxlength']) {
+                        {{ 'Ingredient name must be less than 100 characters' | translate }}
+                      }
+                    </div>
+                  }
+                </div>
                 <button class="remove-btn"
                         type="button"
                         (click)="removeIngredient(i)"
@@ -205,29 +255,41 @@
 
         <button class="add-btn" type="button" (click)="addIngredient()">
           <mat-icon>add</mat-icon>
-          Add Ingredient
+          {{ 'Add Ingredient' | translate }}
         </button>
       </div>
 
       <div class="steps-card">
         <div class="card-header">
           <mat-icon>format_list_numbered</mat-icon>
-          <h3>Process Steps</h3>
+          <h3>{{ 'Process Steps' | translate }}</h3>
         </div>
 
         <div class="form-group">
           <label class="form-label">
             <mat-icon>schedule</mat-icon>
-            Total Time (minutes) *
+            {{ 'Total Time (minutes) *' | translate }}
           </label>
           <input type="number"
                  formControlName="total_cooking_time"
                  placeholder="90"
                  class="form-input time-input"
+                 [class.error]="recipeForm.get('total_cooking_time')?.invalid && recipeForm.get('total_cooking_time')?.touched"
                  min="1">
           <div class="time-display">
             {{ formatTime(recipeForm.get('total_cooking_time')?.value || 0) }}
           </div>
+          @if (recipeForm.get('total_cooking_time')?.invalid && recipeForm.get('total_cooking_time')?.touched) {
+            <div class="error-message">
+              @if (recipeForm.get('total_cooking_time')?.errors?.['required']) {
+                {{ 'Total cooking time is required' | translate }}
+              } @else if (recipeForm.get('total_cooking_time')?.errors?.['min']) {
+                {{ 'Total cooking time must be at least 1 minute' | translate }}
+              } @else if (recipeForm.get('total_cooking_time')?.errors?.['max']) {
+                {{ 'Total cooking time cannot exceed 24 hours (1440 minutes)' | translate }}
+              }
+            </div>
+          }
         </div>
 
         <div class="steps-list" #stepsListContainer>
@@ -238,8 +300,20 @@
                 <div class="step-input">
                   <input type="text"
                          [formControl]="getStepDescriptionControl(i)"
-                         placeholder="Describe step {{ i + 1 }}..."
-                         class="form-input">
+                         [placeholder]="getStepPlaceholder(i)"
+                         class="form-input"
+                         [class.error]="getStepDescriptionControl(i).invalid && getStepDescriptionControl(i).touched">
+                  @if (getStepDescriptionControl(i).invalid && getStepDescriptionControl(i).touched) {
+                    <div class="error-message">
+                      @if (getStepDescriptionControl(i).errors?.['required']) {
+                        {{ 'Step description is required' | translate }}
+                      } @else if (getStepDescriptionControl(i).errors?.['minlength']) {
+                        {{ 'Step description must be at least 5 characters long' | translate }}
+                      } @else if (getStepDescriptionControl(i).errors?.['maxlength']) {
+                        {{ 'Step description must be less than 500 characters' | translate }}
+                      }
+                    </div>
+                  }
                 </div>
                 <button class="remove-btn"
                         type="button"
@@ -254,7 +328,7 @@
 
         <button class="add-btn" type="button" (click)="addStep()">
           <mat-icon>add</mat-icon>
-          Add Step
+          {{ 'Add Step' | translate }}
         </button>
       </div>
     </div>
@@ -263,13 +337,13 @@
     <div class="action-bar">
       <button class="action-btn secondary-btn" (click)="previousStep()">
         <mat-icon>arrow_back</mat-icon>
-        Previous: Basic Information
+        {{ 'Previous: Basic Information' | translate }}
       </button>
 
       <div class="right-actions">
         <button class="action-btn primary-btn" (click)="nextStep()">
           <mat-icon>arrow_forward</mat-icon>
-          Next: Categories & Tags
+          {{ 'Next: Categories & Tags' | translate }}
         </button>
       </div>
     </div>
@@ -280,50 +354,65 @@
     <div class="category-card">
       <div class="card-header">
         <mat-icon>category</mat-icon>
-        <h3>Recipe Classification</h3>
+        <h3>{{ 'Recipe Classification' | translate }}</h3>
       </div>
 
       <div class="form-group">
         <label class="form-label">
           <mat-icon>category</mat-icon>
-          Category *
+          {{ 'Category *' | translate }}
         </label>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [class.error]="recipeForm.get('category_id')?.invalid && recipeForm.get('category_id')?.touched">
           <mat-select formControlName="category_id">
             @for (category of categories; track category.id) {
-              <mat-option [value]="category.id">{{category.name}}</mat-option>
+              <mat-option [value]="category.id">{{category.name | translate}}</mat-option>
             }
           </mat-select>
         </mat-form-field>
+        @if (recipeForm.get('category_id')?.invalid && recipeForm.get('category_id')?.touched) {
+          <div class="error-message">
+            {{ 'Please select a category' | translate }}
+          </div>
+        }
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">
             <mat-icon>public</mat-icon>
-            Country *
+            {{ 'Country *' | translate }}
           </label>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" [class.error]="recipeForm.get('country')?.invalid && recipeForm.get('country')?.touched">
             <mat-select formControlName="country">
               @for (country of safeCountries; track country) {
-                <mat-option [value]="country">{{country}}</mat-option>
+                <mat-option [value]="country">{{country | translate}}</mat-option>
               }
             </mat-select>
           </mat-form-field>
+          @if (recipeForm.get('country')?.invalid && recipeForm.get('country')?.touched) {
+            <div class="error-message">
+              {{ 'Please select a country' | translate }}
+            </div>
+          }
         </div>
 
         <div class="form-group">
           <label class="form-label">
             <mat-icon>speed</mat-icon>
-            Difficulty *
+            {{ 'Difficulty *' | translate }}
           </label>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" [class.error]="recipeForm.get('difficulty')?.invalid && recipeForm.get('difficulty')?.touched">
             <mat-select formControlName="difficulty">
               @for (difficulty of safeDifficultyLevels; track difficulty) {
-                <mat-option [value]="difficulty">{{difficulty}}</mat-option>
+                <mat-option [value]="difficulty">{{difficulty | translate}}</mat-option>
               }
             </mat-select>
           </mat-form-field>
+          @if (recipeForm.get('difficulty')?.invalid && recipeForm.get('difficulty')?.touched) {
+            <div class="error-message">
+              {{ 'Please select a difficulty level' | translate }}
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -332,13 +421,13 @@
     <div class="action-bar">
       <button class="action-btn secondary-btn" (click)="previousStep()">
         <mat-icon>arrow_back</mat-icon>
-        Previous: Ingredients & Steps
+        {{ 'Previous: Ingredients & Steps' | translate }}
       </button>
 
       <div class="right-actions">
         <button class="action-btn primary-btn" (click)="nextStep()">
           <mat-icon>arrow_forward</mat-icon>
-          Next: Video & Review
+          {{ 'Next: Video & Review' | translate }}
         </button>
       </div>
     </div>
@@ -348,8 +437,8 @@
   <div class="step-container" [class.active]="currentStep === 4">
     <div class="video-upload-container">
       <div class="video-header">
-        <h2>Add Video Guide</h2>
-        <p>Help others follow along with your recipe</p>
+        <h2>{{ 'Add Video Guide' | translate }}</h2>
+        <p>{{ 'Help others follow along with your recipe' | translate }}</p>
       </div>
 
       <div class="upload-tabs">
@@ -357,14 +446,14 @@
                 [class.active]="videoType === 'file'"
                 (click)="setVideoType('file')">
           <mat-icon>cloud_upload</mat-icon>
-          Upload Video File
+          {{ 'Upload Video File' | translate }}
         </button>
 
         <button class="tab-btn"
                 [class.active]="videoType === 'youtube'"
                 (click)="setVideoType('youtube')">
           <mat-icon>play_circle</mat-icon>
-          YouTube Link
+          {{ 'YouTube Link' | translate }}
         </button>
       </div>
 
@@ -377,9 +466,9 @@
             <div class="upload-icon">
               <mat-icon>video_call</mat-icon>
             </div>
-            <h3>Upload Your Video</h3>
-            <p>Click to browse or drag & drop your video file</p>
-            <span class="file-info">MP4, AVI, MOV, WMV • Max 100MB</span>
+            <h3>{{ 'Upload Your Video' | translate }}</h3>
+            <p>{{ 'Click to browse or drag & drop your video file' | translate }}</p>
+            <span class="file-info">{{ 'MP4, AVI, MOV, WMV • Max 100MB' | translate }}</span>
           </div>
           <input type="file" #videoInput (change)="onVideoSelected($event)" accept="video/*" hidden>
         </div>
@@ -388,21 +477,21 @@
       @if (videoType === 'youtube') {
         <div class="youtube-section">
           <mat-form-field appearance="outline" class="url-field">
-            <mat-label>YouTube Video URL</mat-label>
+            <mat-label>{{ 'YouTube Video URL' | translate }}</mat-label>
             <input matInput
                    type="url"
                    [(ngModel)]="youtubeUrl"
                    [ngModelOptions]="{standalone: true}"
                    (ngModelChange)="onYoutubeUrlChange($event)"
                    placeholder="https://www.youtube.com/watch?v=...">
-            <mat-hint>Paste the full YouTube video URL</mat-hint>
+            <mat-hint>{{ 'Paste the full YouTube video URL' | translate }}</mat-hint>
           </mat-form-field>
         </div>
       }
 
       @if (videoPreview) {
         <div class="video-preview">
-          <h4>Preview</h4>
+          <h4>{{ 'Preview' | translate }}</h4>
           @if (videoType === 'file') {
             <video controls [src]="videoPreview" class="preview-video">
               Your browser does not support the video tag.
@@ -424,22 +513,22 @@
     <div class="action-bar">
       <button class="action-btn secondary-btn" (click)="previousStep()">
         <mat-icon>arrow_back</mat-icon>
-        Previous: Categories & Tags
+        {{ 'Previous: Categories & Tags' | translate }}
       </button>
 
       <div class="right-actions">
         <button class="action-btn delete-btn" type="button" (click)="onDelete()">
           <mat-icon>delete</mat-icon>
-          Delete Draft
+          {{ 'Delete Draft' | translate }}
         </button>
 
         <button class="action-btn primary-btn" (click)="onSubmit()" [disabled]="uploading">
           @if (uploading) {
             <mat-icon>hourglass_empty</mat-icon>
-            Publishing...
+            {{ 'Publishing...' | translate }}
           } @else {
             <mat-icon>publish</mat-icon>
-            Publish Recipe
+            {{ 'Publish Recipe' | translate }}
           }
         </button>
       </div>

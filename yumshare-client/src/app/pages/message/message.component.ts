@@ -7,31 +7,27 @@ import { Chat, CreateMessageDto } from '../../models/chat.model';
 import { User } from '../../models/user.model';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AuthState } from '../../ngrx/auth/auth.state';
+import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 import { ChatMessageSkeletonComponent } from '../../components/skeleton/chat-message-skeleton.component';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import { ChatMessage } from '../../models/chat-message.model';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { ChatWindowComponent } from './components/chat-window/chat-window.component';
 import {FooterComponent} from '../../components/footer/footer.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, ShareModule, UserListComponent, ChatWindowComponent, FooterComponent],
+  imports: [CommonModule, TranslatePipe, FormsModule, ShareModule, UserListComponent, ChatWindowComponent],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
 export class MessageComponent implements OnInit, OnDestroy {
-  // Current user (mock - should come from auth service)
-  currentUser: User = {
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    username: 'Current User',
-    email: 'current@example.com',
-    avatar_url: 'https://via.placeholder.com/40',
-    created_at: new Date(),
-    updated_at: new Date()
-  };
+  // Current user from auth state
+  mineProfile: User | null = null;
 
   // Chat data
   chats: Chat[] = [];
@@ -126,16 +122,16 @@ export class MessageComponent implements OnInit, OnDestroy {
     private chatService: ChatService,
     private auth: Auth,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store<{ auth: AuthState }>
   ) {
-    const uid = this.auth.currentUser?.uid;
-    if (uid) {
-      this.currentUser.id = uid as any;
-    }
+    // Load mine profile from auth state
+    this.loadMineProfile();
 
     onAuthStateChanged(this.auth, (user) => {
-      if (user && user.uid !== this.currentUser.id) {
-        this.currentUser.id = user.uid as any;
+      if (user && user.uid !== this.mineProfile?.id) {
+        // Reload mine profile when auth state changes
+        this.loadMineProfile();
         // Join socket room and reload chats once identity is known
         this.joinChat();
         this.loadChats();
@@ -143,9 +139,29 @@ export class MessageComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadMineProfile(): void {
+    const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
+      console.log('Mine profile received in message component:', profile);
+      
+      if (profile && profile.id) {
+        this.mineProfile = profile;
+        console.log('Profile loaded successfully in message component:', {
+          id: this.mineProfile.id,
+          username: this.mineProfile.username,
+          email: this.mineProfile.email
+        });
+      } else {
+        this.mineProfile = null;
+        console.log('No profile found in auth state for message component');
+      }
+    });
+    
+    this.subscriptions.push(profileSubscription);
+  }
+
   ngOnInit() {
     this.setupWebSocketListeners();
-    if (this.currentUser.id) {
+    if (this.mineProfile?.id) {
       this.loadChats();
       this.joinChat();
     }
@@ -172,7 +188,7 @@ export class MessageComponent implements OnInit, OnDestroy {
           id: message.id,
           content: message.content,
           sender_id: message.sender_id,
-          isCurrentUser: message.sender_id === this.currentUser.id,
+          isCurrentUser: message.sender_id === this.mineProfile?.id,
           currentMessagesCount: this.messages.length
         });
 
@@ -185,7 +201,7 @@ export class MessageComponent implements OnInit, OnDestroy {
           }
 
           // For current user's messages, only handle if it's not from optimistic update
-          if (message.sender_id === this.currentUser.id) {
+          if (message.sender_id === this.mineProfile?.id) {
             // Check if this is a duplicate of an optimistic message we're tracking
             const isOptimisticDuplicate = Array.from(this.optimisticMessageIds).some(tempId => {
               const tempMessage = this.messages.find(m => m.id === tempId);
@@ -246,7 +262,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         if (data && this.selectedChat && data.chatId === this.selectedChat.id) {
           // Mark messages as read
           this.messages.forEach(msg => {
-            if (msg.sender_id !== this.currentUser.id) {
+            if (msg.sender_id !== this.mineProfile?.id) {
               msg.is_read = true;
             }
           });
@@ -256,13 +272,21 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   private joinChat() {
-    this.chatService.joinChat(this.currentUser.id);
+    this.chatService.joinChat(this.mineProfile?.id || '');
   }
 
   private loadChats() {
     this.loading = true;
-    this.chatService.getUserChats(this.currentUser.id).subscribe({
+    this.chatService.getUserChats(this.mineProfile?.id || '').subscribe({
       next: (chats) => {
+        console.log('Loaded chats:', chats);
+        console.log('Chat details:', chats.map(chat => ({
+          id: chat.id,
+          user1_id: chat.user1_id,
+          user2_id: chat.user2_id,
+          user1: chat.user1 ? { id: chat.user1.id, username: chat.user1.username } : null,
+          user2: chat.user2 ? { id: chat.user2.id, username: chat.user2.username } : null
+        })));
         this.chats = chats;
         this.loading = false;
       },
@@ -295,10 +319,13 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   private loadMessages(chatId: string) {
+    this.messagesLoading.set(true);
+    
     this.chatService.getChatMessages(chatId).subscribe({
       next: (messages) => {
-        this.messages = messages;
-
+        this.messages = messages || [];
+        this.messagesLoading.set(false);
+        
         // Set last message ID for polling
         if (messages && messages.length > 0) {
           this.lastMessageId = messages[messages.length - 1].id as string;
@@ -315,6 +342,8 @@ export class MessageComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading messages:', error);
+        this.messagesLoading.set(false);
+        this.messages = [];
       }
     });
   }
@@ -322,10 +351,10 @@ export class MessageComponent implements OnInit, OnDestroy {
 
 
   private markChatAsRead(chatId: string) {
-    this.chatService.markChatAsRead(chatId, this.currentUser.id).subscribe({
+    this.chatService.markChatAsRead(chatId, this.mineProfile?.id || '').subscribe({
       next: () => {
         this.messages.forEach(msg => {
-          if (msg.sender_id !== this.currentUser.id) {
+          if (msg.sender_id !== this.mineProfile?.id) {
             msg.is_read = true;
           }
         });
@@ -341,7 +370,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     if (!this.isTyping) {
       this.isTyping = true;
-      this.chatService.sendTypingIndicator(this.selectedChat.id, this.currentUser.id, true);
+      this.chatService.sendTypingIndicator(this.selectedChat.id, this.mineProfile?.id || '', true);
     }
 
     if (this.typingTimeout) {
@@ -356,7 +385,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   private stopTyping() {
     if (this.selectedChat && this.isTyping) {
       this.isTyping = false;
-      this.chatService.sendTypingIndicator(this.selectedChat.id, this.currentUser.id, false);
+      this.chatService.sendTypingIndicator(this.selectedChat.id, this.mineProfile?.id || '', false);
     }
   }
 
@@ -370,7 +399,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.isSearching = true;
     this.chatService.searchUsers(this.searchQuery).subscribe({
       next: (users) => {
-        this.searchResults = users.filter(user => user.id !== this.currentUser.id);
+        this.searchResults = users.filter(user => user.id !== this.mineProfile?.id);
         this.showSearchResults = true;
         this.isSearching = false;
       },
@@ -383,14 +412,14 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   startNewChat(user: User) {
     const chatData = {
-      user1_id: this.currentUser.id,
+      user1_id: this.mineProfile?.id || '',
       user2_id: user.id
     };
 
     this.chatService.createChat(chatData).subscribe({
       next: (chat) => {
         this.chats.unshift(chat);
-        if (chat.user1_id === this.currentUser.id) {
+        if (chat.user1_id === this.mineProfile?.id) {
           (this.chats[0] as any).user2 = user;
         } else {
           (this.chats[0] as any).user1 = user;
@@ -407,17 +436,17 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   // Method to check if chat already exists between two users
   checkExistingChat(otherUserId: string): Chat | null {
-    return this.chats.find(chat =>
-      (chat.user1_id === this.currentUser.id && chat.user2_id === otherUserId) ||
-      (chat.user1_id === otherUserId && chat.user2_id === this.currentUser.id)
+    return this.chats.find(chat => 
+      (chat.user1_id === this.mineProfile?.id && chat.user2_id === otherUserId) ||
+      (chat.user1_id === otherUserId && chat.user2_id === this.mineProfile?.id)
     ) || null;
   }
 
   // Method to start chat or select existing chat
   startOrSelectChat(user: User) {
-    const existingChat = this.chats.find(chat =>
-      (chat.user1_id === this.currentUser.id && chat.user2_id === user.id) ||
-      (chat.user1_id === user.id && chat.user2_id === this.currentUser.id)
+    const existingChat = this.chats.find(chat => 
+      (chat.user1_id === this.mineProfile?.id && chat.user2_id === user.id) ||
+      (chat.user1_id === user.id && chat.user2_id === this.mineProfile?.id)
     );
 
     if (existingChat) {
@@ -428,7 +457,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   getOtherUser(chat: Chat): User | null {
-    if (chat.user1_id === this.currentUser.id) {
+    if (chat.user1_id === this.mineProfile?.id) {
       return chat.user2 || null;
     } else {
       return chat.user1 || null;
@@ -447,8 +476,8 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (otherUser && otherUser.username && otherUser.username !== 'null') {
       return otherUser.username;
     }
-
-    const otherUserId = chat.user1_id === this.currentUser.id ? chat.user2_id : chat.user1_id;
+    
+    const otherUserId = chat.user1_id === this.mineProfile?.id ? chat.user2_id : chat.user1_id;
     return `User ${otherUserId.substring(0, 8)}`;
   }
 
@@ -468,8 +497,8 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   getUnreadCount(chat: Chat): number {
     if (!chat.messages) return 0;
-    return chat.messages.filter(msg =>
-      msg.sender_id !== this.currentUser.id && !msg.is_read
+    return chat.messages.filter(msg => 
+      msg.sender_id !== this.mineProfile?.id && !msg.is_read
     ).length;
   }
 
@@ -534,7 +563,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     const messageData: CreateMessageDto = {
       chat_id: this.selectedChat.id,
-      sender_id: this.currentUser.id,
+      sender_id: this.mineProfile?.id || '',
       content: messageContent.trim()
     };
 
@@ -545,7 +574,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     const optimisticMessage: ChatMessage = {
       id: tempId as any,
       chat_id: this.selectedChat.id,
-      sender_id: this.currentUser.id,
+      sender_id: this.mineProfile?.id || '',
       content: messageContent.trim(),
       is_read: true,
       created_at: new Date() as any

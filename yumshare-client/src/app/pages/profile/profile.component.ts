@@ -2,13 +2,14 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
 import { SideBarComponent } from '../../components/side-bar/side-bar.component';
 import { LoadingComponent } from '../../components/loading/loading.component';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DeleteConfirmDialogComponent } from '../../components/delete-confirm-dialog/delete-confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AuthService } from '../../services/auth/auth.service';
 import { FollowService } from '../../services/follow/follow.service';
 import { User } from '../../models';
@@ -17,13 +18,15 @@ import { FollowState } from '../../ngrx/follow/follow.state';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as FollowActions from '../../ngrx/follow/follow.actions';
 import * as FollowSelectors from '../../ngrx/follow/follow.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   imports: [
     ShareModule,
-    LoadingComponent
+    LoadingComponent,
+    ScrollingModule,
+    TranslatePipe
   ],
   styleUrls: ['./profile.component.scss']
 })
@@ -32,6 +35,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);
   private store = inject(Store<{ auth: AuthState; follow: FollowState }>);
   private snackBar = inject(MatSnackBar);
+
+  // Virtual scrolling properties
+  followItemSize = 60; // Height of each follow item
 
   // NgRx Observables
   mineProfile$: Observable<User>;
@@ -452,7 +458,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
+  // TrackBy functions for virtual scrolling performance
+  trackByFollowId(index: number, follow: any): string {
+    return follow.id || `${index}-${follow.follower?.id || follow.following?.id}`;
+  }
 }

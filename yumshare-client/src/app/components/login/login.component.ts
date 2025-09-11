@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ShareModule } from '../../shares/share.module';
+import { ShareModule } from '../../shared/share.module';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../ngrx/auth/auth.state';
@@ -32,7 +32,7 @@ export class LoginComponent {
 
   onGoogleLogin() {
     this.store.dispatch(AuthActions.login());
-    // Dialog sẽ tự động đóng khi user đăng nhập thành công
+    // Dialog sẽ tự động đóng khi user Login thành công
     // thông qua auth state change trong app.component.ts
   }
 }

@@ -176,3 +176,19 @@ export const clearToggleError = createAction(
   '[Favorite] Clear Toggle Error',
   props<{ recipeId: string }>()
 );
+
+// Load Favorites for Multiple Recipes (Optimized)
+export const loadFavoritesForRecipes = createAction(
+  '[Favorite] Load Favorites for Recipes',
+  props<{ userId: string; recipeIds: string[] }>()
+);
+
+export const loadFavoritesForRecipesSuccess = createAction(
+  '[Favorite] Load Favorites for Recipes Success',
+  props<{ favoriteRecipeIds: string[] }>()
+);
+
+export const loadFavoritesForRecipesFailure = createAction(
+  '[Favorite] Load Favorites for Recipes Failure',
+  props<{ error: string }>()
+);

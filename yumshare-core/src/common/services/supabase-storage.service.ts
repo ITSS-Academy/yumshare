@@ -119,10 +119,6 @@ export class SupabaseStorageService {
       const fileExt = file.originalname.split('.').pop();
       const fileName = `${folderPath}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      console.log('Uploading video to:', fileName);
-      console.log('Bucket name:', this.bucketName);
-      console.log('File size:', file.size);
-      console.log('File mimetype:', file.mimetype);
 
       let uploadData;
       
@@ -162,7 +158,6 @@ export class SupabaseStorageService {
         .from(this.bucketName)
         .getPublicUrl(fileName);
 
-      console.log('Upload successful, URL:', urlData.publicUrl);
       return urlData.publicUrl;
     } catch (error) {
       console.error('Video upload error:', error);
@@ -233,7 +228,6 @@ export class SupabaseStorageService {
       if (error) {
         console.error('Error deleting image from Supabase:', error.message);
       } else {
-        console.log(`Successfully deleted image from Supabase: ${imageUrl}`);
       }
     } catch (error) {
       console.error('Error deleting image:', error.message);
@@ -293,7 +287,6 @@ export class SupabaseStorageService {
         if (createError) {
           console.error('Error creating bucket:', createError.message);
         } else {
-          console.log(`Bucket ${this.bucketName} created successfully`);
         }
       }
     } catch (error) {

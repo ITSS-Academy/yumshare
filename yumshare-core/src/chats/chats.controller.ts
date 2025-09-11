@@ -21,8 +21,14 @@ export class ChatsController {
   }
 
   @Get(':chatId/messages')
-  getChatMessages(@Param('chatId') chatId: string) {
-    return this.chatsService.getChatMessages(chatId);
+  getChatMessages(
+    @Param('chatId') chatId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 50;
+    return this.chatsService.getChatMessages(chatId, pageNum, limitNum);
   }
 
 

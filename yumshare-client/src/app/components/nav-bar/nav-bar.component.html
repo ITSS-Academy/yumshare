@@ -10,27 +10,67 @@
       [(ngModel)]="searchQuery"
       (keyup.enter)="onSearch()"
       (input)="onSearchInput()"
-      placeholder="Search"
+      (focus)="onSearchFocus()"
+      (blur)="onSearchBlur()"
+      [placeholder]="'Search recipes, users, categories...' | translate"
+      class="search-input"
     />
+    <button 
+      mat-icon-button 
+      *ngIf="searchQuery" 
+      (click)="clearSearch()"
+      class="clear-btn"
+      [matTooltip]="'Clear search' | translate">
+      <mat-icon>close</mat-icon>
+    </button>
+    <button 
+      mat-icon-button 
+      (click)="onSearch()"
+      [disabled]="!searchQuery?.trim()"
+      class="search-btn"
+      [matTooltip]="'Search' | translate">
+      <mat-icon>search</mat-icon>
+    </button>
+    
+    <!-- Search Suggestions -->
+    <div class="search-suggestions" *ngIf="showSuggestions">
+      <div class="suggestion-header" *ngIf="!searchQuery">{{ 'Quick Search' | translate }}</div>
+      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Popular recipes')">
+        <mat-icon>trending_up</mat-icon>
+        <span>{{ 'Popular recipes' | translate }}</span>
+      </div>
+      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Easy recipes')">
+        <mat-icon>star</mat-icon>
+        <span>{{ 'Easy recipes' | translate }}</span>
+      </div>
+      <div class="suggestion-item" *ngIf="!searchQuery" (click)="quickSearch('Vietnamese cuisine')">
+        <mat-icon>restaurant</mat-icon>
+        <span>{{ 'Vietnamese cuisine' | translate }}</span>
+      </div>
+      <div class="suggestion-item" *ngIf="searchQuery" (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+        <span>{{ 'Search for' | translate }} "{{ searchQuery }}"</span>
+      </div>
+    </div>
   </div>
- <div class="custom-lang-toggle" (click)="switchLang(currentLang === 'en' ? 'vi' : 'en')">
-  <span class="toggle-option" [class.active]="currentLang === 'en'">ENG</span>
-  <span class="toggle-option" [class.active]="currentLang === 'vi'">VIE</span>
-</div>
+  <div class="custom-lang-toggle" (click)="switchLang(currentLang === 'en' ? 'vi' : 'en')">
+    <span class="toggle-option" [class.active]="currentLang === 'en'">ENG</span>
+    <span class="toggle-option" [class.active]="currentLang === 'vi'">VIE</span>
+  </div>
 
   <div class="actions">
     @if (isLoggedIn) {
-      <button mat-icon-button matTooltip="Add Recipe" aria-label="Add Recipe" (click)="onAddRecipe()">
+      <button mat-icon-button [matTooltip]="'Add Recipe' | translate" aria-label="Add Recipe" (click)="onAddRecipe()">
         <mat-icon>add</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Messages" aria-label="Messages" [matBadgeHidden]="messageCount === 0" (click)="onMessage()" [matBadge]="messageCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button [matTooltip]="'Messages' | translate" aria-label="Messages" [matBadgeHidden]="(messageCount$ | async) === 0" (click)="onMessage()" [matBadge]="messageCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>mail</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="notificationCount === 0" [matBadge]="notificationCount" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button [matTooltip]="'Notifications' | translate" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="(notificationCount$ | async) === 0" [matBadge]="notificationCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>notifications</mat-icon>
       </button>
       <!-- <app-dark-mode-toggle></app-dark-mode-toggle> -->
-      <button class="avatar-btn" mat-icon-button matTooltip="Profile" aria-label="Profile" (click)="onProfile()">
+      <button class="avatar-btn" mat-icon-button [matTooltip]="'Profile' | translate" aria-label="Profile" (click)="onProfile()">
         @if (userAvatar) {
           <img class="avatar" [src]="userAvatar" alt="avatar" />
         } @else {
@@ -38,14 +78,12 @@
         }
       </button>
     } @else {
-      <button mat-icon-button matTooltip="Post Recipe" aria-label="Add Recipe" (click)="openLogin()">
+      <button mat-icon-button [matTooltip]="'Post Recipe' | translate" aria-label="Add Recipe" (click)="openLogin()">
         <mat-icon>add</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Login" aria-label="Login" (click)="openLogin()">
+      <button mat-icon-button [matTooltip]="'Login' | translate" aria-label="Login" (click)="openLogin()">
         <mat-icon>login</mat-icon>
       </button>
     }
   </div>
 </div>
-
-

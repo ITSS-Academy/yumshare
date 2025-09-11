@@ -329,4 +329,44 @@ export const favoriteReducer = createReducer(
       [recipeId]: null,
     },
   })),
+
+  // Load Favorites for Multiple Recipes (Optimized)
+  on(FavoriteActions.loadFavoritesForRecipes, (state) => ({
+    ...state,
+    favoriteStatusLoading: {},
+    favoriteStatusError: {},
+  })),
+
+  on(FavoriteActions.loadFavoritesForRecipesSuccess, (state, { favoriteRecipeIds }) => {
+    // Tạo favorite status cho tất cả recipes (bao gồm cả recipes mới)
+    const newFavoriteStatus: { [recipeId: string]: boolean } = { ...state.favoriteStatus };
+    const newFavoriteStatusLoading: { [recipeId: string]: boolean } = { ...state.favoriteStatusLoading };
+    const newFavoriteStatusError: { [recipeId: string]: string | null } = { ...state.favoriteStatusError };
+
+    // Cập nhật favorite status cho tất cả recipes đã có trong state
+    Object.keys(state.favoriteStatus).forEach(recipeId => {
+      newFavoriteStatus[recipeId] = favoriteRecipeIds.includes(recipeId);
+      newFavoriteStatusLoading[recipeId] = false;
+      newFavoriteStatusError[recipeId] = null;
+    });
+
+    return {
+      ...state,
+      favoriteStatus: newFavoriteStatus,
+      favoriteStatusLoading: newFavoriteStatusLoading,
+      favoriteStatusError: newFavoriteStatusError,
+    };
+  }),
+
+  on(FavoriteActions.loadFavoritesForRecipesFailure, (state, { error }) => ({
+    ...state,
+    favoriteStatusError: {
+      ...state.favoriteStatusError,
+      // Set error for all recipes that were being loaded
+      ...Object.keys(state.favoriteStatus).reduce((acc, recipeId) => {
+        acc[recipeId] = error;
+        return acc;
+      }, {} as { [recipeId: string]: string })
+    },
+  })),
 );

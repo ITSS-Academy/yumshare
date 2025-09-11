@@ -1,0 +1,40 @@
+// ===== DELETE CONFIRM DIALOG COMPONENT - USING DESIGN SYSTEM =====
+@use '../../shared/mixins' as *;
+
+.dialog-container {
+  padding: var(--spacing-lg);
+  text-align: center;
+  max-width: 400px;
+}
+
+.dialog-title {
+  font: var(--mat-sys-headline-small);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.dialog-content {
+  font: var(--mat-sys-body-medium);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  
+  button {
+    @include button-base;
+    min-width: 100px;
+    
+    &.cancel-btn {
+      @include button-outline;
+    }
+    
+    &.delete-btn {
+      @include button-danger;
+    }
+  }
+}

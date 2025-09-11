@@ -120,7 +120,6 @@ export class ChatService {
           created_at: new Date()
         };
         // This will trigger the newMessage$ observable
-        console.log('🧪 Simulating message from other user:', mockMessage);
       }, 1000);
     }
   }

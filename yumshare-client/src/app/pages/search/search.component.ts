@@ -6,13 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
-import { Observable, Subject, combineLatest, debounceTime, distinctUntilChanged, takeUntil, startWith, map } from 'rxjs';
+import { Observable, Subject, combineLatest, debounceTime, distinctUntilChanged, takeUntil, startWith, map, Subscription } from 'rxjs';
 import { Recipe } from '../../models/recipe.model';
 import { Category } from '../../models/category.model';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
-import { AsyncPipe, LowerCasePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -23,8 +23,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatCardModule,
     MatIconModule,
     MatButtonModule,
+    CommonModule,
     MatProgressSpinnerModule,
-    LowerCasePipe,
     AsyncPipe,
     TranslatePipe
   ],
@@ -34,6 +34,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class SearchComponent implements OnInit, OnDestroy {
   keyword: string = '';
   selectedCategory: string = '';
+  searchType: 'recipe' | 'author' = 'recipe';
   categories: Category[] = [];
   
   // NgRx observables
@@ -54,6 +55,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   private categorySubject = new Subject<string>();
   private pageSubject = new Subject<number>();
   private destroy$ = new Subject<void>();
+  private subscriptions: Subscription[] = [];
   
   // Pagination
   pageSize = 8;
@@ -92,12 +94,24 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.currentPage = paginatedRecipes.current_page;
           this.totalPages = paginatedRecipes.total_pages;
           this.updateVisiblePages();
+          
+          
           return paginatedRecipes.data;
         } else if (searchResults.length > 0) {
           // Fallback to search results
+          this.currentPage = 1;
+          this.totalPages = 1;
+          this.updateVisiblePages();
+          
+          
           return searchResults;
         } else {
-          // Fallback to all recipes
+          // Fallback to all recipes (initial state)
+          this.currentPage = 1;
+          this.totalPages = 1;
+          this.updateVisiblePages();
+          
+          
           return allRecipes;
         }
       })
@@ -105,16 +119,24 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Load all recipes initially
-    this.store.dispatch(RecipeActions.loadAllRecipes());
+    // Load all recipes initially with pagination
+    this.store.dispatch(RecipeActions.loadPaginatedRecipes({
+      page: 1,
+      size: this.pageSize,
+      orderBy: 'created_at',
+      order: 'DESC'
+    }));
 
     // Load categories from RecipeService
-    this.recipeService.getCategories().subscribe({
-      next: (response: any) => {
-        this.categories = response.data;
-      },
-      error: (error: any) => console.error('Error loading categories:', error),
-    });
+    this.subscriptions.push(
+      this.recipeService.getCategories().subscribe({
+        next: (response: any) => {
+          this.categories = response.data;
+        },
+        error: (error: any) => console.error('Error loading categories:', error),
+      })
+    );
+
 
     // Setup reactive search with debouncing
     this.setupReactiveSearch();
@@ -123,44 +145,39 @@ export class SearchComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions = [];
+    this.store.dispatch(RecipeActions.clearSearchResults());
   }
 
   private setupReactiveSearch() {
-    // Debounced search for keyword changes
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      this.performSearch();
-    });
-
-    // Immediate search for category changes
-    this.categorySubject.pipe(
-      distinctUntilChanged(),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      this.performSearch();
-    });
+    // Remove automatic search on input changes
+    // Only search when explicitly triggered by user actions
 
     // Subscribe to search errors for better error handling
-    this.searchError$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(error => {
-      if (error) {
-        console.error('Search error:', error);
-        // You can add toast notification or other error handling here
-      }
-    });
+    this.subscriptions.push(
+      this.searchError$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(error => {
+        if (error) {
+          console.error('Search error:', error);
+          // You can add toast notification or other error handling here
+        }
+      })
+    );
 
     // Subscribe to search loading state
-    this.searchLoading$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(loading => {
-      if (loading) {
-        console.log('Search in progress...');
-      }
-    });
+    this.subscriptions.push(
+      this.searchLoading$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(loading => {
+        if (loading) {
+          // Search in progress
+        }
+      })
+    );
   }
 
   updateVisiblePages() {
@@ -181,7 +198,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   goToPage(page: number) {
     this.currentPage = page;
-    this.performSearch();
+    this.performSearch(false); // Don't reset page when paginating
+    this.scrollToTop(); // Scroll to top when changing page
   }
 
   prevPage() {
@@ -194,31 +212,57 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onSearch() {
     this.performSearch();
+    this.scrollToTop(); // Scroll to top when performing new search
   }
 
   onKeywordChange() {
-    this.searchSubject.next(this.keyword);
+    // Remove automatic search - only update the keyword value
+    // Search will be triggered only when user clicks Search button
   }
 
   onCategoryChange() {
-    this.categorySubject.next(this.selectedCategory);
+    // Remove automatic search - only update the category value
+    // Search will be triggered only when user clicks Search button
   }
 
-  private performSearch() {
-    // Check if keyword starts with "author:" to search by author
-    let query = this.keyword;
-    let author = '';
+  onSearchTypeChange() {
+    // Clear category when switching to author search
+    if (this.searchType === 'author') {
+      this.selectedCategory = '';
+    }
+  }
+
+  getSearchPlaceholder(): string {
+    return this.searchType === 'author' 
+      ? 'Enter author username...' 
+      : 'Search recipes by name, ingredients...';
+  }
+
+  private performSearch(resetPage: boolean = true) {
+    // Reset to first page when performing new search (not when paginating)
+    if (resetPage) {
+      this.currentPage = 1;
+    }
     
-    if (this.keyword.toLowerCase().startsWith('author:')) {
-      // Extract author name after "author:"
-      author = this.keyword.substring(7).trim();
-      query = ''; // Clear query when searching by author
+    // Determine search parameters based on search type
+    let query = '';
+    let author = '';
+    let category = '';
+    
+    if (this.searchType === 'author') {
+      // Search by author
+      author = this.keyword.trim();
+      category = ''; // Don't use category filter when searching by author
+    } else {
+      // Search by recipe
+      query = this.keyword.trim();
+      category = this.selectedCategory;
     }
     
     this.store.dispatch(
       RecipeActions.searchRecipes({
         query: query,
-        category: this.selectedCategory,
+        category: category,
         author: author,
         page: this.currentPage,
         size: this.pageSize,
@@ -229,13 +273,40 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   clearSearch() {
+    // Reset form fields
     this.keyword = '';
     this.selectedCategory = '';
+    this.searchType = 'recipe';
+    
+    // Reset pagination
+    this.currentPage = 1;
+    this.totalPages = 0;
+    this.visiblePages = [];
+    this.showEllipsis = false;
+    
+    // Clear search results first
     this.store.dispatch(RecipeActions.clearSearchResults());
+    
+    // Then reload all recipes with pagination to get back to initial state
+    setTimeout(() => {
+      this.store.dispatch(RecipeActions.loadPaginatedRecipes({
+        page: 1,
+        size: this.pageSize,
+        orderBy: 'created_at',
+        order: 'DESC'
+      }));
+    }, 100);
+    
+    this.scrollToTop(); // Scroll to top when clearing search
   }
 
   loadInitialRecipes() {
-    this.store.dispatch(RecipeActions.loadAllRecipes());
+    this.store.dispatch(RecipeActions.loadPaginatedRecipes({
+      page: 1,
+      size: this.pageSize,
+      orderBy: 'created_at',
+      order: 'DESC'
+    }));
   }
 
   // Get loading state
@@ -273,7 +344,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           const results = searchResults.length > 0 ? searchResults : allRecipes;
           return {
             totalResults: results.length,
-            currentQuery: query,
+            currentQuery: searchResults.length > 0 ? query : '', // Only show query if we have search results
             isLoading: loading,
             hasError: !!error,
             errorMessage: error,
@@ -285,16 +356,61 @@ export class SearchComponent implements OnInit, OnDestroy {
     );
   }
 
+  // Methods for card functionality
   toggleFavorite(recipe: Recipe) {
     // TODO: Dispatch action để cập nhật trạng thái yêu thích
   }
 
   shareRecipe(recipe: Recipe) {
-    console.log(`Sharing recipe: ${recipe.title}`);
+    const url = `${window.location.origin}/recipe-detail/${recipe.id}`;
+    const title = recipe.title || 'YumShare Recipe';
+    const text = `Check out this recipe: ${title}`;
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => {
+          // Share failed - could show toast notification
+        });
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
   }
 
   viewRecipe(recipeId: string) {
     this.store.dispatch(RecipeActions.loadRecipeById({ id: recipeId }));
-    this.router.navigate(['/recipes', recipeId]);
+    this.router.navigate(['/recipe-detail', recipeId]);
+  }
+
+  getDifficultyLabel(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
+    return difficulty || 'Unknown';
+  }
+
+  getDifficultyClass(difficulty: any): string {
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'easy';
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'medium';
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'hard';
+    return '';
+  }
+
+  private scrollToTop() {
+    // Scroll to top of the search container
+    const searchContainer = document.getElementById('search-container');
+    if (searchContainer) {
+      searchContainer.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    } else {
+      // Fallback: scroll to top of window
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+      });
+    }
   }
 }

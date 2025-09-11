@@ -1,0 +1,228 @@
+// ===== DESIGN SYSTEM MIXINS =====
+// File này chứa các mixins và utility classes để sử dụng với @use
+
+// ===== SPACING SYSTEM =====
+:root {
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+}
+
+// ===== BORDER RADIUS SYSTEM =====
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 20px;
+  --radius-round: 50%;
+}
+
+// ===== BUTTON COMPONENT SYSTEM =====
+
+// Base button mixin
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--mat-sys-plain-font-family);
+  font-weight: var(--mat-sys-medium-font-weight);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  &:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+// Button style variants
+@mixin button-primary {
+  @include button-base;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(141, 198, 63, 0.2);
+  
+  &:hover:not(:disabled) {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 8px rgba(141, 198, 63, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(141, 198, 63, 0.2);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  
+  &:hover:not(:disabled) {
+    background: var(--primary-lighter);
+    color: var(--primary-dark);
+  }
+  
+  &:active {
+    background: var(--primary-light);
+  }
+}
+
+@mixin button-outline {
+  @include button-base;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  
+  &:hover:not(:disabled) {
+    background: var(--surface-variant);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+  
+  &:active {
+    background: var(--primary-lighter);
+  }
+}
+
+@mixin button-danger {
+  @include button-base;
+  background: var(--error);
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+  
+  &:hover:not(:disabled) {
+    background: var(--error-dark);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+  }
+}
+
+@mixin button-success {
+  @include button-base;
+  background: var(--success);
+  color: white;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+  
+  &:hover:not(:disabled) {
+    background: var(--success-dark);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+  }
+}
+
+// ===== INPUT COMPONENT SYSTEM =====
+
+@mixin input-base {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font: var(--mat-sys-body-large);
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: border-color var(--animation-duration-fast) var(--animation-easing);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(141, 198, 63, 0.1);
+  }
+  
+  &::placeholder {
+    color: var(--text-muted);
+  }
+  
+  &:disabled {
+    background: var(--surface-variant);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+}
+
+// ===== CARD COMPONENT SYSTEM =====
+
+@mixin card-base {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-light);
+  overflow: hidden;
+  transition: all var(--animation-duration-medium) var(--animation-easing);
+}
+
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--primary-light);
+  }
+}
+
+// ===== UTILITY CLASSES =====
+// Note: Utility classes are available but prefer using CSS properties directly
+// to avoid @extend issues with @use
+
+.flex { display: flex !important; }
+.flex-col { flex-direction: column !important; }
+.flex-row { flex-direction: row !important; }
+.items-center { align-items: center !important; }
+.items-start { align-items: flex-start !important; }
+.items-end { align-items: flex-end !important; }
+.justify-center { justify-content: center !important; }
+.justify-between { justify-content: space-between !important; }
+.justify-start { justify-content: flex-start !important; }
+.justify-end { justify-content: flex-end !important; }
+.justify-around { justify-content: space-around !important; }
+.justify-evenly { justify-content: space-evenly !important; }
+
+// Spacing utilities
+.p-xs { padding: var(--spacing-xs) !important; }
+.p-sm { padding: var(--spacing-sm) !important; }
+.p-md { padding: var(--spacing-md) !important; }
+.p-lg { padding: var(--spacing-lg) !important; }
+.p-xl { padding: var(--spacing-xl) !important; }
+
+.m-xs { margin: var(--spacing-xs) !important; }
+.m-sm { margin: var(--spacing-sm) !important; }
+.m-md { margin: var(--spacing-md) !important; }
+.m-lg { margin: var(--spacing-lg) !important; }
+.m-xl { margin: var(--spacing-xl) !important; }
+
+// Border radius utilities
+.rounded-sm { border-radius: var(--radius-sm) !important; }
+.rounded-md { border-radius: var(--radius-md) !important; }
+.rounded-lg { border-radius: var(--radius-lg) !important; }
+.rounded-xl { border-radius: var(--radius-xl) !important; }
+.rounded-xxl { border-radius: var(--radius-xxl) !important; }
+.rounded-round { border-radius: var(--radius-round) !important; }

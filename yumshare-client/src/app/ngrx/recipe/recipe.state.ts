@@ -36,19 +36,19 @@ export interface RecipeState {
   getRecipesByCategoryLoading: boolean;
   getRecipesByCategoryError: string | null;
 
-  getRecipesByCategoryMainCourses: Recipe[] | null;
+  getRecipesByCategoryMainCourses: PaginatedResponse<Recipe> | null;
   getRecipesByCategoryLoadingMainCourses: boolean;
   getRecipesByCategoryErrorMainCourses: string | null;
 
-  getRecipesByCategoryBeverages: Recipe[] | null;
+  getRecipesByCategoryBeverages: PaginatedResponse<Recipe> | null;
   getRecipesByCategoryLoadingBeverages: boolean;
   getRecipesByCategoryErrorBeverages: string | null;
 
-  getRecipesByCategoryDesserts: Recipe[] | null;
+  getRecipesByCategoryDesserts: PaginatedResponse<Recipe> | null;
   getRecipesByCategoryLoadingDesserts: boolean;
   getRecipesByCategoryErrorDesserts: string | null;
 
-  getRecipesByCategorySnacks: Recipe[] | null;
+  getRecipesByCategorySnacks: PaginatedResponse<Recipe> | null;
   getRecipesByCategoryLoadingSnacks: boolean;
   getRecipesByCategoryErrorSnacks: string | null;
 

@@ -6,7 +6,7 @@
       [searchResults]="searchResults"
       [showSearchResults]="showSearchResults"
       [loading]="loading"
-      [currentUser]="currentUser"
+      [currentUser]="mineProfile"
       (chatSelected)="selectChat($event)"
       (userSelected)="startOrSelectChat($event)"
       (searchQueryChanged)="searchQuery = $event; searchUsers()">
@@ -19,7 +19,7 @@
       <app-chat-window
         [chat]="selectedChat"
         [messages]="messages"
-        [currentUser]="currentUser"
+        [currentUser]="mineProfile"
         [otherUser]="getOtherUser(selectedChat)"
         (back)="selectedChat = null"
         (sendMessage)="handleSendMessage($event)"
@@ -28,10 +28,9 @@
     } @else {
       <div class="empty-chat">
         <div class="empty-chat-icon">💬</div>
-        <h2>Select a conversation</h2>
-        <p>Choose a chat from the sidebar to start messaging</p>
+        <h2>{{ 'Select a conversation' | translate }}</h2>
+        <p>{{ 'Choose a chat from the sidebar to start messaging' | translate }}</p>
       </div>
     }
   </div>
-
 </div>

@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { NotificationService, CreateNotificationDto } from './notification.service';
 import { NotificationType } from '../../models/notification.model';
+import {TranslateService, _} from "@ngx-translate/core";
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationHelperService {
+  private translate = inject(TranslateService);
+
   constructor(private notificationService: NotificationService) {}
 
   /**
@@ -128,15 +131,18 @@ export class NotificationHelperService {
    * Tạo notification khi có tin nhắn mới
    */
   createNewMessageNotification(recipientId: string, senderName: string, messageContent: string, chatId: string): void {
-    const notification: CreateNotificationDto = {
+   this.translate.get(_('sent_you_a_message')).subscribe((res: string) => {
+    console.log(res);
+    
+      const notification: CreateNotificationDto = {
       user_id: recipientId,
       type: NotificationType.SYSTEM, // Hoặc tạo type MESSAGE mới
-      content: `${senderName} sent you a message: ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`,
+      content: `${senderName} ${res} ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`,
       metadata: { chat_id: chatId }
     };
-    
     this.notificationService.createNotification(notification).subscribe({
       error: (err) => console.error('Error creating message notification:', err)
+    });
     });
   }
 

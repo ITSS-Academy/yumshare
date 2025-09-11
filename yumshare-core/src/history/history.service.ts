@@ -27,11 +27,42 @@ export class HistoryService {
   }
 
   findAll() {
-    return this.historyRepository.find({ relations: ['user', 'recipe'] });
+    return this.historyRepository.find({ 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   findOne(id: string) {
-    return this.historyRepository.findOne({ where: { id }, relations: ['user', 'recipe'] });
+    return this.historyRepository.findOne({ 
+      where: { id }, 
+      relations: ['user', 'recipe'],
+      select: {
+        id: true,
+        user: {
+          id: true,
+          username: true,
+          avatar_url: true
+        },
+        recipe: {
+          id: true,
+          title: true,
+          image_url: true
+        }
+      }
+    });
   }
 
   async update(id: string, updateDto: UpdateHistoryDto) {
