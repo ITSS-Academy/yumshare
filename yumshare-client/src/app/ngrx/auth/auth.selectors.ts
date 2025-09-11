@@ -68,3 +68,27 @@ export const selectUserFullName = createSelector(
   selectCurrentUser,
   (user) => user?.displayName
 );
+
+// Select mine profile username
+export const selectMineProfileUsername = createSelector(
+  selectMineProfile,
+  (profile) => profile?.username
+);
+
+// Select mine profile avatar
+export const selectMineProfileAvatar = createSelector(
+  selectMineProfile,
+  (profile) => profile?.avatar_url
+);
+
+// Select mine profile email
+export const selectMineProfileEmail = createSelector(
+  selectMineProfile,
+  (profile) => profile?.email
+);
+
+// Select is authenticated based on mine profile
+export const selectIsAuthenticatedByProfile = createSelector(
+  selectMineProfile,
+  (profile) => !!(profile && profile.id)
+);

@@ -45,4 +45,14 @@ export class CommentsController {
   remove(@Param('id') id: string) {
     return this.commentsService.remove(id);
   }
+
+  @Get('debug/recipe/:id')
+  async debugRecipe(@Param('id') id: string) {
+    return this.commentsService.debugRecipe(id);
+  }
+
+  @Post('debug/test-notification')
+  async testNotification(@Body() body: { userId: string, recipeId: string }) {
+    return this.commentsService.testNotification(body.userId, body.recipeId);
+  }
 }

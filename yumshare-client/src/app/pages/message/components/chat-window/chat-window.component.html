@@ -2,7 +2,7 @@
   <!-- Chat Header -->
   <div class="chat-header">
     <div class="chat-user-info">
-      <button class="back-btn" (click)="onBack()">←</button>
+      <button class="back-btn" (click)="onBack()"><mat-icon>arrow_back</mat-icon></button>
       <img
         [src]="safeAvatar(otherUser?.avatar_url)"
         [alt]="otherUser?.username"
@@ -88,7 +88,7 @@
     } @else {
       <!-- No messages state -->
       <div class="no-messages">
-        <div class="no-messages-icon">💬</div>
+        <mat-icon>message</mat-icon>
         <p>No messages yet. Start the conversation!</p>
       </div>
     }
@@ -110,7 +110,7 @@
         [disabled]="!newMessage.trim()"
         class="send-btn"
       >
-        ➤
+        <mat-icon>send</mat-icon>
       </button>
     </div>
   </div>

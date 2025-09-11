@@ -38,8 +38,10 @@
 
       <router-outlet></router-outlet>
 
-      <!-- Footer -->
-      <app-footer></app-footer>
+      <!-- Footer - Hidden on message page -->
+      @if (!isMessagePage()) {
+        <app-footer></app-footer>
+      }
     </div>
   </div>
 </div>

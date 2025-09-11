@@ -38,7 +38,9 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
   }
 
   @SubscribeMessage('join')
-  handleJoin(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
+  handleJoin(@MessageBody() data: string | { userId: string }, @ConnectedSocket() client: Socket) {
+    // Handle both formats: direct userId string or { userId: string } object
+    const userId = typeof data === 'string' ? data : data.userId;
     this.connectedUsers.set(userId, client.id);
     client.join(userId);
   }

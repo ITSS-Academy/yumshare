@@ -33,6 +33,7 @@ import { selectRecipeLikeCount } from '../../ngrx/likes/likes.selectors';
 })
 export class CardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() cardData: any[] = [];
+  @Input() layout: 'carousel' | 'grid' = 'carousel';
   
   // NgRx observables
   currentUserId$: Observable<string | undefined>;
@@ -90,11 +91,12 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
     combineLatest([
       this.cardDataSubject.asObservable(),
       this.currentUserId$
-    ]).pipe(
+    ]    ).pipe(
       takeUntil(this.destroy$),
-      distinctUntilChanged((prev, curr) => 
-        JSON.stringify(prev[0]) === JSON.stringify(curr[0]) && prev[1] === curr[1]
-      ),
+      // Remove distinctUntilChanged to ensure all updates are processed
+      // distinctUntilChanged((prev, curr) => 
+      //   JSON.stringify(prev[0]) === JSON.stringify(curr[0]) && prev[1] === curr[1]
+      // ),
       switchMap(([cardData, userId]) => {
         if (!cardData || cardData.length === 0) {
           return [];
@@ -221,7 +223,6 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
       this.showLoginPrompt();
       return;
     }
-
     // Dispatch toggle favorite action
     this.store.dispatch(FavoriteActions.toggleFavorite({
       userId: this.currentUserId,

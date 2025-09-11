@@ -1,7 +1,6 @@
 import { ApplicationConfig, provideZoneChangeDetection, ErrorHandler } from '@angular/core';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { GlobalErrorHandler } from './services/error-handler/global-error-handler.service';
 import { httpErrorInterceptor } from './services/error-handler/http-error.interceptor';
 import { authInterceptor } from './services/auth/auth.interceptor';
 

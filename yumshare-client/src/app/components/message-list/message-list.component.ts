@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { Notification, NotificationType } from '../../models/notification.model';
 import { NotificationService } from '../../services/notification/notification.service';
 import { SocketService } from '../../services/socket/socket.service';
+import { LocalTimePipe } from '../../pipes/local-time.pipe';
 
 @Component({
   selector: 'app-message-list',
@@ -20,7 +21,8 @@ import { SocketService } from '../../services/socket/socket.service';
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    LocalTimePipe
   ],
   templateUrl: './message-list.component.html',
   styleUrl: './message-list.component.scss'

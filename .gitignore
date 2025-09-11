@@ -55,11 +55,9 @@ Thumbs.db
 /.env.production.local
 /.env.local
 
-# Google Cloud credentials - THÊM VÀO ĐÂY
+# Google Cloud credentials
 yumshare-core/src/config/private-key.json
 **/private-key.json
 **/service-account.json
 **/credentials.json
-**/config/*.json"yumshare-core/src/config/private-key.json" 
-"yumshare-core/src/config/private-key.json" 
-"src/config/*.json" 
+**/config/*.json 

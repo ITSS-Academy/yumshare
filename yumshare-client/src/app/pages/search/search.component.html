@@ -99,42 +99,7 @@
   }
 
   <div class="results-grid-wrapper">
-    <div class="results-grid" id="results-grid">
-      @for (recipe of displayedResults$ | async; track recipe.id) {
-        <div class="recipe-card" (click)="viewRecipe(recipe.id)">
-          <img [src]="recipe.image_url || 'https://via.placeholder.com/260x180'" 
-               [alt]="recipe.title" 
-               class="recipe-image">
-          <div class="recipe-content">
-            <h3 class="recipe-title">{{ recipe.title }}</h3>
-            <p class="recipe-description">{{ recipe.description || 'No description available' }}</p>
-            <div class="recipe-info">
-              <span class="difficulty" [ngClass]="getDifficultyClass(recipe.difficulty)">
-                {{ getDifficultyLabel(recipe.difficulty) }}
-              </span>
-              <span class="cooking-time">
-                <mat-icon>schedule</mat-icon>
-                {{ recipe.total_cooking_time }} min
-              </span>
-            </div>
-            <div class="recipe-footer">
-              <div class="user-info">
-                <img [src]="recipe.user?.avatar_url || 'assets/default-avatar.png'" 
-                     [alt]="recipe.user?.username" 
-                     class="user-avatar">
-                <span class="username">{{ recipe.user?.username || 'Unknown User' }}</span>
-              </div>
-              <div class="actions">
-                <mat-icon (click)="toggleFavorite(recipe); $event.stopPropagation()" 
-                         class="favorite-icon">favorite_border</mat-icon>
-                <mat-icon (click)="shareRecipe(recipe); $event.stopPropagation()" 
-                         class="share-icon">share</mat-icon>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
+    <app-card [cardData]="displayedResults$ | async" layout="grid"></app-card>
   </div>
 
   @if (searchResults$ | async; as searchResults) {

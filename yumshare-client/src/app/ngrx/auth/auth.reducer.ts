@@ -15,102 +15,72 @@ export const initialState: AuthState = {
 export const authReducer = createReducer(
   initialState,
 
-  on(AuthActions.login, (state,{type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      isLoading: true,
-      error: null
-    }
-  }),
+  on(AuthActions.login, (state) => ({
+    ...state,
+    isLoading: true,
+    error: null
+  })),
 
-  on(AuthActions.storeCurrentUser, (state,{idToken,currentUser,type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      currentUser: currentUser,
-      idToken: idToken,
-      isLoading: false,
-      error: null
-    }
-  }),
+  on(AuthActions.storeCurrentUser, (state, {idToken, currentUser}) => ({
+    ...state,
+    currentUser: currentUser,
+    idToken: idToken,
+    isLoading: false,
+    error: null
+  })),
 
-  on(AuthActions.loginFailure, (state,{type, error}) =>{
-    console.log(type);
-    console.log(error)
-    return {
-      ...state,
-      isLoading: false,
-      error: error
-    }
-  }),
+  on(AuthActions.loginFailure, (state, {error}) => ({
+    ...state,
+    isLoading: false,
+    error: error
+  })),
 
-  on(AuthActions.loginSuccess, (state,{type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      isLoading: false,
-      error: null
-    }
-  }),
+  on(AuthActions.loginSuccess, (state) => ({
+    ...state,
+    isLoading: false,
+    error: null
+  })),
 
-  on(AuthActions.logout, (state,{type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      isLoading: true,
-      error: null
-    }
-  }),
+  on(AuthActions.logout, (state) => ({
+    ...state,
+    isLoading: true,
+    error: null
+  })),
 
-  on(AuthActions.logoutSuccess, (state,{type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      idToken: '',
-      isLoading: false,
-      error: null
-    }
-  }),
+  on(AuthActions.logoutSuccess, (state) => ({
+    ...state,
+    idToken: '',
+    isLoading: false,
+    error: null
+  })),
 
-  on(AuthActions.logoutFailure, (state, {error, type}) => {
-    console.log(type);
-    return {
-      ...state,
-      isLoading: false,
-      error: error
-    }
-  }),
+  on(AuthActions.logoutFailure, (state, {error}) => ({
+    ...state,
+    isLoading: false,
+    error: error
+  })),
 
-  on(AuthActions.clearAuthState, (state,{type})=>{
-    console.log(type);
-    return {
-      ...state,
-      currentUser: <AuthModel>{},
-      idToken: '',
-      isLoading: false,
-      error: null
-    }
-  }),
+  on(AuthActions.clearAuthState, (state) => ({
+    ...state,
+    currentUser: <AuthModel>{},
+    mineProfile: <User>{},
+    idToken: '',
+    isLoading: false,
+    error: null
+  })),
 
-  on(AuthActions.getMineProfile, (state,{type}) =>{
-    console.log(type);
-    return {
-      ...state,
-      isLoading: true,
-      error: null
-    }
-  }),
+  on(AuthActions.getMineProfile, (state) => ({
+    ...state,
+    isLoading: true,
+    error: null
+  })),
 
-  on(AuthActions.getMineProfileSuccess, (state,{type,mineProfile}) =>{
-    console.log(type);
-    return {
-      ...state,
-      mineProfile: mineProfile,
-      isLoading: false,
-      error: null
-    }
-  }),
+  on(AuthActions.getMineProfileSuccess, (state, {mineProfile}) => ({
+    ...state,
+    mineProfile: mineProfile,
+    isLoading: false,
+    error: null
+  })),
 
   on(AuthActions.getMineProfileFailure, (state,{type,error}) =>{
     console.log(type);

@@ -26,6 +26,13 @@ export class Notification {
   @Column({ default: false })
   is_read: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ 
+    type: 'timestamp with time zone', 
+    default: () => "timezone('Asia/Ho_Chi_Minh', now())",
+    transformer: {
+      to: (value: Date) => value,
+      from: (value: Date) => value ? new Date(value.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })) : value
+    }
+  })
   created_at: Date;
 } 

@@ -19,10 +19,6 @@ import { take } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import { Category } from '../../models/category.model';
 import { Recipe } from '../../models/recipe.model';
-import { RecipeStep } from '../../models/recipe-step.model';
-import { PaginatedResponse } from '../../models/paginated-response.model';
-
-import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { User } from '../../models/user.model';
@@ -186,41 +182,24 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     return item?.value?.step_number || index;
   }
 
-  // Method to sync stepsData with FormArray
-  syncStepsWithFormArray() {
-    // Clear existing FormArray
-    this.steps.clear();
-    
-    // Rebuild FormArray from stepsData
-    this.stepsData.forEach((step, index) => {
-      this.steps.push(this.fb.group({
-        step_number: [step.step_number || index + 1],
-        description: [step.description, [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
-        cooking_time: [step.cooking_time || 0, [Validators.min(0), Validators.max(300)]],
-        tips: [step.tips || '', Validators.maxLength(200)]
-      }));
-    });
-  }
 
-  // Handle step description change
-  onStepDescriptionChange(index: number, value: string) {
-    if (this.stepsData[index]) {
-      this.stepsData[index].description = value;
-    }
+  // Method to sync FormArray data to stepsData
+  syncFormArrayToStepsData() {
+    this.stepsData = this.steps.controls.map((stepControl, index) => ({
+      step_number: index + 1,
+      description: stepControl.get('description')?.value || '',
+      cooking_time: stepControl.get('cooking_time')?.value || 0,
+      tips: stepControl.get('tips')?.value || ''
+    }));
   }
 
   // Debug method to check form validation status
   private logFormValidationStatus() {
- 
-    
     // Log each step validation
     this.steps.controls.forEach((step, index) => {
-      console.log(`Step ${index + 1} valid:`, step.valid);
-      console.log(`Step ${index + 1} errors:`, step.errors);
+      // Step validation checked
     });
   }
-
-
 
   loadCategories() {
     // First check if categories are already in store
@@ -303,18 +282,14 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
   loadMineProfile() {
     const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
-      console.log('Mine profile received in edit-recipe:', profile);
+      // Mine profile received in edit-recipe
       
       if (profile && profile.id) {
         this.mineProfile = profile;
-        console.log('Profile loaded successfully in edit-recipe:', {
-          id: this.mineProfile.id,
-          username: this.mineProfile.username,
-          email: this.mineProfile.email
-        });
+        // Profile loaded successfully in edit-recipe
       } else {
         this.mineProfile = null;
-        console.log('No profile found in auth state for edit-recipe');
+        // No profile found in auth state for edit-recipe
       }
     });
     
@@ -334,7 +309,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
           take(1)
         ).subscribe((authState: any) => {
           if (authState.currentUser && authState.currentUser.uid) {
-            console.log('✅ Using profile from store for permission check:', authState.currentUser.uid);
+            // console.log('✅ Using profile from store for permission check:', authState.currentUser.uid);
             this.recipeService.checkEditPermission(this.recipeId!, authState.idToken).subscribe({
               next: (permissionResponse) => {
                 if (!permissionResponse.canEdit) {
@@ -348,24 +323,24 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
                 this.loading = false;
               },
               error: (error) => {
-                console.error('Error checking edit permission:', error);
+                // console.error('Error checking edit permission:', error);
                 // Tạm thời bỏ qua lỗi auth và cho phép edit
                 // TODO: Sửa vấn đề auth middleware
-                console.warn('Skipping permission check due to auth error, allowing edit');
+                // console.warn('Skipping permission check due to auth error, allowing edit');
                 this.populateFormAfterCategoriesLoaded(recipe);
                 this.loading = false;
               }
             });
           } else {
             // Không có profile trong store, bỏ qua permission check
-            console.warn('No profile in store, skipping permission check');
+            // console.warn('No profile in store, skipping permission check');
             this.populateFormAfterCategoriesLoaded(recipe);
             this.loading = false;
           }
         });
       },
       error: (error: any) => {
-        console.error('Error loading recipe:', error);
+        // console.error('Error loading recipe:', error);
         
         // Xử lý lỗi permission từ backend
         if (error.status === 401) {
@@ -387,15 +362,15 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
   }
 
   private populateFormAfterCategoriesLoaded(recipe: Recipe) {
-    console.log('📝 [EDIT-RECIPE] Waiting for categories to load before populating form...');
+    // console.log('📝 [EDIT-RECIPE] Waiting for categories to load before populating form...');
     
     // Wait for categories to be loaded
     const checkCategories = () => {
       if (this.categories && this.categories.length > 0) {
-        console.log('✅ [EDIT-RECIPE] Categories loaded, now populating form');
+        // console.log('✅ [EDIT-RECIPE] Categories loaded, now populating form');
         this.populateForm(recipe);
       } else {
-        console.log('⏳ [EDIT-RECIPE] Categories not ready yet, waiting...');
+        // console.log('⏳ [EDIT-RECIPE] Categories not ready yet, waiting...');
         setTimeout(checkCategories, 100);
       }
     };
@@ -496,7 +471,10 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
   addStep() {
     const stepNumber = this.steps.length + 1;
-    this.steps.push(this.createStepFormGroup(stepNumber));
+    
+    // Create new FormGroup for the step
+    const newStepFormGroup = this.createStepFormGroup(stepNumber);
+    this.steps.push(newStepFormGroup);
     
     // Also update stepsData to keep UI in sync
     this.stepsData.push({
@@ -508,6 +486,11 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     
     // Force change detection
     this.cdr.detectChanges();
+    
+    // Mark the new step as touched to show validation
+    setTimeout(() => {
+      newStepFormGroup.get('description')?.markAsTouched();
+    }, 0);
   }
 
   removeStep(index: number) {
@@ -700,16 +683,6 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Image event handlers
-  onImageLoad() {
-    // Image loaded successfully
-  }
-
-  onImageError(event: Event) {
-    const target = event.target as HTMLImageElement;
-    // Use data URI instead of external placeholder
-    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhaWxlZCB0byBMb2FkPC90ZXh0Pjwvc3ZnPg==';
-  }
 
   onImageClick() {
     this.imageInput.nativeElement.click();
@@ -773,20 +746,25 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     }
 
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được edit
-    if (this.originalRecipe && this.originalRecipe.user_id !== this.mineProfile.id) {
+    const recipeUserId = this.originalRecipe?.user?.id;
+    
+    if (this.originalRecipe && recipeUserId !== this.mineProfile.id) {
       this.snackBar.open('You do not have permission to edit this recipe', 'Close', { duration: 3000 });
       return;
     }
     
-    // Sync stepsData with FormArray before validation
-    this.syncStepsWithFormArray();
+    // Sync FormArray data to stepsData before validation and submission
+    this.syncFormArrayToStepsData();
     
     // Debug: Log validation status
     this.logFormValidationStatus();
     
-    // Check if stepsData has valid descriptions
-    const hasValidSteps = this.stepsData.length > 0 && 
-                         this.stepsData.every(step => step.description && step.description.trim() !== '');
+    // Check if FormArray has valid steps
+    const hasValidSteps = this.steps.length > 0 && 
+                         this.steps.controls.every(stepControl => {
+                           const description = stepControl.get('description');
+                           return description?.value && description.value.trim() !== '';
+                         });
     
     if (this.recipeForm.valid && hasValidSteps) {
       this.uploading = true;
@@ -823,14 +801,27 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
 
 
         
+        // Get idToken from store
+        const authState = await this.store.select('auth').pipe(take(1)).toPromise();
+        
+        if (!authState?.idToken) {
+          this.snackBar.open('Authentication token not found', 'Close', { duration: 3000 });
+          return;
+        }
+        
         // Update recipe
-        const response = await this.recipeService.updateRecipeWithFiles(this.recipeId, formData).toPromise();
+        const response = await this.recipeService.updateRecipeWithFiles(this.recipeId, authState.idToken, formData).toPromise();
         
         this.snackBar.open('Recipe updated successfully!', 'Close', { duration: 3000 });
-        this.router.navigate(['/recipe', this.recipeId]);
+        
+        // Navigate to my-recipe page
+        this.router.navigate(['/my-recipe']).catch(navError => {
+          // Fallback navigation to home
+          this.router.navigate(['/']);
+        });
         
       } catch (error) {
-        console.error('Error updating recipe:', error);
+        // console.error('Error updating recipe:', error);
         this.snackBar.open('Error updating recipe. Please try again.', 'Close', { duration: 3000 });
       } finally {
         this.uploading = false;
@@ -847,73 +838,73 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async submitRecipe() {
-    // Sync stepsData with FormArray before validation
-    this.syncStepsWithFormArray();
+  // private async submitRecipe() {
+  //   // Sync stepsData with FormArray before validation
+  //   this.syncStepsWithFormArray();
     
-    // Debug: Log validation status
-    this.logFormValidationStatus();
+  //   // Debug: Log validation status
+  //   this.logFormValidationStatus();
     
-    // Check if stepsData has valid descriptions
-    const hasValidSteps = this.stepsData.length > 0 && 
-                         this.stepsData.every(step => step.description && step.description.trim() !== '');
+  //   // Check if stepsData has valid descriptions
+  //   const hasValidSteps = this.stepsData.length > 0 && 
+  //                        this.stepsData.every(step => step.description && step.description.trim() !== '');
     
-    if (this.recipeForm.valid && hasValidSteps) {
-      this.uploading = true;
+  //   if (this.recipeForm.valid && hasValidSteps) {
+  //     this.uploading = true;
       
-      try {
-        // Create FormData for file uploads
-        const formData = new FormData();
+  //     try {
+  //       // Create FormData for file uploads
+  //       const formData = new FormData();
         
-        // Add recipe data
-        const recipeData = this.recipeForm.value;
-        formData.append('title', recipeData.title);
-        formData.append('description', recipeData.description);
-        formData.append('servings', recipeData.servings.toString());
-        formData.append('total_cooking_time', recipeData.total_cooking_time.toString());
-        formData.append('difficulty', recipeData.difficulty);
-        formData.append('country', recipeData.country);
-        formData.append('category_id', recipeData.category_id);
+  //       // Add recipe data
+  //       const recipeData = this.recipeForm.value;
+  //       formData.append('title', recipeData.title);
+  //       formData.append('description', recipeData.description);
+  //       formData.append('servings', recipeData.servings.toString());
+  //       formData.append('total_cooking_time', recipeData.total_cooking_time.toString());
+  //       formData.append('difficulty', recipeData.difficulty);
+  //       formData.append('country', recipeData.country);
+  //       formData.append('category_id', recipeData.category_id);
         
-        // Add ingredients and steps as JSON
-        formData.append('ingredients', JSON.stringify(recipeData.ingredients));
-        formData.append('steps', JSON.stringify(this.stepsData));
+  //       // Add ingredients and steps as JSON
+  //       formData.append('ingredients', JSON.stringify(recipeData.ingredients));
+  //       formData.append('steps', JSON.stringify(this.stepsData));
         
-        // Add new image if selected
-        if (this.selectedImage) {
-          formData.append('image', this.selectedImage);
-        }
+  //       // Add new image if selected
+  //       if (this.selectedImage) {
+  //         formData.append('image', this.selectedImage);
+  //       }
         
-        // Add video (file or YouTube URL)
-        if (this.videoType === 'file' && this.selectedVideo) {
-          formData.append('video', this.selectedVideo);
-        } else if (this.videoType === 'youtube' && this.youtubeUrl) {
-          formData.append('video_url', this.youtubeUrl);
-        }
+  //       // Add video (file or YouTube URL)
+  //       if (this.videoType === 'file' && this.selectedVideo) {
+  //         formData.append('video', this.selectedVideo);
+  //       } else if (this.videoType === 'youtube' && this.youtubeUrl) {
+  //         formData.append('video_url', this.youtubeUrl);
+  //       }
 
-        // Update recipe
-        const response = await this.recipeService.updateRecipeWithFiles(this.recipeId!, formData).toPromise();
+  //       // Update recipe
+  //       const response = await this.recipeService.updateRecipeWithFiles(this.recipeId!, formData).toPromise();
         
-        this.snackBar.open('Recipe updated successfully!', 'Close', { duration: 3000 });
-        this.router.navigate(['/recipe', this.recipeId]);
+  //       this.snackBar.open('Recipe updated successfully!', 'Close', { duration: 3000 });
+  //       this.router.navigate(['/recipe', this.recipeId]);
         
-      } catch (error) {
-        console.error('Error updating recipe:', error);
-        this.snackBar.open('Error updating recipe. Please try again.', 'Close', { duration: 3000 });
-      } finally {
-        this.uploading = false;
-      }
-    } else {
-      this.markFormGroupTouched();
+  //     } catch (error) {
+  //       console.error('Error updating recipe:', error);
+  //       this.snackBar.open('Error updating recipe. Please try again.', 'Close', { duration: 3000 });
+  //     } finally {
+  //       this.uploading = false;
+  //     }
+  //   } else {
+  //     this.markFormGroupTouched();
       
-      // Check specific validation issues
-      if (!hasValidSteps) {
-        this.snackBar.open('Please fill in all step descriptions', 'Close', { duration: 3000 });
-      } else {
-        this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
-      }
-    }
-  }
+  //     // Check specific validation issues
+  //     if (!hasValidSteps) {
+  //       this.snackBar.open('Please fill in all step descriptions', 'Close', { duration: 3000 });
+  //     } else {
+  //       this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+  //     }
+  //   }
+  // }
 
   private markFormGroupTouched() {
     Object.keys(this.recipeForm.controls).forEach(key => {
@@ -1108,7 +1099,8 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     if (!this.recipeId) return;
     
     // Kiểm tra quyền: chỉ user tạo ra recipe mới được delete
-    if (!this.mineProfile || (this.originalRecipe && this.originalRecipe.user_id !== this.mineProfile.id)) {
+    const recipeUserId = this.originalRecipe?.user?.id;
+    if (!this.mineProfile || (this.originalRecipe && recipeUserId !== this.mineProfile.id)) {
       this.snackBar.open('You do not have permission to delete this recipe', 'Close', { duration: 3000 });
       return;
     }

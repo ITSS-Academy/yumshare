@@ -33,7 +33,7 @@ import { CompressionMiddleware } from './common/middleware/compression.middlewar
       database: process.env.DB_NAME || '',
       autoLoadEntities: true,
       synchronize: false, // Disable auto-sync to prevent schema conflicts
-      // Add timezone configuration
+      // Add timezone configuration for Vietnam
       extra: {
         timezone: 'Asia/Ho_Chi_Minh',
       },

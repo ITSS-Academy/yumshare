@@ -5,6 +5,7 @@ export interface FollowState {
   // Follow/Unfollow state
   isLoading: boolean;
   error: string | null;
+  unfollowSuccess: boolean;
   
   // Followers data
   followers: PaginatedResponse<Follow> | null;

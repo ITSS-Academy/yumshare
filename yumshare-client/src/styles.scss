@@ -3,6 +3,9 @@
 
 @use "@angular/material" as mat;
 
+// Import responsive design system
+@import './app/shared/styles/responsive.scss';
+
 // ===== Z-INDEX HIERARCHY SYSTEM =====
 /*
 Z-Index Scale:

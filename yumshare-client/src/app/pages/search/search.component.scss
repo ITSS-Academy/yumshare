@@ -586,73 +586,73 @@
 }
 
 // ===== RESPONSIVE DESIGN =====
+@import '../../shared/styles/responsive.scss';
 
-@media (max-width: 1200px) {
-  .results-grid {
-    grid-template-columns: repeat(3, 1fr);
+.search-container {
+  @include responsive-container;
+}
+
+.results-grid {
+  @include responsive-grid(1, 2, 3, 4);
+}
+
+.search-bar {
+  @include responsive-flex(column, row);
+  align-items: stretch;
+  max-width: 100%;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+
+  @include desktop-and-up {
+    padding: var(--spacing-md);
     gap: var(--spacing-md);
-  }
-  
-  .container-card .dish-card {
-    height: 400px;
-    
-    img {
-      height: 200px;
-    }
   }
 }
 
-@media (max-width: 1024px) {
-  .results-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-  }
-  
-  .container-card .dish-card {
-    height: 380px;
-    
-    img {
-      height: 180px;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .search-container {
-    padding: 0 var(--spacing-md);
-  }
-
-  .search-bar {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    max-width: 100%;
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-  }
-
-  .search-bar input,
-  .search-bar select {
+.search-bar input,
+.search-bar select {
+  @include mobile-only {
     width: 100%;
     min-width: auto;
     flex: 1;
   }
+  
+  @include tablet-and-up {
+    flex: 1;
+    min-width: 120px;
+  }
+}
 
-  #category-select {
+#category-select {
+  @include mobile-only {
     flex: 1;
     min-width: auto;
   }
+  
+  @include tablet-and-up {
+    flex: 1;
+    min-width: 150px;
+  }
+}
 
-  .search-type-select {
+.search-type-select {
+  @include mobile-only {
     min-width: 140px !important;
     flex: 0 0 140px;
   }
+  
+  @include tablet-and-up {
+    min-width: 160px !important;
+    flex: 0 0 160px;
+  }
+}
 
-  .search-bar button {
+.search-bar button {
+  @include responsive-button;
+  
+  @include mobile-only {
     min-width: 100px;
-    height: 44px;
-    font-size: 0.9rem;
     flex: 1;
     
     mat-icon {
@@ -660,76 +660,63 @@
       margin-right: var(--spacing-xs);
     }
   }
+  
+  @include tablet-and-up {
+    min-width: 120px;
+    flex: 0 0 auto;
+  }
+}
 
-  .pagination {
+.pagination {
+  @include mobile-only {
+    margin: var(--spacing-lg) 0;
+  }
+  
+  @include tablet-and-up {
     margin: var(--spacing-xl) 0;
   }
 }
 
-@media (max-width: 480px) {
-  .search-container {
-    padding: 0 var(--spacing-sm);
-  }
-
-  #search-title {
+#search-title {
+  @include mobile-only {
     font: var(--mat-sys-headline-medium);
   }
-
-  .results-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
   
-  .container-card .dish-card {
-    height: 360px;
+  @include tablet-and-up {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.container-card .dish-card {
+  @include mobile-only {
+    height: 300px;
     
     img {
-      height: 160px;
+      height: 150px;
     }
-    
-    .dish-title {
-      font: var(--mat-sys-title-small);
-      margin: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs);
-    }
-    
-    .dish-description {
-      font: var(--mat-sys-body-small);
-      margin: 0 var(--spacing-sm) var(--spacing-sm);
-      height: 40px;
-    }
-    
-    .dish-info-row {
-      margin: 0 var(--spacing-sm) var(--spacing-sm);
-      padding: var(--spacing-xs) var(--spacing-sm);
-    }
-    
-    .card-footer {
-      padding: var(--spacing-sm);
-    }
-  }
-
-  .pagination button {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
   }
   
-  .search-type-select {
-    min-width: 120px !important;
-    flex: 0 0 120px;
-    font-size: 0.85rem;
-  }
-
-  .search-bar button {
-    min-width: 80px;
-    height: 40px;
-    font-size: 0.85rem;
-    padding: 0 var(--spacing-sm);
-    flex: 1;
+  @include tablet-only {
+    height: 350px;
     
-    mat-icon {
-      font-size: 16px;
-      margin-right: var(--spacing-xs);
+    img {
+      height: 180px;
+    }
+  }
+  
+  @include desktop-only {
+    height: 380px;
+    
+    img {
+      height: 180px;
+    }
+  }
+  
+  @include large-desktop {
+    height: 400px;
+    
+    img {
+      height: 200px;
     }
   }
 }

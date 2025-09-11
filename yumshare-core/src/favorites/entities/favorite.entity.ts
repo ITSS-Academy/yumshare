@@ -22,6 +22,6 @@ export class Favorite {
   @JoinColumn({ name: 'recipe_id' })
   recipe: Recipe | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 }

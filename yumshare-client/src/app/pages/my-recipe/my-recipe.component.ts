@@ -172,14 +172,14 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
     // Debug: Log current user ID
     this.subscriptions.push(
       this.currentUserId$.subscribe(userId => {
-        console.log('Current User ID:', userId);
+        // Current User ID loaded
       })
     );
 
     // Debug: Log auth state
     this.subscriptions.push(
       this.isAuthenticated$.subscribe(isAuth => {
-        console.log('Is Authenticated:', isAuth);
+        // Authentication status checked
       })
     );
 
@@ -188,7 +188,7 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
       this.currentUserId$
         .pipe(filter(userId => !!userId))
         .subscribe(userId => {
-          console.log('Loading recipes for user:', userId);
+          // Loading recipes for user
           this.loadUserRecipes(userId!, this.currentFilters);
         })
     );
@@ -196,7 +196,7 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
     // Debug: Log recipes data
     this.subscriptions.push(
       this.recipes$.subscribe(recipes => {
-        console.log('Recipes data:', recipes);
+        // Recipes data loaded
       })
     );
 

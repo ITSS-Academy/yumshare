@@ -16,10 +16,7 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import { Category } from '../../models/category.model';
-import { RecipeStep } from '../../models/recipe-step.model';
-import { PaginatedResponse } from '../../models/paginated-response.model';
 import { SafePipe } from '../../pipes/safe.pipe';
-import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { User } from '../../models/user.model';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
@@ -67,7 +64,6 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   
   // Grid Multi-step properties
   currentStep: number = 1;
-
   
   private subscriptions: Subscription[] = [];
 
@@ -342,16 +338,10 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
   }
 
   loadCategories() {
-    console.log('🔄 Dispatching loadCategories action...');
-    // Dispatch action to load categories
     this.store.dispatch(CategoryActions.loadCategories());
     
-    // Subscribe to categories from store
     const categoriesSubscription = this.store.select(CategorySelectors.selectCategoryListState).subscribe({
       next: ({ categories, loading, error }) => {
-        console.log('📦 Category state received:', { categories, loading, error });
-        
-        // Check if categories is an array or has data property
         let categoriesArray: Category[] = [];
         if (Array.isArray(categories)) {
           categoriesArray = categories;
@@ -360,17 +350,12 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         }
         
         if (categoriesArray && categoriesArray.length > 0) {
-          console.log('✅ Categories loaded successfully:', categoriesArray);
           this.categories = categoriesArray;
           
-          // Set the first category as default if form is empty
           if (!this.recipeForm.get('category_id')?.value) {
             this.recipeForm.patchValue({ category_id: categoriesArray[0].id });
-            console.log('🎯 Set default category:', categoriesArray[0].id);
           }
         } else if (!loading && !error) {
-          console.log('⚠️ No categories found, using fallback');
-          // Use fallback categories if no data and not loading
           this.categories = [
             { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
             { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
@@ -397,19 +382,10 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
   loadMineProfile() {
     const profileSubscription = this.store.select(AuthSelectors.selectMineProfile).subscribe((profile: User | null) => {
-      console.log('Mine profile received:', profile);
-      
       if (profile && profile.id) {
         this.mineProfile = profile;
-        console.log('Profile loaded successfully:', {
-          id: this.mineProfile.id,
-          username: this.mineProfile.username,
-          email: this.mineProfile.email,
-          avatar_url: this.mineProfile.avatar_url
-        });
       } else {
         this.mineProfile = null;
-        console.log('No profile found in auth state');
       }
     });
     

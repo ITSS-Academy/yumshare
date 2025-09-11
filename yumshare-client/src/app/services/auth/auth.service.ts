@@ -61,4 +61,14 @@ export class AuthService {
     const user = this.auth.currentUser;
     return user ? await user.getIdToken() : null;
   }
+
+  // Upload avatar
+  uploadAvatar(userId: string, formData: FormData, idToken: string): Observable<User> {
+    return this.http.post<User>(`${environment.apiUrl}/users/${userId}/avatar`, formData, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+        // Don't set Content-Type, let browser set it with boundary for FormData
+      }
+    });
+  }
 }

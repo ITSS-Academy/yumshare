@@ -1,4 +1,4 @@
-<div class="container-card">
+<div class="container-card" [ngClass]="'layout-' + layout">
   <div class="card-carousel">
     @for (item of cardData; track item.id) {
       <mat-card class="dish-card" appearance="outlined">
@@ -40,13 +40,17 @@
             <span class="username">{{ item.user?.username }}</span>
           </div>
           <div class="actions">
-            <mat-icon 
-              (click)="getToggleError(item.id) ? clearToggleError(item.id) : toggleFavorite(item)" 
-              [style.color]="isFavorite(item.id) ? 'var(--primary)' : '#666'"
-              [style.cursor]="isToggleLoading(item.id) ? 'wait' : 'pointer'"
-              [title]="getFavoriteTooltip(item.id)">
-              {{ isToggleLoading(item.id) ? 'hourglass_empty' : (isFavorite(item.id) ? 'favorite' : 'favorite_border') }}
-            </mat-icon>
+            @if (toggleLoading$ | async; as toggleLoading) {
+              @if (favoriteStatus$ | async; as favoriteStatus) {
+                <mat-icon 
+                  (click)="getToggleError(item.id) ? clearToggleError(item.id) : toggleFavorite(item)" 
+                  [style.color]="favoriteStatus[item.id] ? 'var(--primary)' : '#666'"
+                  [style.cursor]="toggleLoading[item.id] ? 'wait' : 'pointer'"
+                  [title]="getFavoriteTooltip(item.id)">
+                  {{ toggleLoading[item.id] ? 'hourglass_empty' : (favoriteStatus[item.id] ? 'favorite' : 'favorite_border') }}
+                </mat-icon>
+              }
+            }
             <mat-icon (click)="shareRecipe(item)" style="cursor:pointer" title="Share recipe">share</mat-icon>
           </div>
         </mat-card-actions>

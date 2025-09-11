@@ -17,8 +17,20 @@ export const loadUserNotificationsEffect = createEffect(
       ofType(NotificationActions.loadUserNotifications),
       switchMap(({ userId, page = 1, size = 20, filter = {}, sortBy = 'created_at', sortOrder = 'DESC' }) =>
         notificationService.getUserNotificationsPaginated(userId, page, size, filter, sortBy, sortOrder).pipe(
-          map((notifications) => NotificationActions.loadUserNotificationsSuccess({ notifications })),
-          catchError((error) => of(NotificationActions.loadUserNotificationsFailure({ error: error.message })))
+          map((notifications) => NotificationActions.loadUserNotificationsSuccess({ 
+            notifications: { 
+              data: notifications, 
+              total: notifications.length, 
+              current_page: 1, 
+              total_pages: 1, 
+              end_page: 1,
+              has_next: false, 
+              has_prev: false 
+            } 
+          })),
+          catchError((error) => {
+            return of(NotificationActions.loadUserNotificationsFailure({ error: error.message }));
+          })
         )
       )
     );
@@ -177,15 +189,22 @@ export const deleteAllNotificationsEffect = createEffect(
 // Real-time Notification Effects
 export const realTimeNotificationEffect = createEffect(
   (actions$ = inject(Actions), socketService = inject(SocketService), store = inject(Store)) => {
+    let subscriptionCreated = false;
+    
     return actions$.pipe(
       ofType(NotificationActions.loadUserNotificationsSuccess),
       tap(() => {
-        // Listen for real-time notifications
-        socketService.notification$.subscribe(notification => {
-          if (notification) {
-            store.dispatch(NotificationActions.notificationReceived({ notification }));
-          }
-        });
+        // Only create subscription once to avoid duplicates
+        if (!subscriptionCreated) {
+          subscriptionCreated = true;
+          
+          // Listen for real-time notifications
+          socketService.notification$.subscribe(notification => {
+            if (notification) {
+              store.dispatch(NotificationActions.notificationReceived({ notification }));
+            }
+          });
+        }
       })
     );
   },

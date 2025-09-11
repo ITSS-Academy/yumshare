@@ -1,0 +1,55 @@
+<!-- ===== ERROR PAGE - USING DESIGN SYSTEM ===== -->
+<div class="error-container">
+  <div class="error-content">
+    <!-- Error Icon -->
+    <div class="error-icon">
+      <span class="material-icons">{{ getErrorIcon() }}</span>
+    </div>
+    
+    <!-- Error Code -->
+    <div class="error-code">{{ errorCode }}</div>
+    
+    <!-- Error Title -->
+    <h1 class="error-title">{{ errorTitle }}</h1>
+    
+    <!-- Error Message -->
+    <p class="error-message">{{ errorMessage }}</p>
+    
+    <!-- Action Buttons -->
+    <div class="error-actions">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        routerLink="/"
+        class="home-btn">
+        <span class="material-icons">home</span>
+        Go Home
+      </button>
+      
+      <button 
+        mat-stroked-button 
+        (click)="goBack()"
+        class="back-btn">
+        <span class="material-icons">arrow_back</span>
+        Go Back
+      </button>
+    </div>
+    
+    <!-- Additional Help -->
+    <div class="error-help">
+      <p class="help-text">
+        Need help? 
+        <a routerLink="/contact" class="help-link">Contact Support</a>
+        or 
+        <a routerLink="/faq" class="help-link">Check FAQ</a>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Decorative Elements -->
+  <div class="error-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+  </div>
+</div>

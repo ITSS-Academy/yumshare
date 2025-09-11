@@ -1,3 +1,6 @@
+// ===== COMMENT COMPONENT - USING DESIGN SYSTEM =====
+@use '../../../../shared/mixins' as *;
+
 // Virtual Scrolling Container
 .virtual-scroll-container {
   width: 100%;
@@ -625,5 +628,72 @@ hr {
   .menu-item {
     padding: 0.5rem 0.6rem;
     font-size: 0.8rem;
+  }
+}
+
+// Comment Edit Mode Styles - Using Design System
+
+.comment-edit {
+  margin-top: var(--spacing-sm);
+  
+  .edit-textarea {
+    @include input-base;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .edit-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    justify-content: flex-end;
+    
+    .cancel-btn {
+      @include button-outline;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: 14px;
+    }
+    
+    .save-btn {
+      @include button-primary;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: 14px;
+    }
+  }
+}
+
+// Edit Mode for Virtual Scroll - Using Design System
+.edit-mode {
+  margin-top: var(--spacing-sm);
+  
+  textarea {
+    @include input-base;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .edit-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    justify-content: flex-end;
+    
+    .cancel-btn {
+      @include button-outline;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: 14px;
+    }
+    
+    .save-btn {
+      @include button-primary;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: 14px;
+    }
   }
 }

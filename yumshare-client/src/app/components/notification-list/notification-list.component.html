@@ -69,7 +69,7 @@
               <p class="notification-text">{{ notification.content }}</p>
               <div class="notification-meta">
                 <span class="notification-time">
-                  {{ notification.created_at | date:'short' }}
+                  {{ notification.created_at | localTime:'full' }}
                 </span>
                 @if (!notification.is_read) {
                   <mat-chip color="primary" selected>New</mat-chip>

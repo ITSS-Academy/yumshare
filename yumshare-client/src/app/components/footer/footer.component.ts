@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { ShareModule } from "../../shared/share.module";
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-footer',
-  imports: [],
+  imports: [ShareModule, MatIconModule],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss'
 })

@@ -146,7 +146,6 @@ export const navigateAfterCategoryCreate = createEffect(
     return actions$.pipe(
       ofType(CategoryActions.createCategorySuccess),
       tap(({ category }) => {
-        console.log(`Category created successfully: ${category.id}`);
         // You can inject Router here and navigate to category detail page
         // const router = inject(Router);
         // router.navigate(['/categories', category.id]);
@@ -162,7 +161,6 @@ export const navigateAfterCategoryUpdate = createEffect(
     return actions$.pipe(
       ofType(CategoryActions.updateCategorySuccess),
       tap(({ category }) => {
-        console.log(`Category updated successfully: ${category.id}`);
         // You can inject Router here and navigate to category detail page
         // const router = inject(Router);
         // router.navigate(['/categories', category.id]);
@@ -184,7 +182,7 @@ export const logCategoryActions = createEffect(
         CategoryActions.loadActiveCategories
       ),
       tap((action) => {
-        console.log(`Category Action: ${action.type}`, action);
+        // Log category actions if needed for debugging
       })
     );
   },

@@ -13,6 +13,7 @@ import { Notification, NotificationType } from '../../models/notification.model'
 import { NotificationService } from '../../services/notification/notification.service';
 import { SocketService } from '../../services/socket/socket.service';
 import { MessageListComponent } from '../message-list/message-list.component';
+import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import * as NotificationActions from '../../ngrx/notification/notification.actions';
 import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
@@ -26,6 +27,7 @@ import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
     MatButtonModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    LocalTimePipe,
   ],
   templateUrl: './notification-list.component.html',
   styleUrls: ['./notification-list.component.scss']
@@ -71,12 +73,12 @@ export class NotificationListComponent implements OnInit, OnDestroy {
         }
       })
     );
+
     
-    // Listen for real-time notifications
+    // Listen for real-time notifications (handled by effect, just show toast)
     this.subscriptions.push(
       this.socketService.notification$.subscribe(notification => {
         if (notification) {
-          this.store.dispatch(NotificationActions.notificationReceived({ notification }));
           this.showToastNotification(notification);
         }
       })

@@ -75,8 +75,8 @@ export const updateRecipeWithFilesEffect = createEffect(
   (actions$ = inject(Actions), recipeService = inject(RecipeService)) => {
     return actions$.pipe(
       ofType(RecipeActions.updateRecipeWithFiles),
-      switchMap(({ id, recipeData }) =>
-        recipeService.updateRecipeWithFiles(id, recipeData).pipe(
+      switchMap(({ id, idToken, recipeData }) =>
+        recipeService.updateRecipeWithFiles(id, idToken, recipeData).pipe(
           map((updatedRecipe) => RecipeActions.updateRecipeWithFilesSuccess({ recipe: updatedRecipe })),
           catchError((error) => of(RecipeActions.updateRecipeWithFilesFailure({ error: error.message })))
         )

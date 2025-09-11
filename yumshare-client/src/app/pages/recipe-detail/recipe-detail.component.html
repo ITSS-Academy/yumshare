@@ -29,9 +29,14 @@
           <div class="righttt">
             <p class="food-description">{{ recipe.description }}</p>
             <div class="block">
-              <mat-chip>{{ recipe.difficulty }}</mat-chip>
-              <mat-chip>{{ recipe.total_cooking_time }} min</mat-chip>
-              <mat-chip>{{ recipe.country }}</mat-chip>
+              <span class="custom-chip difficulty-chip" 
+                    [class]="'difficulty-' + (recipe.difficulty?.toLowerCase() || 'unknown')"
+                    [style.background-color]="getDifficultyColor(recipe.difficulty)" 
+                    [style.color]="'white'">
+                {{ getDifficultyText(recipe.difficulty) }}
+              </span>
+              <span class="custom-chip time-chip">{{ recipe.total_cooking_time }} min</span>
+              <span class="custom-chip country-chip">{{ recipe.country }}</span>
             </div>
           </div>
         </div>
@@ -92,7 +97,7 @@
           <div class="post-like">
             Like for this recipe:
             <button mat-icon-button (click)="toggleLike()" [disabled]="likeLoading$ | async">
-              <mat-icon [style.color]="(isLiked$ | async) ? '#000' : '#e0e0e0'">thumb_up</mat-icon>
+              <mat-icon [style.color]="(isLiked$ | async) ? 'var(--primary)' : '#e0e0e0'">thumb_up</mat-icon>
             </button>
             <span>{{ likeCount$ | async }}</span>
           </div>

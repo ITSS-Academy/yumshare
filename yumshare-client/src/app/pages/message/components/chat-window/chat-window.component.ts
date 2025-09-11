@@ -2,16 +2,18 @@ import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, AfterVie
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatIconModule } from '@angular/material/icon';
 import { Chat } from '../../../../models/chat.model';
 import { User } from '../../../../models/user.model';
 import { ChatMessage } from '../../../../models/chat-message.model';
 import { ChatMessageSkeletonComponent } from '../../../../components/skeleton/chat-message-skeleton.component';
 import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
+import { ShareModule } from "../../../../shared/share.module";
 
 @Component({
   selector: 'app-chat-window',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe, ScrollingModule],
+  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe, ScrollingModule, ShareModule, MatIconModule],
   templateUrl: './chat-window.component.html',
   styleUrls: ['./chat-window.component.scss']
 })

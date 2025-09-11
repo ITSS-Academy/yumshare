@@ -33,11 +33,9 @@ export const authInterceptor = (
     request.url.includes('/check-edit-permission') // Check for the actual endpoint pattern
   );
   
-  // Debug log
+  // Debug log for specific endpoints if needed
   if (request.url.includes('check-edit-permission')) {
-    console.log('🔍 Auth Interceptor - check-edit-permission request detected');
-    console.log('🔍 URL:', request.url);
-    console.log('🔍 Is protected endpoint:', isProtectedEndpoint);
+    // Debug logging for check-edit-permission endpoint
   }
   
   // If it's a public endpoint, proceed without authentication
@@ -51,20 +49,10 @@ export const authInterceptor = (
       take(1),
       switchMap(authState => {
         const hasToken = !!(authState.idToken && authState.idToken.length > 0);
-        console.log('🔍 Auth State for protected endpoint:', {
-          hasToken,
-          tokenLength: authState.idToken?.length || 0,
-          currentUser: authState.currentUser?.uid || 'none'
-        });
-        
         if (!hasToken) {
-          console.warn('❌ No token available for protected endpoint:', request.url);
           // Return the request without token - let the backend handle the 401
           return next(request);
         }
-        
-        console.log('✅ Sending token for protected endpoint:', request.url);
-        console.log('✅ Token preview:', authState.idToken?.substring(0, 20) + '...');
         
         const authReq = request.clone({
           setHeaders: {

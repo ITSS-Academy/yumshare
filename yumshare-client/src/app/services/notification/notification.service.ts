@@ -177,20 +177,8 @@ export class NotificationService {
     filter: any = {}, 
     sortBy: string = 'created_at', 
     sortOrder: 'ASC' | 'DESC' = 'DESC'
-  ): Observable<PaginatedResponse<Notification>> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('sortBy', sortBy)
-      .set('sortOrder', sortOrder);
-
-    // Add filter parameters
-    if (filter.type) params = params.set('type', filter.type);
-    if (filter.isRead !== undefined) params = params.set('isRead', filter.isRead.toString());
-    if (filter.dateRange?.start) params = params.set('startDate', filter.dateRange.start.toISOString());
-    if (filter.dateRange?.end) params = params.set('endDate', filter.dateRange.end.toISOString());
-
-    return this.http.get<PaginatedResponse<Notification>>(`${this.apiUrl}/notifications/user/${userId}`, { params });
+  ): Observable<Notification[]> {
+    return this.http.get<Notification[]>(`${this.apiUrl}/notifications/user/${userId}`);
   }
 
   /**

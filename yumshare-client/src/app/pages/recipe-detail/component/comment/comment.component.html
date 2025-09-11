@@ -74,7 +74,7 @@
           @if (mineProfile$ | async; as mineProfile) {
             @if (canEdit(comment, mineProfile) || canDelete(comment, mineProfile)) {
               <div class="comment-menu">
-                <button class="menu-btn" (click)="toggleMenu(comment.id)">
+                <button class="menu-btn" (click)="toggleMenu(comment.id); $event.stopPropagation()">
                   <span class="material-icons">more_vert</span>
                 </button>
 
@@ -141,34 +141,28 @@
               
               <!-- YouTube-style more_vert menu -->
               @if (mineProfile$ | async; as mineProfile) {
+                <!-- Debug info - temporarily visible -->
                 @if (canEdit(comment, mineProfile) || canDelete(comment, mineProfile)) {
                   <div class="comment-menu">
-                    <button class="menu-btn" (click)="toggleMenu(comment.id)">
+                    <button class="menu-btn" (click)="toggleMenu(comment.id); $event.stopPropagation()">
                       <span class="material-icons">more_vert</span>
                     </button>
                     
                     <!-- Dropdown Menu -->
-                    @if (editingCommentId === comment.id) {
-                      <div class="menu-dropdown show">
-                        <button class="menu-item" (click)="onEditComment(comment)">
-                          <span class="material-icons">edit</span>
-                          Edit
-                        </button>
-                        <button class="menu-item delete" (click)="onDeleteComment(comment.id)">
-                          <span class="material-icons">delete</span>
-                          Delete
-                        </button>
-                      </div>
-                    } @else {
-                      <div class="menu-dropdown" [class.show]="openMenuId === comment.id">
-                        <button class="menu-item" (click)="onEditComment(comment)">
-                          <span class="material-icons">edit</span>
-                          Edit
-                        </button>
-                        <button class="menu-item delete" (click)="onDeleteComment(comment.id)">
-                          <span class="material-icons">delete</span>
-                          Delete
-                        </button>
+                    @if (activeMenuId === comment.id) {
+                      <div class="dropdown-menu">
+                        @if (canEdit(comment, mineProfile)) {
+                          <button class="menu-item edit-item" (click)="onEditComment(comment)">
+                            <span class="material-icons">edit</span>
+                            Edit
+                          </button>
+                        }
+                        @if (canDelete(comment, mineProfile)) {
+                          <button class="menu-item delete-item" (click)="onDeleteComment(comment.id)">
+                            <span class="material-icons">delete</span>
+                            Delete
+                          </button>
+                        }
                       </div>
                     }
                   </div>
@@ -180,7 +174,7 @@
             @if (editingCommentId === comment.id) {
               <div class="comment-edit">
                 <textarea 
-                  [(ngModel)]="editingCommentContent"
+                  [(ngModel)]="editingContent"
                   placeholder="Edit your comment..."
                   rows="3"
                   class="edit-textarea">
@@ -189,8 +183,8 @@
                   <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
                   <button 
                     class="save-btn" 
-                    (click)="onSaveEdit(comment.id)"
-                    [disabled]="!editingCommentContent?.trim() || (operationLoading$ | async)">
+                    (click)="onSaveEdit()"
+                    [disabled]="!editingContent?.trim() || (operationLoading$ | async)">
                     Save
                   </button>
                 </div>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Chat, CreateChatDto, CreateMessageDto } from '../../models/chat.model';
 import { ChatMessage } from '../../models/chat-message.model';
@@ -73,8 +74,31 @@ export class ChatService {
     return this.http.get<Chat>(`${this.apiUrl}/chats/${chatId}`);
   }
 
-  getChatMessages(chatId: string, page: number = 1, limit: number = 50): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/chats/${chatId}/messages?page=${page}&limit=${limit}`);
+  getChatMessages(chatId: string, page: number = 1, limit: number = 50): Observable<ChatMessage[]> {
+    return this.http.get<any>(`${this.apiUrl}/chats/${chatId}/messages?page=${page}&limit=${limit}`).pipe(
+      map((response: any) => {
+        // Parse string dates to Date objects
+        if (Array.isArray(response)) {
+          return response.map((message: any) => {
+            try {
+              return {
+                ...message,
+                created_at: new Date(message.created_at),
+                updated_at: message.updated_at ? new Date(message.updated_at) : undefined
+              };
+            } catch (error) {
+              console.error('Error parsing message date:', error, message);
+              return {
+                ...message,
+                created_at: new Date(),
+                updated_at: undefined
+              };
+            }
+          });
+        }
+        return response;
+      })
+    );
   }
 
   createChat(chatData: CreateChatDto): Observable<Chat> {

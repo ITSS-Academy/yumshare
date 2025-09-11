@@ -107,7 +107,51 @@ app-footer {
   }
 }
 
-@media (max-width: 767.98px) {
+// Tablet responsive (768px - 991px) - sidebar should be visible but not fixed
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .sidebar-container {
+    position: relative;
+    width: 15rem;
+    min-width: 15rem;
+    height: 100vh;
+    background-color: var(--surface);
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    transition: all var(--animation-duration-fast) var(--animation-easing);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    overflow-y: auto;
+    z-index: auto;
+    box-shadow: none;
+    transform: none;
+  }
+  
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    will-change: scroll-position;
+    min-height: 0;
+    background: var(--background);
+    padding: var(--spacing-md);
+  }
+}
+
+// Mobile responsive (≤ 767px)
+@media (max-width: 767px) {
   .sidebar-container {
     position: fixed;
     top: 0;
@@ -194,7 +238,7 @@ app-footer {
   right: -1.25rem;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 767px) {
   .sidebar-toggle-btn {
     display: none;
   }
@@ -202,7 +246,7 @@ app-footer {
 
 
 
-// Backdrop cho mobile
+// Backdrop cho mobile - chỉ hiển thị trên mobile thực sự (≤ 767px)
 .backdrop {
   position: fixed;
   top: 0;
@@ -213,4 +257,9 @@ app-footer {
   z-index: 999;
   cursor: pointer;
   transition: opacity var(--animation-duration-fast) var(--animation-easing);
+  
+  // Ẩn backdrop trên tablet và desktop
+  @media (min-width: 768px) {
+    display: none !important;
+  }
 }

@@ -27,7 +27,8 @@ export interface QueryOptions {
   providedIn: 'root'
 })
 export class FavoriteService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrl
+  private pendingOperations = new Set<string>(); // Track pending operations;
 
   constructor(private http: HttpClient) { }
 
@@ -180,6 +181,16 @@ export class FavoriteService {
       return throwError(() => new Error('userId và recipeId là bắt buộc'));
     }
 
+    const operationKey = `${userId}-${recipeId}`;
+    
+    // Check if there's already a pending operation for this user-recipe combination
+    if (this.pendingOperations.has(operationKey)) {
+      return throwError(() => new Error('Operation already in progress'));
+    }
+
+    // Mark operation as pending
+    this.pendingOperations.add(operationKey);
+
     return new Observable(observer => {
       // Kiểm tra trạng thái hiện tại
       this.isInFavorites(userId, recipeId).subscribe({
@@ -188,23 +199,34 @@ export class FavoriteService {
             // Nếu đã có trong favorites, xóa nó
             this.removeFromFavorites(userId, recipeId).subscribe({
               next: () => {
+                this.pendingOperations.delete(operationKey);
                 observer.next(false);
                 observer.complete();
               },
-              error: (error) => observer.error(error)
+              error: (error) => {
+                this.pendingOperations.delete(operationKey);
+                observer.error(error);
+              }
             });
           } else {
             // Nếu chưa có trong favorites, thêm nó
             this.addToFavorites({ user_id: userId, recipe_id: recipeId }).subscribe({
               next: () => {
+                this.pendingOperations.delete(operationKey);
                 observer.next(true);
                 observer.complete();
               },
-              error: (error) => observer.error(error)
+              error: (error) => {
+                this.pendingOperations.delete(operationKey);
+                observer.error(error);
+              }
             });
           }
         },
-        error: (error) => observer.error(error)
+        error: (error) => {
+          this.pendingOperations.delete(operationKey);
+          observer.error(error);
+        }
       });
     });
   }

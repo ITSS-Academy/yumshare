@@ -114,6 +114,11 @@ export const getFollowingCountFailure = createAction(
   props<{ error: any }>()
 );
 
+// Reload Following Action
+export const reloadFollowing = createAction(
+  '[Follow] Reload Following'
+);
+
 // Clear Follow State Actions
 export const clearFollowState = createAction(
   '[Follow] Clear Follow State'

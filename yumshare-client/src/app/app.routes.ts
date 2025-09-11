@@ -71,18 +71,31 @@ export const routes: Routes = [
         (m) => m.ProfileComponent
       )
   },
-  {
-    path: 'notifications',
-    loadComponent: () =>
-      import('./pages/notifications/notifications.page').then(
-        (m) => m.NotificationsPageComponent
-      )
-  },
+
 
   {
     path: 'faq',
     loadComponent: () =>
       import('./pages/faq/faq.component').then((m) => m.FaqComponent),
+  },
+  {
+    path: 'error',
+    loadComponent: () =>
+      import('./pages/page-error/page-error.component').then(
+        (m) => m.PageErrorComponent
+      ),
+  },
+  {
+    path: 'error/:code',
+    loadComponent: () =>
+      import('./pages/page-error/page-error.component').then(
+        (m) => m.PageErrorComponent
+      ),
+  },
+  // Wildcard route - must be last
+  {
+    path: '**',
+    redirectTo: '/error'
   },
 ];
 

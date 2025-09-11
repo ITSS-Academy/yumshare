@@ -224,28 +224,40 @@ export const notificationReducer = createReducer(
   })),
 
   // Real-time Notifications
-  on(NotificationActions.notificationReceived, (state, { notification }) => ({
-    ...state,
-    notifications: [notification, ...state.notifications],
-    lastNotification: notification,
-    totalCount: state.totalCount + 1,
-    unreadCount: notification.is_read ? state.unreadCount : state.unreadCount + 1,
-    messageCount: notification.type === 'message' && !notification.is_read 
-      ? state.messageCount + 1 
-      : state.messageCount,
-  })),
+  on(NotificationActions.notificationReceived, (state, { notification }) => {
+    // Check if notification already exists to prevent duplicates
+    const existingNotifications = Array.isArray(state.notifications) ? state.notifications : [];
+    const notificationExists = existingNotifications.some(n => n.id === notification.id);
+    
+    if (notificationExists) {
+      return state; // Return current state without changes
+    }
+    
+    return {
+      ...state,
+      notifications: [notification, ...existingNotifications],
+      lastNotification: notification,
+      totalCount: state.totalCount + 1,
+      unreadCount: notification.is_read ? state.unreadCount : state.unreadCount + 1,
+      messageCount: notification.type === 'message' && !notification.is_read 
+        ? state.messageCount + 1 
+        : state.messageCount,
+    };
+  }),
 
   on(NotificationActions.notificationUpdated, (state, { notification }) => ({
     ...state,
-    notifications: state.notifications.map(n => 
-      n.id === notification.id ? notification : n
-    ),
+    notifications: Array.isArray(state.notifications) 
+      ? state.notifications.map(n => n.id === notification.id ? notification : n)
+      : [],
     lastNotification: notification,
   })),
 
   on(NotificationActions.notificationDeleted, (state, { id }) => ({
     ...state,
-    notifications: state.notifications.filter(n => n.id !== id),
+    notifications: Array.isArray(state.notifications) 
+      ? state.notifications.filter(n => n.id !== id)
+      : [],
     totalCount: Math.max(0, state.totalCount - 1),
   })),
 

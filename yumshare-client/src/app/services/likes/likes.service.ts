@@ -3,10 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Like } from '../../models'; 
 import { throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LikesApiService {
-  private apiUrl = 'http://localhost:3000/likes'; 
+  private apiUrl = `${environment.apiUrl}/likes`; 
+  private pendingOperations = new Set<string>(); // Track pending operations
 
   constructor(private http: HttpClient) {}
 
@@ -39,36 +41,56 @@ export class LikesApiService {
     return this.getLikeCount(recipeId);
   }
   toggleLike(userId: string, recipeId: string): Observable<boolean> {
-  if (!userId || !recipeId) {
-    return throwError(() => new Error('userId và recipeId là bắt buộc'));
-  }
+    if (!userId || !recipeId) {
+      return throwError(() => new Error('userId và recipeId là bắt buộc'));
+    }
 
-  return new Observable<boolean>(observer => {
-    this.checkIfLiked(userId, recipeId).subscribe({
-      next: (isLiked) => {
-        if (isLiked) {
-          // Nếu đã like, thì unlike
-          this.unlikeRecipe(userId, recipeId).subscribe({
-            next: () => {
-              observer.next(false); // Đã unlike
-              observer.complete();
-            },
-            error: (error) => observer.error(error)
-          });
-        } else {
-          // Nếu chưa like, thì like
-          this.likeRecipe(userId, recipeId).subscribe({
-            next: () => {
-              observer.next(true); // Đã like
-              observer.complete();
-            },
-            error: (error) => observer.error(error)
-          });
+    const operationKey = `${userId}-${recipeId}`;
+    
+    // Check if there's already a pending operation for this user-recipe combination
+    if (this.pendingOperations.has(operationKey)) {
+      return throwError(() => new Error('Operation already in progress'));
+    }
+
+    // Mark operation as pending
+    this.pendingOperations.add(operationKey);
+
+    return new Observable<boolean>(observer => {
+      this.checkIfLiked(userId, recipeId).subscribe({
+        next: (isLiked) => {
+          if (isLiked) {
+            // Nếu đã like, thì unlike
+            this.unlikeRecipe(userId, recipeId).subscribe({
+              next: () => {
+                this.pendingOperations.delete(operationKey);
+                observer.next(false); // Đã unlike
+                observer.complete();
+              },
+              error: (error) => {
+                this.pendingOperations.delete(operationKey);
+                observer.error(error);
+              }
+            });
+          } else {
+            // Nếu chưa like, thì like
+            this.likeRecipe(userId, recipeId).subscribe({
+              next: () => {
+                this.pendingOperations.delete(operationKey);
+                observer.next(true); // Đã like
+                observer.complete();
+              },
+              error: (error) => {
+                this.pendingOperations.delete(operationKey);
+                observer.error(error);
+              }
+            });
+          }
+        },
+        error: (error) => {
+          this.pendingOperations.delete(operationKey);
+          observer.error(error);
         }
-      },
-      error: (error) => observer.error(error)
+      });
     });
-  });
-
-}
+  }
 }

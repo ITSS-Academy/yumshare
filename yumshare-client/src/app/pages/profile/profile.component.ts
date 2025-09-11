@@ -59,6 +59,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   activeTab: 'followers' | 'following' = 'followers';
   currentUserId: string | null = null;
   isEditingBio = false;
+  isUploadingAvatar = false;
 
   // Pagination state
   currentFollowersPage = 1;
@@ -216,9 +217,73 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        this.showError('Please select a valid image file');
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        this.showError('Image size must be less than 5MB');
+        return;
+      }
+      
+      // Show preview immediately
       this.avatarUrl = URL.createObjectURL(file);
-      // TODO: Implement avatar upload
-      this.showSuccess('Avatar preview updated');
+      
+      // Upload avatar
+      this.uploadAvatar(file);
+    }
+  }
+
+  onSelectAvatar() {
+    const input = document.getElementById('avatar-input') as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  }
+
+  private async uploadAvatar(file: File) {
+    this.isUploadingAvatar = true;
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    try {
+      // Get current user ID and token
+      const idToken = await this.authService.getCurrentIdToken();
+      if (!idToken) {
+        this.showError('Authentication required. Please login again.');
+        this.isUploadingAvatar = false;
+        return;
+      }
+
+      this.mineProfile$.subscribe(profile => {
+        if (profile?.id) {
+          this.authService.uploadAvatar(profile.id, formData, idToken).subscribe({
+            next: (updatedUser) => {
+              // Update the profile in store
+              this.store.dispatch(AuthActions.updateProfileSuccess({ updateProfile: updatedUser }));
+              this.showSuccess('Avatar updated successfully');
+              this.isUploadingAvatar = false;
+            },
+            error: (error) => {
+              console.error('Avatar upload error:', error);
+              this.showError('Failed to upload avatar. Please try again.');
+              // Reset to original avatar on error
+              this.mineProfile$.subscribe(profile => {
+                this.avatarUrl = profile?.avatar_url || 'https://via.placeholder.com/80';
+              });
+              this.isUploadingAvatar = false;
+            }
+          });
+        }
+      }).unsubscribe();
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      this.showError('Authentication error. Please login again.');
+      this.isUploadingAvatar = false;
     }
   }
 
@@ -444,6 +509,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         followerId: this.currentUserId,
         followingId: targetUserId
       }));
+      
+      // Reload following count after follow (wait for API call to complete)
+      setTimeout(() => {
+        this.store.dispatch(FollowActions.getFollowingCount({
+          userId: this.currentUserId!
+        }));
+      }, 500); // Wait 0.5 seconds for follow to complete
     }
   }
 
@@ -454,6 +526,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
         followerId: this.currentUserId,
         followingId: targetUserId
       }));
+      
+      // Reload following list and count after unfollow (wait for API call to complete)
+      setTimeout(() => {
+        if (this.activeTab === 'following') {
+          this.loadFollowing();
+        }
+        // Also reload following count
+        this.store.dispatch(FollowActions.getFollowingCount({
+          userId: this.currentUserId!
+        }));
+      }, 500); // Wait 0.5 seconds for unfollow to complete
     }
   }
 

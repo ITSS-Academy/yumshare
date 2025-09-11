@@ -1,4 +1,5 @@
-import { Controller, Headers, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, UseGuards } from '@nestjs/common';
+import { Controller, Headers, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, UseGuards, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -102,6 +103,33 @@ export class AuthController {
       }
       throw new HttpException(
         'Failed to update user status',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  @Post(':id/avatar')
+  @UseInterceptors(FileInterceptor('avatar'))
+  async uploadAvatar(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    try {
+      return await this.authService.uploadAvatar(id, file);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to upload avatar',
         HttpStatus.BAD_REQUEST
       );
     }

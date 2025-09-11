@@ -12,7 +12,7 @@ export interface Message {
     name: string;
     avatar: string;
   };
-  timestamp: Date;
+  created_at: Date;
 }
 
 @Component({
@@ -31,9 +31,10 @@ export class MessageItemComponent {
   }
 
   get formattedTime(): string {
-    return this.message.timestamp.toLocaleTimeString('vi-VN', {
+    return this.message.created_at.toLocaleTimeString('vi-VN', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'UTC'
     });
   }
 }

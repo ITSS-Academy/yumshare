@@ -30,6 +30,7 @@ import { Favorite } from '../../models/favorite.model';
 import { Recipe } from '../../models/recipe.model';
 import { PaginatedResponse } from '../../models/paginated-response.model';
 import { Category } from '../../models/category.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-my-favourite-recipe',
@@ -103,7 +104,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   hasFavorites$: Observable<boolean>;
   isEmpty$: Observable<boolean>;
 
-  constructor() {
+  constructor(private router: Router) {
     // Initialize observables
     this.favorites$ = this.store.select(FavoriteSelectors.selectFavorites);
     this.paginatedFavorites$ = this.store.select(FavoriteSelectors.selectPaginatedFavorites);
@@ -166,33 +167,13 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     // Load active categories
     this.store.dispatch({ type: '[Category] Load Active Categories' });
     
-    // Debug: Log categories loading
-    this.subscriptions.push(
-      this.activeCategories$.subscribe(categories => {
-        console.log('Active Categories loaded in MyFavouriteRecipe:', categories);
-      })
-    );
-
-    // Debug: Log current user ID
-    this.subscriptions.push(
-      this.currentUserId$.subscribe(userId => {
-        console.log('Current User ID:', userId);
-      })
-    );
-
-    // Debug: Log auth state
-    this.subscriptions.push(
-      this.isAuthenticated$.subscribe(isAuth => {
-        console.log('Is Authenticated:', isAuth);
-      })
-    );
+    // Debug subscriptions removed for cleaner code
 
     // Get user ID from auth state and set it in favorite state
     this.subscriptions.push(
       this.store.select(AuthSelectors.selectUserId)
         .pipe(filter(userId => !!userId))
         .subscribe(userId => {
-          console.log('Setting current user ID in favorite state:', userId);
           this.store.dispatch(FavoriteActions.setCurrentUser({ userId: userId! }));
         })
     );
@@ -202,25 +183,14 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
       this.currentUserId$
         .pipe(filter(userId => !!userId))
         .subscribe(userId => {
-          console.log('Loading favorites for user:', userId);
           this.loadUserFavorites(userId!, this.currentFilters);
         })
     );
 
-    // Debug: Log favorites data
-    this.subscriptions.push(
-      this.favorites$.subscribe(favorites => {
-        console.log('Favorites data:', favorites);
-        console.log('Favorites count:', favorites.length);
-      })
-    );
+    // Debug: Log favorites data removed for cleaner code
 
     // Debug: Log loading state
-    this.subscriptions.push(
-      this.favoritesLoading$.subscribe(loading => {
-        console.log('Favorites loading:', loading);
-      })
-    );
+    // Favorites loading state subscription removed for cleaner code
 
     // Handle errors
     this.subscriptions.push(
@@ -272,10 +242,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
       ...filters // Include any filters
     };
 
-    console.log('Dispatching loadUserFavorites action with:', {
-      userId,
-      queryOptions
-    });
+    // Dispatching loadUserFavorites action
     
     this.store.dispatch(FavoriteActions.loadUserFavorites({
       userId,
@@ -417,7 +384,10 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  toggleFavourite(recipe: Favorite) {
+  toggleFavourite(recipe: Favorite, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
     this.subscriptions.push(
       this.currentUserId$
         .pipe(filter(userId => !!userId))
@@ -445,5 +415,9 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   // TrackBy function for virtual scrolling performance
   trackByFavoriteId(index: number, favorite: Favorite): string {
     return favorite.id;
+  }
+
+  onNavigateToRecipeDetail(recipeId: string) {
+    this.router.navigate(['/recipe-detail', recipeId]);
   }
 }

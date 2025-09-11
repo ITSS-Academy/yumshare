@@ -44,9 +44,15 @@
   color: #666;
   
   .no-messages-icon {
-    font-size: 48px;
     margin-bottom: 16px;
     opacity: 0.5;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #666;
+    }
   }
   
   p {
@@ -58,10 +64,11 @@
 .chat-window-container {
   display: flex;
   flex-direction: column;
-  height: 32rem;
+  height: 100vh; /* Use viewport height to ensure full height */
+  max-height: 100vh; /* Prevent overflow */
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-variant) 100%);
   font-family: Noto Sans, sans-serif;
-  overflow-y: scroll; /* vẫn cho cuộn */
+  overflow: hidden; /* Remove scroll from container, let messages container handle it */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE & Edge */
 }
@@ -98,12 +105,18 @@
       border-radius: 50%;
       width: 36px;
       height: 36px;
-      font-size: 18px;
       cursor: pointer;
       color: var(--primary);
       margin-right: 12px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 8px rgba(141, 198, 63, 0.1);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: var(--primary);
+      }
 
       &:hover {
         background: linear-gradient(135deg, var(--primary-lightest) 0%, var(--primary-lighter) 100%);
@@ -168,9 +181,10 @@
 /* Messages Container */
 .messages-container {
   flex: 1;
-  height: 100%;
+  min-height: 0; /* Important for flex child to shrink */
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-variant) 100%);
   overflow-y: auto;
+  overflow-x: hidden;
 
   .messages-list {
     display: flex;
@@ -271,6 +285,10 @@
   padding: 20px;
   background: linear-gradient(135deg, rgba(141, 198, 63, 0.03) 0%, rgba(127, 197, 32, 0.03) 100%);
   border-top: 2px solid rgba(141, 198, 63, 0.15);
+  flex-shrink: 0; /* Prevent input from shrinking */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 
   .input-wrapper {
     display: flex;
@@ -310,13 +328,19 @@
       border-radius: 50%;
       width: 36px;
       height: 36px;
-      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 8px rgba(141, 198, 63, 0.2);
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: white;
+      }
 
       &:hover:not(:disabled) {
         transform: scale(1.05);
@@ -325,9 +349,12 @@
 
       &:disabled {
         background: #f0f0f0;
-        color: #999;
         cursor: not-allowed;
         box-shadow: none;
+        
+        mat-icon {
+          color: #999;
+        }
       }
     }
   }

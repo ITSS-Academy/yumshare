@@ -1,17 +1,18 @@
-<div class="chat-container" [ngClass]="{'chat-open': selectedChat}">
-  <!-- Sidebar -->
-  <div class="user">
-    <app-user-list
-      [chats]="chats"
-      [searchResults]="searchResults"
-      [showSearchResults]="showSearchResults"
-      [loading]="loading"
-      [currentUser]="mineProfile"
-      (chatSelected)="selectChat($event)"
-      (userSelected)="startOrSelectChat($event)"
-      (searchQueryChanged)="searchQuery = $event; searchUsers()">
-    </app-user-list>
-  </div>
+@if (mineProfile) {
+  <div class="chat-container" [ngClass]="{'chat-open': selectedChat}">
+    <!-- Sidebar -->
+    <div class="user">
+      <app-user-list
+        [chats]="chats"
+        [searchResults]="searchResults"
+        [showSearchResults]="showSearchResults"
+        [loading]="loading"
+        [currentUser]="mineProfile"
+        (chatSelected)="selectChat($event)"
+        (userSelected)="startOrSelectChat($event)"
+        (searchQueryChanged)="searchQuery = $event; searchUsers()">
+      </app-user-list>
+    </div>
 
   <!-- Chat window -->
   <div class="chat-area">
@@ -27,11 +28,19 @@
       </app-chat-window>
     } @else {
       <div class="empty-chat">
-        <div class="empty-chat-icon">💬</div>
+        <div class="empty-chat-icon"><mat-icon>chat_bubble_outline</mat-icon></div>
         <h2>Select a conversation</h2>
         <p>Choose a chat from the sidebar to start messaging</p>
       </div>
     }
-  </div>
+    </div>
 
-</div>
+  </div>
+} @else {
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <mat-icon>account_circle</mat-icon>
+      <p>Loading user profile...</p>
+    </div>
+  </div>
+}
