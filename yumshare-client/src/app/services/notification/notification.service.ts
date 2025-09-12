@@ -160,7 +160,7 @@ export class NotificationService {
             this.messageCountSubject.next(messageCount);
           },
           error: (err) => {
-            console.error('Error refreshing notification count:', err);
+            // Error refreshing notification count
           }
         });
       }

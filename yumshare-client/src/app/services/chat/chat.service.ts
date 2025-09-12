@@ -87,7 +87,6 @@ export class ChatService {
                 updated_at: message.updated_at ? new Date(message.updated_at) : undefined
               };
             } catch (error) {
-              console.error('Error parsing message date:', error, message);
               return {
                 ...message,
                 created_at: new Date(),

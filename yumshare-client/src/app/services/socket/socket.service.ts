@@ -48,12 +48,10 @@ export class SocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
       this.connectionStatusSubject.next(false);
     });
 
     this.socket.on('notification', (notification: Notification) => {
-      console.log('🔔 Received notification:', notification);
       this.notificationSubject.next(notification);
     });
 

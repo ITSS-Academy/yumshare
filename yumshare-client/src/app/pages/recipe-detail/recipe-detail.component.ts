@@ -142,13 +142,13 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         
         // Debug: Subscribe to isLiked$ to see state changes (remove when stable)
         // const debugSub = this.isLiked$.subscribe(isLiked => {
-        //   console.log(`[RecipeDetail] isLiked for recipe ${this.recipeId}:`, isLiked);
+        //   // Debug log removed
         // });
         // this.subscriptions.push(debugSub);
         
         // Debug: Subscribe to like count changes (remove when stable)
         // const countDebugSub = this.likeCount$.subscribe(count => {
-        //   console.log(`[RecipeDetail] like count for recipe ${this.recipeId}:`, count);
+        //   // Debug log removed
         // });
         // this.subscriptions.push(countDebugSub);
       }
@@ -160,7 +160,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     // Subscribe to current user changes and reload likes when user changes
     const userChangeSub = this.currentUser$.subscribe(user => {
       if (user?.uid && this.recipeId) {
-        // console.log('[RecipeDetail] User changed, reloading likes for:', user.uid);
+        // User changed, reloading likes
         // Small delay to ensure previous requests complete
         setTimeout(() => {
           this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
@@ -212,7 +212,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
       filter(user => !!user?.uid), // Only proceed when user is available
       take(1)
     ).subscribe(user => {
-      // console.log('[RecipeDetail] Loading likes for user:', user.uid, 'recipe:', this.recipeId);
+      // Loading likes for user and recipe
       this.store.dispatch(LikesActions.checkIfLiked({ userId: user.uid, recipeId: this.recipeId }));
     });
     this.subscriptions.push(loadLikesSub);

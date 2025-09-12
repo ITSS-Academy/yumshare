@@ -282,7 +282,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         this.loading = false;
         // Don't show error if user is not authenticated
         if (error.status !== 401 && error.status !== 403) {
-          console.error('Failed to load chats');
+          // Error handled silently
         }
       }
     });
@@ -326,12 +326,11 @@ export class MessageComponent implements OnInit, OnDestroy {
         if (messages.length === 0 && this.selectedChat) {
           const otherUser = this.getOtherUser(this.selectedChat);
           if (otherUser) {
-            console.log(`New chat started with ${otherUser.username}`);
+            // New chat started
           }
         }
       },
       error: (error) => {
-        console.error('Error loading messages:', error);
         this.messagesLoading.set(false);
         this.messages = [];
       }
@@ -350,7 +349,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        console.error('Error marking chat as read:', error);
+        // Error marking chat as read
       }
     });
   }
@@ -394,7 +393,6 @@ export class MessageComponent implements OnInit, OnDestroy {
         this.isSearching = false;
       },
       error: (error) => {
-        console.error('Error searching users:', error);
         this.isSearching = false;
       }
     });
@@ -419,7 +417,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         this.searchQuery = '';
       },
       error: (error) => {
-        console.error('Error creating chat:', error);
+        // Error creating chat
       }
     });
   }
@@ -534,12 +532,12 @@ export class MessageComponent implements OnInit, OnDestroy {
             this.messages = messages;
             this.lastMessageId = latestMessage.id;
             this.scrollToBottom();
-            console.log('Polling: Found new messages, updated UI');
+            // Found new messages, updated UI
           }
         }
       },
       error: (error) => {
-        console.error('Polling error:', error);
+        // Polling error
       }
     });
   }
@@ -606,14 +604,13 @@ export class MessageComponent implements OnInit, OnDestroy {
 
           this.scrollToBottom();
         } else {
-          console.warn('Optimistic message not found for replacement:', tempId);
+          // Optimistic message not found for replacement
         }
 
         // Don't send via WebSocket since we already have the server message
         // WebSocket is only for real-time updates from other users
       },
       error: (error) => {
-        console.error('Failed to send message:', error);
         // Remove optimistic message
         const tempMessageIndex = this.messages.findIndex(m => m.id === tempId);
         if (tempMessageIndex !== -1) {

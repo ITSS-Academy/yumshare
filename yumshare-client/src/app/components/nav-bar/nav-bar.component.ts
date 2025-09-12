@@ -168,7 +168,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
       this.store.dispatch(AuthActions.clearAuthState());
       this.store.dispatch(FollowActions.clearFollowState());
     } catch (error) {
-      console.error('Logout error:', error);
       // Nếu có lỗi, vẫn clear auth state và follow state
       this.store.dispatch(AuthActions.clearAuthState());
       this.store.dispatch(FollowActions.clearFollowState());

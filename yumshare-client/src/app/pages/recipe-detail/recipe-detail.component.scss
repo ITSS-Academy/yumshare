@@ -148,7 +148,7 @@
 /* Regular Scroll Containers */
 .regular-ingredient-list,
 .regular-step-list {
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -788,6 +788,10 @@ p {
   }
   .right {
     width: 68%;
+  }
+  .describe {
+    gap: 2rem;
+    padding-top: 2.5rem;
   }
   .ingredient-list {
     max-height: 18rem;

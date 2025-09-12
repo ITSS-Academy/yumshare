@@ -30,7 +30,7 @@
       <div class="empty-chat">
         <div class="empty-chat-icon"><mat-icon>chat_bubble_outline</mat-icon></div>
         <h3>{{ 'No conversations yet' | translate }}</h3>
-          <p>{{ 'Start a new conversation by searching for users' | translate }}</p>
+        <p>{{ 'Start a new conversation by searching for users' | translate }}</p>
       </div>
     }
     </div>
@@ -39,8 +39,8 @@
 } @else {
   <div class="loading-container">
     <div class="loading-spinner">
-      <mat-icon>account_circle</mat-icon>
-      <p>Loading user profile...</p>
+      <mat-icon>chat</mat-icon>
+      <p>{{ 'Loading messages...' | translate }}</p>
     </div>
   </div>
 }

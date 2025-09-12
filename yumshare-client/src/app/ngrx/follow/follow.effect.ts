@@ -13,7 +13,6 @@ export const followUserEffects = createEffect(
         from(followService.followUser(action.followerId, action.followingId)).pipe(
           map((follow) => FollowActions.followUserSuccess({ follow })),
           catchError((error) => {
-            console.error('Follow error:', error);
             return of(FollowActions.followUserFailure({ error: error.message }));
           })
         )

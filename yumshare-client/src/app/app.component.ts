@@ -72,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.store.dispatch(AuthActions.storeCurrentUser({currentUser: user, idToken: idToken}));
         this.store.dispatch(AuthActions.getMineProfile({idToken: idToken}));
         
-        console.log('idToken', idToken);
+        // Token refreshed
         // Hiển thị snackbar chỉ khi chưa từng hiển thị trong session này
         if (!localStorage.getItem('loginSnackbarShown')) {
           this._snackBar.openFromComponent(SnackbarComponent, {
@@ -183,7 +183,7 @@ export class AppComponent implements OnInit, OnDestroy {
           idToken: newToken
         }));
       } catch (error) {
-        console.error('❌ Error refreshing token:', error);
+        // Error refreshing token
       }
     }, 50 * 60 * 1000); // 50 phút
   }

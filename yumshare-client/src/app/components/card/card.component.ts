@@ -210,7 +210,6 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
   // ❤️ toggle favorite using NgRx - OPTIMIZED
   toggleFavorite(item: any) {
     if (!item.id) {
-      console.error('Recipe ID is required for favorite toggle');
       return;
     }
 
