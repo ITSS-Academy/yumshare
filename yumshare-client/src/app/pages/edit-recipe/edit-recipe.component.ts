@@ -19,13 +19,17 @@ import { take } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe/recipe.service';
 import { Category } from '../../models/category.model';
 import { Recipe } from '../../models/recipe.model';
+import { RecipeStep } from '../../models/recipe-step.model';
+import { PaginatedResponse } from '../../models/paginated-response.model';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AuthModel } from '../../models/auth.model';
 import { AuthState } from '../../ngrx/auth/auth.state';
 import { SafePipe } from '../../pipes/safe.pipe';
 import { User } from '../../models/user.model';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 import * as CategoryActions from '../../ngrx/category/category.actions';
 import * as CategorySelectors from '../../ngrx/category/category.selectors';
-
+import {TranslateService} from '@ngx-translate/core';
 @Component({
   selector: 'app-edit-recipe',
   templateUrl: './edit-recipe.component.html',
@@ -42,7 +46,8 @@ import * as CategorySelectors from '../../ngrx/category/category.selectors';
     MatCardModule,
     MatDividerModule,
     MatStepperModule,
-    SafePipe
+    SafePipe,
+    TranslatePipe
   ],
   styleUrls: ['./edit-recipe.component.scss']
 })
@@ -78,6 +83,7 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private route: ActivatedRoute,
     private router: Router,
+    private translate: TranslateService,
     private store: Store<{auth: AuthState, category: any}>,
     private cdr: ChangeDetectorRef
   ) {
@@ -296,6 +302,9 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     this.subscriptions.push(profileSubscription);
   }
 
+  getStepPlaceholder(i: number): string {
+  return `${this.translate.instant('Describe step')} ${i + 1}...`;
+  }
   loadRecipe() {
     if (!this.recipeId) return;
     
@@ -670,18 +679,17 @@ export class EditRecipeComponent implements OnInit, OnDestroy {
     return this.extractYoutubeVideoId(url) !== null;
   }
 
-  formatTime(minutes: number): string {
+ formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
     if (hours > 0 && mins > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''}`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''}`;
-    } else {
-      return `${mins} minute${mins > 1 ? 's' : ''}`;
-    }
+    return `${hours} ${this.translate.instant('hours')} ${mins} ${this.translate.instant('minutes')}`;
+  } else if (hours > 0) {
+    return `${hours} ${this.translate.instant('hours')}`;
+  } else {
+    return `${mins} ${this.translate.instant('minutes')}`;
   }
+}
 
 
   onImageClick() {

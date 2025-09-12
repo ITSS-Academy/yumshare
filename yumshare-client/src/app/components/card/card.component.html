@@ -19,11 +19,10 @@
         <!-- Độ khó & Thời gian nấu & Like count -->
         <div class="dish-info-row" (click)="navigationToDetail(item.id)">
           <span class="difficulty-label" [ngClass]="getDifficultyClass(item.difficulty)">
-            {{ getDifficultyLabel(item.difficulty) }}
-          </span>
+{{ getDifficultyLabel(item.difficulty) | translate }}          </span>
           <span class="cooktime-label">
             <mat-icon style="font-size:18px;vertical-align:middle;">schedule</mat-icon>
-            {{ item.total_cooking_time }} minutes
+            {{ item.total_cooking_time }} {{ 'minutes' | translate }}
           </span>
           <span class="like-count-label">
             <mat-icon style="font-size:18px;vertical-align:middle;">thumb_up</mat-icon>

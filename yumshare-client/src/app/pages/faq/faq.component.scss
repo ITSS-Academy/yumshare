@@ -34,6 +34,8 @@
   margin-bottom: 0;
 }
 
+
+
 .headtext1 {
   width: 40%;
   margin-top: 0;
@@ -182,16 +184,16 @@
   content: "";
 }
 .group1:hover .chat1 p::before {
-  content: "Explore hundreds of world-class recipes, from everyday meals to fine dining";
+  content: var(--faq-hover-1, "Explore hundreds of world-class recipes, from everyday meals to fine dining");
 }
 .group2:hover .chat2 p::before {
-  content: "Clear guidance for every dish so you can cook with confidence";
+  content: var(--faq-hover-2, "Clear guidance for every dish so you can cook with confidence");
 }
 .group3:hover .chat3 p::before {
-  content: "Find exactly what you want in seconds with our intelligent search.";
+  content: var(--faq-hover-3, "Find exactly what you want in seconds with our intelligent search.");
 }
 .group4:hover .chat4 p::before {
-  content: "Connect, share, and learn with food lovers worldwide.";
+  content: var(--faq-hover-4, "Connect, share, and learn with food lovers worldwide.");
 }
 .group1 .nut, .group2 .nut, .group3 .nut, .group4 .nut {
   z-index: 3;
@@ -645,4 +647,10 @@
     align-items: center;
 
   }
+}
+
+@media (min-width: 1438px){
+  .lang-vi .t1{
+  margin-right: 28% !important;
+}
 }

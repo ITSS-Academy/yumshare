@@ -8,12 +8,13 @@ import { User } from '../../../../models/user.model';
 import { ChatMessage } from '../../../../models/chat-message.model';
 import { ChatMessageSkeletonComponent } from '../../../../components/skeleton/chat-message-skeleton.component';
 import { LocalTimePipe } from '../../../../pipes/local-time.pipe';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ShareModule } from "../../../../shared/share.module";
 
 @Component({
   selector: 'app-chat-window',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe, ScrollingModule, ShareModule, MatIconModule],
+  imports: [CommonModule, FormsModule, ChatMessageSkeletonComponent, LocalTimePipe, ScrollingModule, ShareModule, TranslatePipe,MatIconModule],
   templateUrl: './chat-window.component.html',
   styleUrls: ['./chat-window.component.scss']
 })

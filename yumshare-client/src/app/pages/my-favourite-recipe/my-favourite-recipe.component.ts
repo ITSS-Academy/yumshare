@@ -18,6 +18,7 @@ import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TranslatePipe } from '@ngx-translate/core';
 
 // NgRx imports
 import * as FavoriteActions from '../../ngrx/favorite/favorite.actions';
@@ -37,6 +38,7 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule,
     FormsModule,
+    TranslatePipe,
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,

@@ -18,11 +18,11 @@ import { ChatMessage } from '../../models/chat-message.model';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { ChatWindowComponent } from './components/chat-window/chat-window.component';
 import {FooterComponent} from '../../components/footer/footer.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, ShareModule, UserListComponent, ChatWindowComponent, MatIconModule],
+  imports: [CommonModule, TranslatePipe, FormsModule, ShareModule, UserListComponent, ChatWindowComponent],
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })

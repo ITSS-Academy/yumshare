@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, filter, startWith, take } from 'rxjs/operators';
+import { TranslatePipe } from '@ngx-translate/core';
 
 // Material UI imports
 import { MatButton, MatIconButton } from "@angular/material/button";
@@ -36,6 +37,7 @@ import { Category } from '../../models/category.model';
   imports: [
     CommonModule,
     FormsModule,
+    TranslatePipe,
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,

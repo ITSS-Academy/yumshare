@@ -13,6 +13,7 @@ import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
 import { AsyncPipe, CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CardComponent } from '../../components/card/card.component';
 
 @Component({
@@ -26,6 +27,7 @@ import { CardComponent } from '../../components/card/card.component';
     CommonModule,
     MatProgressSpinnerModule,
     AsyncPipe,
+    TranslatePipe,
     CardComponent,
   ],
   templateUrl: './search.component.html',

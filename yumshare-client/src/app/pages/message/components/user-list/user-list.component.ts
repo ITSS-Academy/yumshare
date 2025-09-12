@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Chat } from '../../../../models/chat.model';
 import { User } from '../../../../models/user.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule,TranslatePipe],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
 })

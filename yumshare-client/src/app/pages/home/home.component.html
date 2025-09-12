@@ -11,47 +11,45 @@
     </div>
   </div>
 
-  <h3>Recipe Categories</h3>
+  <h3>{{ 'Recipe Categories' | translate }}</h3>
   <div class="container-image-categories">
     @for (category of category$ | async; track category.id; let i = $index) {
       <h2 [class]="'dish-type-' + (i + 1)" (click)="categoryClick(category)">
-        <span>{{ category.name }}</span>
+        <span>{{ category.name | translate }}</span>
       </h2>
     }
   </div>
 
   <div class="section-header">
-    <h3>Today's Dish</h3>
+    <h3>{{ "Today's Dish" | translate }}</h3>
     <button class="view-all-btn" (click)="nextTodayDish()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
   <div class="container-card">
-      @if (paginatedRecipes) {
-  <app-card [cardData]="paginatedRecipes.data"></app-card>
-}
+    @if (paginatedRecipes) {
+      <app-card [cardData]="paginatedRecipes.data"></app-card>
+    }
   </div>
 
   <div class="section-header">
-    <h3>Main courses</h3> 
+    <h3>{{ 'Main courses' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllMainCourses()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
-
-<div class="container-card">
-  @if (mainCourses && mainCourses.length > 0) {
-    <app-card [cardData]="mainCourses"></app-card>
-  }
-</div>
-
+  <div class="container-card">
+    @if (mainCourses && mainCourses.length > 0) {
+      <app-card [cardData]="mainCourses"></app-card>
+    }
+  </div>
 
   <div class="section-header">
-    <h3>Beverages</h3>
+    <h3>{{ 'Beverages' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllBeverages()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
@@ -62,9 +60,9 @@
   </div>
 
   <div class="section-header">
-    <h3>Desserts</h3>
+    <h3>{{ 'Desserts' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllDesserts()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>
@@ -75,9 +73,9 @@
   </div>
 
   <div class="section-header">
-    <h3>Snacks</h3>
+    <h3>{{ 'Snacks' | translate }}</h3>
     <button class="view-all-btn" (click)="viewAllSnacks()">
-      <span>See All</span>
+      <span>{{ 'See All' | translate }}</span>
       <span class="arrow">&#10095;</span>
     </button>
   </div>

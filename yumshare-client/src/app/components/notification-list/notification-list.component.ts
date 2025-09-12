@@ -17,7 +17,7 @@ import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import * as NotificationActions from '../../ngrx/notification/notification.actions';
 import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-notification-list',
   standalone: true,
@@ -27,6 +27,7 @@ import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
     MatButtonModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    TranslatePipe,
     LocalTimePipe,
   ],
   templateUrl: './notification-list.component.html',

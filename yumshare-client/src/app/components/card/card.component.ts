@@ -15,7 +15,7 @@ import { selectRecipeLikeCount } from '../../ngrx/likes/likes.selectors';
 // import {ResponsiveImageComponent} from '../responsive-image/responsive-image.component';
 // import {LazyImageDirective} from '../../directives/lazy-image/lazy-image.directive';
 // import {SlideInDirective} from '../../directives/animations/slide-in.directive';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-card',
   imports: [
@@ -25,7 +25,8 @@ import { selectRecipeLikeCount } from '../../ngrx/likes/likes.selectors';
     MatSnackBarModule,
     ShareModule,
     CommonModule,
-    LazyImageDirective
+    LazyImageDirective,
+    TranslatePipe,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -287,7 +288,6 @@ export class CardComponent implements OnInit, OnDestroy, OnChanges {
           // Share failed - could show toast notification
         });
     } else {
-      // Fallback: copy link to clipboard
       navigator.clipboard.writeText(url).then(() => {
         alert('Link copied to clipboard!');
       });

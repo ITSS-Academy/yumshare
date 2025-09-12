@@ -1,5 +1,5 @@
 <div class="search-container" id="search-container">
-  <h2 id="search-title">Discover Your Favorites</h2>
+  <h2 id="search-title">{{ 'Discover Your Favorites' | translate }}</h2>
 
   <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
     <select 
@@ -9,13 +9,13 @@
       class="search-type-select"
       (ngModelChange)="onSearchTypeChange()"
     >
-      <option value="recipe">Search Recipes</option>
-      <option value="author">Search by Author</option>
+      <option value="recipe">{{ 'Recipes' | translate }}</option>
+      <option value="author">{{ 'Authors' | translate }}</option>
     </select>
     <input
       type="text"
       id="search-input"
-      [placeholder]="getSearchPlaceholder()"
+      [placeholder]="getSearchPlaceholder() | translate"
       [(ngModel)]="keyword"
       name="keyword"
     />
@@ -25,18 +25,18 @@
       name="category"
       [disabled]="searchType === 'author'"
     >
-      <option value="">All Categories</option>
+      <option value="">{{ 'All Categories' | translate }}</option>
       @for (c of categories; track c.id) {
-        <option [value]="c.id">{{ c.name }}</option>
+        <option [value]="c.id">{{ c.name | translate }}</option>
       }
     </select>
     <button mat-raised-button color="primary" id="search-button" type="submit">
       <mat-icon>search</mat-icon>
-      Search
+      {{ 'Search' | translate }}
     </button>
     <button mat-stroked-button color="warn" id="clear-button" type="button" (click)="clearSearch()">
       <mat-icon>clear</mat-icon>
-      Clear
+      {{ 'Clear' | translate }}
     </button>
   </form>
 
@@ -50,7 +50,7 @@
     <div class="error-container" id="search-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="onSearch()">Retry</button>
+      <button mat-raised-button color="primary" (click)="onSearch()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -58,7 +58,7 @@
     <div class="error-container" id="recipes-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="loadInitialRecipes()">Retry</button>
+      <button mat-raised-button color="primary" (click)="loadInitialRecipes()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -66,18 +66,23 @@
     @if (stats.totalResults > 0) {
       <div class="results-info" id="results-info">
         @if (stats.currentQuery) {
-          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b> 
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'results for' | translate }}: <b>{{ stats.currentQuery }}</b> 
             @if (searchType === 'author') {
-              <span class="search-type-badge">(by author)</span>
+              <span class="search-type-badge">({{ 'by author' | translate }})</span>
             } @else {
-              <span class="search-type-badge">(recipes)</span>
+              <span class="search-type-badge">({{ 'recipes' | translate }})</span>
             }
           </p>
         } @else {
-          <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'recipes' | translate }}
+          </p>
         }
         @if (stats.totalPages > 1) {
-          <p>Page {{ stats.currentPage }} of {{ stats.totalPages }}</p>
+          <p>
+            {{ 'Page' | translate }} {{ stats.currentPage }} {{ 'of' | translate }} {{ stats.totalPages }}
+          </p>
         }
         @if (stats.isLoading) {
           <mat-spinner diameter="20"></mat-spinner>
@@ -86,14 +91,15 @@
     } @else if (!stats.isLoading && !stats.hasError && stats.currentQuery) {
       <div class="no-results" id="no-results">
         <mat-icon>search_off</mat-icon>
-        <p>No results found for "{{ stats.currentQuery }}" 
+        <p>
+          {{ 'No results found for' | translate }} "{{ stats.currentQuery }}" 
           @if (searchType === 'author') {
-            <span class="search-type-badge">(by author)</span>
+            <span class="search-type-badge">({{ 'by author' | translate }})</span>
           } @else {
-            <span class="search-type-badge">(recipes)</span>
+            <span class="search-type-badge">({{ 'recipes' | translate }})</span>
           }
         </p>
-        <button mat-raised-button color="primary" (click)="clearSearch()">Clear Search</button>
+        <button mat-raised-button color="primary" (click)="clearSearch()">{{ 'Clear Search' | translate }}</button>
       </div>
     }
   }

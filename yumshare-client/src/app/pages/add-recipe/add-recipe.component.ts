@@ -22,7 +22,8 @@ import { User } from '../../models/user.model';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 import * as CategoryActions from '../../ngrx/category/category.actions';
 import * as CategorySelectors from '../../ngrx/category/category.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-recipe',
   templateUrl: './add-recipe.component.html',
@@ -39,7 +40,8 @@ import * as CategorySelectors from '../../ngrx/category/category.selectors';
     MatCardModule,
     MatDividerModule,
     MatStepperModule,
-    SafePipe
+    SafePipe,
+    TranslatePipe
   ],
   styleUrls: ['./add-recipe.component.scss']
 })
@@ -71,7 +73,8 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     private recipeService: RecipeService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private store: Store<{auth: AuthState, category: any}>
+    private store: Store<{auth: AuthState, category: any}>,
+    private translate: TranslateService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -266,6 +269,10 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
 
     return true;
   }
+  
+  getStepPlaceholder(i: number): string {
+  return `${this.translate.instant('Describe step')} ${i + 1}...`;
+}
 
   onVideoDragOver(event: DragEvent) {
     event.preventDefault();
@@ -403,13 +410,13 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     if (hours > 0 && mins > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''}`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''}`;
-    } else {
-      return `${mins} minute${mins > 1 ? 's' : ''}`;
-    }
+    return `${hours} ${this.translate.instant('hours')} ${mins} ${this.translate.instant('minutes')}`;
+  } else if (hours > 0) {
+    return `${hours} ${this.translate.instant('hours')}`;
+  } else {
+    return `${mins} ${this.translate.instant('minutes')}`;
   }
+}
 
   async onSubmit() {
     if (!this.mineProfile) {

@@ -14,7 +14,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Comment } from '../../../../models/comment.model';
 import { User } from '../../../../models/user.model';
 import { CreateCommentDto, UpdateCommentDto } from '../../../../../app/services/comment/comment.service';
-
+import { TranslatePipe } from '@ngx-translate/core';
 // NGRX imports
 import * as CommentActions from '../../../../ngrx/comment/comment.actions';
 import * as AuthActions from '../../../../ngrx/auth/auth.actions';
@@ -33,7 +33,8 @@ import { selectCurrentUser, selectMineProfile } from '../../../../ngrx/auth/auth
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    ScrollingModule
+    ScrollingModule,
+    TranslatePipe
   ],
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.scss']

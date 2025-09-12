@@ -18,14 +18,15 @@ import { FollowState } from '../../ngrx/follow/follow.state';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as FollowActions from '../../ngrx/follow/follow.actions';
 import * as FollowSelectors from '../../ngrx/follow/follow.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   imports: [
     ShareModule,
     LoadingComponent,
-    ScrollingModule
+    ScrollingModule,
+    TranslatePipe
   ],
   styleUrls: ['./profile.component.scss']
 })
