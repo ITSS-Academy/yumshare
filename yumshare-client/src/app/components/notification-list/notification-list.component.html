@@ -1,14 +1,14 @@
 <div class="notification-container">
   <!-- Header -->
   <div class="notification-header">
-    <h3>Notifications</h3>
+    <h3>{{ 'Notifications' | translate }}</h3>
     <div class="header-actions">
       <button 
         mat-button 
         color="primary" 
         (click)="markAllAsRead()"
         [disabled]="(unreadCount$ | async) === 0">
-        Mark all as read
+        {{ 'Mark all as read' | translate }}
       </button>
     </div>
   </div>
@@ -17,7 +17,7 @@
   @if (loading$ | async) {
     <div class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading notifications...</p>
+      <p>{{ 'Loading notifications...' | translate }}</p>
     </div>
   }
 
@@ -27,7 +27,7 @@
       <mat-icon color="warn">error</mat-icon>
       <p>{{ error }}</p>
       <button mat-button color="primary" (click)="loadNotifications()">
-        Retry
+        {{ 'Retry' | translate }}
       </button>
     </div>
   }
@@ -36,8 +36,8 @@
   @if (!(loading$ | async) && !(error$ | async) && (notifications$ | async)?.length === 0) {
     <div class="empty-container">
       <mat-icon>notifications_none</mat-icon>
-      <p>No notifications yet</p>
-      <small>You'll see notifications here when someone interacts with your content</small>
+      <p>{{ 'No notifications yet' | translate }}</p>
+      <small>{{ "You'll see notifications here when someone interacts with your content" | translate }}</small>
     </div>
   }
 
@@ -49,7 +49,7 @@
     <div class="other-notifications-section">
       <h4 class="section-title">
         <mat-icon>notifications</mat-icon>
-        Notifications
+        {{ 'Notifications' | translate }}
       </h4>
       <div class="notifications-list">
         @for (notification of otherNotifications$ | async; track notification.id) {
@@ -66,13 +66,13 @@
 
             <!-- Notification Content -->
             <div class="notification-content">
-              <p class="notification-text">{{ notification.content }}</p>
+              <p class="notification-text">{{ getTranslatedNotificationContent(notification) }}</p>
               <div class="notification-meta">
                 <span class="notification-time">
                   {{ notification.created_at | localTime:'full' }}
                 </span>
                 @if (!notification.is_read) {
-                  <mat-chip color="primary" selected>New</mat-chip>
+                  <mat-chip color="primary" selected>{{ 'New' | translate }}</mat-chip>
                 }
               </div>
             </div>
@@ -84,7 +84,7 @@
                   mat-icon-button 
                   color="primary"
                   (click)="markAsRead(notification); $event.stopPropagation()"
-                  matTooltip="Mark as read">
+                  [matTooltip]="'Mark as read' | translate">
                   <mat-icon>check</mat-icon>
                 </button>
               }
@@ -92,7 +92,7 @@
                 mat-icon-button 
                 color="warn"
                 (click)="deleteNotification(notification.id); $event.stopPropagation()"
-                matTooltip="Delete notification">
+                [matTooltip]="'Delete notification' | translate">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>

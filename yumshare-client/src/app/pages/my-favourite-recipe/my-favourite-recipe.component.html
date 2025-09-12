@@ -1,31 +1,30 @@
 <div class="content-container" #contentContainer>
   <div class="my-recipe-header">
-    <h1>My Favourite Recipes</h1>
-    <p>Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your
-      favourites. Enjoy exploring and saving your best-loved dishes!</p>
+    <h1>{{ 'My Favourite Recipes' | translate }}</h1>
+    <p>{{ "Here, you can manage all your favourite recipes. Feel free to click on any recipe to view or remove it from your favourites. Enjoy exploring and saving your best-loved dishes!" | translate }}</p>
   </div>
 
   <div class="sort-and-category">
     <div class="difficulty">
       <button mat-button [matMenuTriggerFor]="Difficulty">
-        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedDifficulty | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Difficulty="matMenu">
-        <button mat-menu-item (click)="clearDifficultyFilter()">All Difficulties</button>
-        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
-        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
-        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+        <button mat-menu-item (click)="clearDifficultyFilter()">{{ 'All Difficulties' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Easy')">{{ 'Easy' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">{{ 'Medium' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">{{ 'Hard' | translate }}</button>
       </mat-menu>
     </div>
 
     <div class="category">
       <button mat-button [matMenuTriggerFor]="Category">
-        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedCategory | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Category="matMenu">
-        <button mat-menu-item (click)="clearCategoryFilter()">All Categories</button>
+        <button mat-menu-item (click)="clearCategoryFilter()">{{ 'All Categories' | translate }}</button>
         @for (category of activeCategories$ | async; track category.id) {
-          <button mat-menu-item (click)="setCategory(category)">{{ category.name }}</button>
+          <button mat-menu-item (click)="setCategory(category)">{{ category.name | translate }}</button>
         }
       </mat-menu>
     </div>
@@ -35,13 +34,13 @@
     @if (favoritesLoading$ | async) {
       <div class="loading-container">
         <mat-spinner></mat-spinner>
-        <p>Loading your favorite recipes...</p>
+        <p>{{ 'Loading your favorite recipes...' | translate }}</p>
       </div>
     } @else if (isEmpty$ | async) {
       <div class="empty-state">
         <mat-icon class="empty-icon">favorite_border</mat-icon>
-        <h3>No favorite recipes yet</h3>
-        <p>Explore and add your favorite recipes to this list!</p>
+        <h3>{{ 'No favorite recipes yet' | translate }}</h3>
+        <p>{{ 'Explore and add your favorite recipes to this list!' | translate }}</p>
       </div>
     } @else {
       @if ((displayedRecipes$ | async)?.length > 15) {
@@ -61,8 +60,8 @@
                 <!-- Top: title + author -->
                 <div class="recipe-header">
                   <div class="name-and-author">
-                    <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
-                    <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || ('Untitled Recipe' | translate) }}</h3>
+                    <p class="recipe-author">{{ 'by' | translate }} {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || ('Unknown Author' | translate) }}</p>
                   </div>
                   <div class="example-button-row">
                     <div class="example-flex-container">
@@ -75,13 +74,13 @@
 
                 <!-- Middle: description -->
                 <div class="recipe-description">
-                  <p>{{ favorite.recipe?.description || 'No description available' }}</p>
+                  <p>{{ favorite.recipe?.description || ('No description available' | translate) }}</p>
                 </div>
 
                 <!-- Additional info -->
                 <div class="recipe-meta">
-                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} min</span>
-                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || 'Unknown' }}</span>
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} {{ 'min' | translate }}</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || ('Unknown' | translate) }}</span>
                 </div>
 
                 <!-- Creation date -->
@@ -109,8 +108,8 @@
                 <!-- Top: title + author -->
                 <div class="recipe-header">
                   <div class="name-and-author">
-                    <h3 class="recipe-title">{{ favorite.recipe?.title || 'Untitled Recipe' }}</h3>
-                    <p class="recipe-author">by {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || 'Unknown Author' }}</p>
+                    <h3 class="recipe-title">{{ favorite.recipe?.title || ('Untitled Recipe' | translate) }}</h3>
+                    <p class="recipe-author">{{ 'by' | translate }} {{ favorite.recipe?.user?.displayName || favorite.recipe?.user?.email || ('Unknown Author' | translate) }}</p>
                   </div>
                   <div class="example-button-row">
                     <div class="example-flex-container">
@@ -123,13 +122,13 @@
 
                 <!-- Middle: description -->
                 <div class="recipe-description">
-                  <p>{{ favorite.recipe?.description || 'No description available' }}</p>
+                  <p>{{ favorite.recipe?.description || ('No description available' | translate) }}</p>
                 </div>
 
                 <!-- Additional info -->
                 <div class="recipe-meta">
-                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} min</span>
-                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || 'Unknown' }}</span>
+                  <span class="recipe-time">{{ favorite.recipe?.total_cooking_time || 0 }} {{ 'min' | translate }}</span>
+                  <span class="recipe-difficulty" [class]="'recipe-difficulty ' + ((favorite.recipe?.difficulty || 'Unknown')?.toLowerCase() || '')">{{ favorite.recipe?.difficulty || ('Unknown' | translate) }}</span>
                 </div>
 
                 <!-- Creation date -->

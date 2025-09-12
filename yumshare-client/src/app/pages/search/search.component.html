@@ -1,5 +1,5 @@
 <div class="search-container" id="search-container">
-  <h2 id="search-title">Discover Cooking Recipes</h2>
+  <h2 id="search-title">{{ 'Discover Cooking Recipes' | translate }}</h2>
 
   <div class="search-form-container">
     <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
@@ -12,7 +12,7 @@
           (click)="searchType = 'recipe'; onSearchTypeChange()"
         >
           <mat-icon>restaurant</mat-icon>
-          <span>Recipes</span>
+          <span>{{ 'Recipes' | translate }}</span>
         </button>
         <button 
           type="button"
@@ -21,7 +21,7 @@
           (click)="searchType = 'author'; onSearchTypeChange()"
         >
           <mat-icon>person</mat-icon>
-          <span>Authors</span>
+          <span>{{ 'Authors' | translate }}</span>
         </button>
       </div>
 
@@ -61,25 +61,27 @@
           </div>
           
           <!-- Dropdown Options -->
-          <div class="dropdown-options" [class.show]="isDropdownOpen" *ngIf="isDropdownOpen">
-            <div 
-              class="dropdown-option" 
-              [class.selected]="selectedCategory === ''"
-              (click)="selectCategory('')"
-            >
-              <mat-icon>apps</mat-icon>
-              <span>All Categories</span>
-            </div>
-            @for (category of categories; track category.id) {
+          @if (isDropdownOpen) {
+            <div class="dropdown-options" [class.show]="isDropdownOpen">
               <div 
                 class="dropdown-option" 
-                [class.selected]="selectedCategory === category.id"
-                (click)="selectCategory(category.id)"
+                [class.selected]="selectedCategory === ''"
+                (click)="selectCategory('')"
               >
-                <span>{{ category.name }}</span>
+                <mat-icon>apps</mat-icon>
+                <span>{{ 'All Categories' | translate }}</span>
               </div>
-            }
-          </div>
+              @for (category of categories; track category.id) {
+                <div 
+                  class="dropdown-option" 
+                  [class.selected]="selectedCategory === category.id"
+                  (click)="selectCategory(category.id)"
+                >
+                  <span>{{ category.name | translate }}</span>
+                </div>
+              }
+            </div>
+          }
         </div>
       </div>
 
@@ -94,7 +96,7 @@
           [disabled]="!keyword.trim()"
         >
           <mat-icon>search</mat-icon>
-          <span>Search</span>
+          <span>{{ 'Search' | translate }}</span>
         </button>
         <button 
           mat-stroked-button 
@@ -105,16 +107,17 @@
           class="clear-btn"
         >
           <mat-icon>refresh</mat-icon>
-          <span>Reset</span>
+          <span>{{ 'Reset' | translate }}</span>
         </button>
       </div>
     </form>
 
     <!-- Quick Filters -->
-    <div class="quick-filters" *ngIf="searchType === 'recipe' && categories.length > 0">
+    @if (searchType === 'recipe' && categories.length > 0) {
+      <div class="quick-filters">
       <span class="filter-label">
         <mat-icon>tune</mat-icon>
-        Quick filters:
+        {{ 'Quick filters:' | translate }}
       </span>
       <div class="filter-chips">
         <button 
@@ -123,7 +126,7 @@
           (click)="selectedCategory = ''"
         >
           <mat-icon>apps</mat-icon>
-          All
+          {{ 'All' | translate }}
         </button>
         @for (category of categories; track category.id) {
           <button 
@@ -131,11 +134,12 @@
             [class.active]="selectedCategory === category.id"
             (click)="selectedCategory = category.id"
           >
-            {{ category.name }}
+            {{ category.name | translate }}
           </button>
         }
       </div>
-    </div>
+      </div>
+    }
   </div>
 
   <!-- @if (getLoadingState() | async) {
@@ -148,7 +152,7 @@
     <div class="error-container" id="search-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="onSearch()">Retry</button>
+      <button mat-raised-button color="primary" (click)="onSearch()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -156,7 +160,7 @@
     <div class="error-container" id="recipes-error">
       <mat-icon>error</mat-icon>
       <p class="error-message">{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="loadInitialRecipes()">Retry</button>
+      <button mat-raised-button color="primary" (click)="loadInitialRecipes()">{{ 'Retry' | translate }}</button>
     </div>
   }
 
@@ -164,18 +168,23 @@
     @if (stats.totalResults > 0) {
       <div class="results-info" id="results-info">
         @if (stats.currentQuery) {
-          <p>Showing <b>{{ stats.totalResults }}</b> results for: <b>{{ stats.currentQuery }}</b> 
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'results for' | translate }}: <b>{{ stats.currentQuery }}</b> 
             @if (searchType === 'author') {
-              <span class="search-type-badge">(by author)</span>
+              <span class="search-type-badge">({{ 'by author' | translate }})</span>
             } @else {
-              <span class="search-type-badge">(recipes)</span>
+              <span class="search-type-badge">({{ 'recipes' | translate }})</span>
             }
           </p>
         } @else {
-          <p>Showing <b>{{ stats.totalResults }}</b> recipes</p>
+          <p>
+            {{ 'Showing' | translate }} <b>{{ stats.totalResults }}</b> {{ 'recipes' | translate }}
+          </p>
         }
         @if (stats.totalPages > 1) {
-          <p>Page {{ stats.currentPage }} of {{ stats.totalPages }}</p>
+          <p>
+            {{ 'Page' | translate }} {{ stats.currentPage }} {{ 'of' | translate }} {{ stats.totalPages }}
+          </p>
         }
         @if (stats.isLoading) {
           <mat-spinner diameter="20"></mat-spinner>
@@ -184,14 +193,15 @@
     } @else if (!stats.isLoading && !stats.hasError && stats.currentQuery) {
       <div class="no-results" id="no-results">
         <mat-icon>search_off</mat-icon>
-        <p>No results found for "{{ stats.currentQuery }}" 
+        <p>
+          {{ 'No results found for' | translate }} "{{ stats.currentQuery }}" 
           @if (searchType === 'author') {
-            <span class="search-type-badge">(by author)</span>
+            <span class="search-type-badge">({{ 'by author' | translate }})</span>
           } @else {
-            <span class="search-type-badge">(recipes)</span>
+            <span class="search-type-badge">({{ 'recipes' | translate }})</span>
           }
         </p>
-        <button mat-raised-button color="primary" (click)="clearSearch()">Clear Search</button>
+        <button mat-raised-button color="primary" (click)="clearSearch()">{{ 'Clear Search' | translate }}</button>
       </div>
     }
   }

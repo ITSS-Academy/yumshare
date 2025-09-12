@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-page-error',
-  imports: [CommonModule, MatButtonModule, MatIconModule, RouterModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, RouterModule, TranslateModule],
   templateUrl: './page-error.component.html',
   styleUrl: './page-error.component.scss'
 })

@@ -20,7 +20,9 @@ import { Subscription, Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
 import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -29,6 +31,8 @@ import * as NotificationSelectors from '../../ngrx/notification/notification.sel
     FormsModule,
     CommonModule,
     RouterModule,
+    TranslatePipe,
+    MatSlideToggleModule
     // DarkModeToggleComponent
   ],
   templateUrl: './nav-bar.component.html',
@@ -42,10 +46,9 @@ export class NavBarComponent implements OnInit, OnDestroy {
   userAvatar = '';
   mineProfile: User | null = null;
 
-  searchQuery = '';
-  showSuggestions = false;
   messageCount$!: Observable<number>;
   notificationCount$!: Observable<number>;
+  currentLang: string = 'en';
 
   private subscriptions: Subscription[] = [];
 
@@ -53,8 +56,18 @@ export class NavBarComponent implements OnInit, OnDestroy {
     private router: Router, 
     private dialog: MatDialog,
     private store: Store<{auth: AuthState}>,
-    private auth: Auth
+    private auth: Auth,
+    public translate: TranslateService // public để dùng trong template
+
   ) {
+    translate.addLangs(['en', 'vi']);
+
+    // Initialize currentLang using recommended methods
+    this.currentLang =
+      translate.getCurrentLang() ||
+      translate.getFallbackLang() ||
+      'en';
+
     // Initialize observables
     this.messageCount$ = this.store.select(NotificationSelectors.selectMessageCount);
     this.notificationCount$ = this.store.select(NotificationSelectors.selectUnreadCount);
@@ -83,6 +96,10 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
     // Setup keyboard shortcuts
     this.setupKeyboardShortcuts();
+    // Cập nhật currentLang khi đổi ngôn ngữ ở nơi khác
+    this.translate.onLangChange.subscribe(event => {
+      this.currentLang = event.lang;
+    });
   }
 
   ngOnDestroy() {
@@ -92,53 +109,16 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   onToggleSidebar() { this.toggleSidebar.emit(); }
 
-  onSearch() {
-    if (this.searchQuery?.trim()) {
-      this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
-      this.showSuggestions = false;
-    }
-  }
-
-  onSearchInput() {
-    // Show suggestions when typing
-    this.showSuggestions = this.searchQuery.length > 0;
-  }
-
-  clearSearch() {
-    this.searchQuery = '';
-    this.showSuggestions = false;
-  }
-
-  quickSearch(term: string) {
-    this.searchQuery = term;
-    this.onSearch();
-  }
-
-  onSearchFocus() {
-    this.showSuggestions = true;
-  }
-
-  onSearchBlur() {
-    // Delay hiding suggestions to allow clicking on them
-    setTimeout(() => {
-      this.showSuggestions = false;
-    }, 200);
+  openSearchModal() {
+    this.router.navigate(['/search']);
   }
 
   private setupKeyboardShortcuts() {
     document.addEventListener('keydown', (event) => {
-      // Ctrl+K to focus search
+      // Ctrl+K to open search
       if (event.ctrlKey && event.key === 'k') {
         event.preventDefault();
-        const searchInput = document.querySelector('.search input') as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }
-      
-      // Escape to clear search
-      if (event.key === 'Escape' && this.searchQuery) {
-        this.clearSearch();
+        this.openSearchModal();
       }
     });
   }
@@ -177,7 +157,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
       this.dialog.open(LoginComponent, { panelClass: 'custom-dialog', autoFocus: false });
     }
   }
-
+ 
 
 
   async onLogout() {
@@ -215,7 +195,10 @@ export class NavBarComponent implements OnInit, OnDestroy {
   onSettings() {
     // Navigate to settings page
   }
-
+ switchLang(lang: string) {
+    this.translate.use(lang);
+    this.currentLang = lang;
+  }
 
 
   // Method to simulate login (for testing)

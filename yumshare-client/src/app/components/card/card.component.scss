@@ -119,6 +119,33 @@
       gap: var(--spacing-sm);
       margin: 0 var(--spacing-md) var(--spacing-sm);
     }
+    .like-count {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #555;
+      gap: 4px;
+      line-height: 1;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+
+      mat-icon {
+        font-size: 16px !important;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        vertical-align: middle;
+      }
+      span {
+        display: flex;
+        align-items: center;
+        height: 16px;
+        line-height: 16px;
+      }
+    }
     .difficulty-label {
       font: var(--mat-sys-label-small);
       font-weight: var(--mat-sys-medium-font-weight);

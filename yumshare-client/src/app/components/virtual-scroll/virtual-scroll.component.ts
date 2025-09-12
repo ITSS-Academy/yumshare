@@ -31,14 +31,21 @@ export interface VirtualScrollOptions {
       <div class="virtual-scroll-content" 
            [style.transform]="'translateY(' + offsetY + 'px)'">
         
-        <div *ngFor="let item of visibleItems; trackBy: trackByFn"
-             class="virtual-scroll-item"
-             [style.height.px]="options.itemHeight">
-          
-          <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item, index: getItemIndex(item) }">
-          </ng-container>
-          
-        </div>
+        @if (visibleItems.length > 0) {
+          @for (item of visibleItems; track trackByFn($index, item)) {
+            <div class="virtual-scroll-item"
+                 [style.height.px]="options.itemHeight">
+              
+              <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item, index: getItemIndex(item) }">
+              </ng-container>
+              
+            </div>
+          }
+        } @else {
+          <div class="virtual-scroll-empty">
+            <p>No items to display</p>
+          </div>
+        }
         
       </div>
       
@@ -74,6 +81,15 @@ export interface VirtualScrollOptions {
     
     .virtual-scroll-item:hover {
       background-color: #f5f5f5;
+    }
+    
+    .virtual-scroll-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #666;
+      font-style: italic;
     }
   `]
 })

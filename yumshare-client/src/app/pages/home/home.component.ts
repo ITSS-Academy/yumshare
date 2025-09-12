@@ -10,7 +10,13 @@ import { Category, Recipe } from '../../models';
 import * as categoryActions from '../../ngrx/category/category.actions';
 import * as recipeActions from '../../ngrx/recipe/recipe.actions';
 import { CategoryState } from '../../ngrx/category/category.state';
+import { loadRecipeLikeCount } from '../../ngrx/likes/likes.actions';
 
+
+// NGX-TRANSLATE
+import { TranslateService } from '@ngx-translate/core';
+// import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -18,14 +24,14 @@ import { CategoryState } from '../../ngrx/category/category.state';
   imports: [
     MatProgressSpinnerModule,
     ShareModule,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit, OnDestroy {
   category$!: Observable<Category[]>;
-  
   paginatedRecipes$!: Observable<any>;
   paginatedRecipes: any;
   
@@ -42,9 +48,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   snacks: Recipe[] = [];
 
   subscriptions: Subscription[] = [];
-  constructor(private router: Router,
-              private store: Store<{recipe: RecipeState, category: CategoryState}>,
-              ) {
+
+  constructor(
+    private router: Router,
+    private store: Store<{ recipe: RecipeState, category: CategoryState }>,
+    private translate: TranslateService // Để dùng switchLang nếu muốn
+  ) {
+        translate.addLangs(['en', 'vi']);
+
     this.category$ = this.store.select(state => state.category.activeCategories);
     this.paginatedRecipes$ = this.store.select(state => state.recipe.paginatedRecipes);
     this.mainCourses$ = this.store.select(state => state.recipe.getRecipesByCategoryMainCourses);
@@ -54,18 +65,19 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(categoryActions.loadActiveCategories());
     this.store.dispatch(recipeActions.loadPaginatedRecipes({ page: 1, size: 10 }));
-    this.store.dispatch(recipeActions.getRecipesByCategoryMainCourses({categoryId: '49a60260-4891-4e2a-8d89-4ae373a4f985'}));
-    this.store.dispatch(recipeActions.getRecipesByCategoryBeverages({categoryId: 'ede393b2-64f8-4e69-a90e-86fb926a0262'}));
-    this.store.dispatch(recipeActions.getRecipesByCategoryDesserts({categoryId: '6208d5b9-308f-4e12-bd33-f4c0c43b8279'}));
-    this.store.dispatch(recipeActions.getRecipesByCategorySnacks({categoryId: '6d5ba137-7e96-4ae0-8873-259ea3afe284'}));
-
+    this.store.dispatch(recipeActions.getRecipesByCategoryMainCourses({ categoryId: '49a60260-4891-4e2a-8d89-4ae373a4f985' }));
+    this.store.dispatch(recipeActions.getRecipesByCategoryBeverages({ categoryId: 'ede393b2-64f8-4e69-a90e-86fb926a0262' }));
+    this.store.dispatch(recipeActions.getRecipesByCategoryDesserts({ categoryId: '6208d5b9-308f-4e12-bd33-f4c0c43b8279' }));
+    this.store.dispatch(recipeActions.getRecipesByCategorySnacks({ categoryId: '6d5ba137-7e96-4ae0-8873-259ea3afe284' }));
   }
+
   carouselImages: string[] = [
     'https://d3design.vn/uploads/Food_menu_web_banner_social_media_banner_template_Free_Psd7.jpg',
-    'https://beptueu.vn/hinhanh/tintuc/top-15-hinh-anh-mon-an-ngon-viet-nam-khien-ban-khong-the-roi-mat-1.jpg',
-    'https://img.pikbest.com/templates/20240714/delicious-food-menu-facebook-cover-and-web-banner-template_10667180.jpg!w700wp',
-  ];
+    'https://cms.piklab.vn/resources/Tai%20nguyen%20Piklab/File%20design%20TMDT/piklab539.jpg',
+    // 'https://img.pikbest.com/templates/20240714/delicious-food-menu-facebook-cover-and-web-banner-template_10667180.jpg!w700wp',
+    'https://www.brantbeacon.ca/wp-content/uploads/2024/02/https___cdn.evbuc_.com_images_666355159_279435315055_1_original.jpeg'
 
+  ];
 
   currentImageIndex = 0;
   private intervalId: any;
@@ -79,7 +91,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.category$.subscribe(categories => {
         // Categories loaded successfully
       })
-    )
+    );
 
    this.subscriptions.push(
     this.paginatedRecipes$.subscribe(paginatedRecipes => {
@@ -158,7 +170,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-    this.subscriptions.forEach(sub => sub.unsubscribe());  
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   nextImage() {
@@ -194,4 +206,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/search']).then();
   }
 
+  // Hàm chuyển đổi ngôn ngữ runtime (nếu cần)
+  switchLang(lang: string) {
+    this.translate.use(lang);
+  }
 }

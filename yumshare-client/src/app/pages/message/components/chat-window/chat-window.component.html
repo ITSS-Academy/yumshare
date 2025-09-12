@@ -10,17 +10,15 @@
       >
       <div class="chat-user-details">
         <div class="chat-user-name">{{ otherUser?.username || getFallbackUserName() }}</div>
-        <!-- <div class="chat-user-status">Online</div> -->
       </div>
     </div>
     <div class="chat-actions">
-<!--      <button class="action-btn">⋮</button>-->
+      <!-- ... -->
     </div>
   </div>
 
   <!-- Messages Container with Virtual Scrolling -->
   <div class="messages-container">
-    
     @if (messagesLoading) {
       <div class="loading-container">
         <app-chat-message-skeleton></app-chat-message-skeleton>
@@ -89,7 +87,7 @@
       <!-- No messages state -->
       <div class="no-messages">
         <mat-icon>message</mat-icon>
-        <p>No messages yet. Start the conversation!</p>
+       <p>{{ 'No messages yet. Start the conversation!' | translate }}</p>
       </div>
     }
   </div>
@@ -99,7 +97,7 @@
     <div class="input-wrapper">
       <input
         type="text"
-        placeholder="Type a message..."
+        [placeholder]="'Type a message...' | translate"
         [(ngModel)]="newMessage"
         (input)="onTyping()"
         (keypress)="onKeyPress($event)"

@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, filter, startWith, take } from 'rxjs/operators';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // Material UI imports
 import { MatButton, MatIconButton } from "@angular/material/button";
@@ -36,6 +37,7 @@ import { Category } from '../../models/category.model';
   imports: [
     CommonModule,
     FormsModule,
+    TranslatePipe,
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,
@@ -59,6 +61,7 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private translate = inject(TranslateService);
   private subscriptions: Subscription[] = [];
 
   // Public router for template access
@@ -213,7 +216,7 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
         .pipe(filter(error => !!error))
         .subscribe(error => {
           console.error('Recipes error:', error);
-          this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
+          this.snackBar.open(`${this.translate.instant('Error:')} ${error}`, this.translate.instant('Close'), { duration: 5000 });
         })
     );
 
@@ -423,7 +426,7 @@ export class MyRecipeComponent implements OnInit, OnDestroy {
         });
         
         // Show success message
-        this.snackBar.open('Recipe deleted successfully', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('Recipe deleted successfully'), this.translate.instant('Close'), { duration: 3000 });
         
         // Reload recipes after deletion
         this.subscriptions.push(

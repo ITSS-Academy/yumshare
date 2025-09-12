@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { LazyImageDirective } from '../../directives/lazy-image/lazy-image.directive';
 import { LoadingComponent } from '../../components/loading/loading.component';
@@ -37,7 +38,7 @@ import {
   selectLikesLoading,
   selectLikesForRecipe
 } from '../../ngrx/likes/likes.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
@@ -52,7 +53,8 @@ import {
     ScrollingModule,
     SafePipe,
     LazyImageDirective,
-    LoadingComponent
+    LoadingComponent,
+    TranslatePipe
   ],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
@@ -95,7 +97,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     private store: Store,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {
     // Initialize observables
     this.recipe$ = this.store.select(selectRecipeById);
@@ -169,7 +172,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     // Handle recipe errors
     const recipeErrorSub = this.recipeError$.subscribe(error => {
       if (error) {
-        this.snackBar.open(`Error loading recipe: ${error}`, 'Close', { duration: 3000 });
+        this.snackBar.open(`${this.translate.instant('Error loading recipe')}: ${error}`, this.translate.instant('Close'), { duration: 3000 });
       }
     });
     this.subscriptions.push(recipeErrorSub);
@@ -177,7 +180,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     // Handle comment errors
     const commentErrorSub = this.commentsError$.subscribe(error => {
       if (error) {
-        this.snackBar.open(`Error loading comments: ${error}`, 'Close', { duration: 3000 });
+        this.snackBar.open(`${this.translate.instant('Error loading comments')}: ${error}`, this.translate.instant('Close'), { duration: 3000 });
       }
     });
     this.subscriptions.push(commentErrorSub);
@@ -237,7 +240,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
     const followToggleSub = this.currentUser$.pipe(take(1)).subscribe((currentUser: any) => {
       if (!currentUser || !currentUser.uid) {
-        this.snackBar.open('Please Login to follow user!', 'Login', {
+        this.snackBar.open(this.translate.instant('Please Login to follow user!'), this.translate.instant('Close'), {
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
@@ -270,7 +273,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   toggleLike(): void {
     const toggleLikeSub = this.currentUser$.pipe(take(1)).subscribe(user => {
       if (!user || !user.uid) {
-        this.snackBar.open('Please Login to like recipe!', 'Login', {
+        this.snackBar.open(this.translate.instant('Please Login to like recipe!'), this.translate.instant('Close'), {
           duration: 2000,
           panelClass: ['warning-snackbar']
         });
@@ -286,7 +289,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   onLoginRequired(): void {
-    this.snackBar.open('Please Login to follow user!', 'Login', {
+    this.snackBar.open(this.translate.instant('Please Login to follow user!'), this.translate.instant('Close'), {
       duration: 4000,
       panelClass: ['warning-snackbar']
     });
@@ -462,7 +465,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   onIframeError(): void {
-    this.snackBar.open('Failed to load video. Please check the URL.', 'Close', {
+    this.snackBar.open(this.translate.instant('Failed to load video. Please check the URL.'), this.translate.instant('Close'), {
       duration: 3000,
       panelClass: ['error-snackbar']
     });

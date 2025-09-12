@@ -5,8 +5,6 @@
   max-width: 600px;
   margin: 0 auto;
   padding: var(--spacing-md);
-  max-height: 70vh;
-  overflow-y: auto;
 }
 
 .message-header {
@@ -65,9 +63,41 @@
 }
 
 .messages-list {
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+  
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-sm);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+    border-radius: var(--radius-sm);
+    transition: all var(--animation-duration-fast) var(--animation-easing);
+    
+    &:hover {
+      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    }
+  }
+  
+  &::-webkit-scrollbar-thumb:active {
+    background: #64748b;
+  }
+  
+  // Firefox scrollbar styling
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 rgba(0, 0, 0, 0.05);
 }
 
 .message-item {

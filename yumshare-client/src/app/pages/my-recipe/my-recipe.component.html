@@ -1,32 +1,30 @@
 <div class="content-container" #contentContainer>
   <div class="my-recipe-header">
-    <h1>My Recipes</h1>
-    <p>Here, you can manage all the recipes you've posted. Feel free to click on any recipe to edit or delete it. You
-      can also view comments and feedback from others. Don't forget to keep your recipes updated and share your culinary
-      adventures with the community!</p>
+    <h1>{{ 'My Recipes' | translate }}</h1>
+    <p>{{ "Here, you can manage all the recipes you've posted. Feel free to click on any recipe to edit or delete it. You can also view comments and feedback from others. Don't forget to keep your recipes updated and share your culinary adventures with the community!" | translate }}</p>
   </div>
 
   <div class="sort-and-category">
     <div class="difficulty">
       <button mat-button [matMenuTriggerFor]="Difficulty">
-        {{ selectedDifficulty }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedDifficulty | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Difficulty="matMenu">
-        <button mat-menu-item (click)="clearDifficultyFilter()">All Difficulties</button>
-        <button mat-menu-item (click)="setDifficulty('Easy')">Easy</button>
-        <button mat-menu-item (click)="setDifficulty('Medium')">Medium</button>
-        <button mat-menu-item (click)="setDifficulty('Hard')">Hard</button>
+        <button mat-menu-item (click)="clearDifficultyFilter()">{{ 'All Difficulties' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Easy')">{{ 'Easy' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Medium')">{{ 'Medium' | translate }}</button>
+        <button mat-menu-item (click)="setDifficulty('Hard')">{{ 'Hard' | translate }}</button>
       </mat-menu>
     </div>
 
     <div class="category">
       <button mat-button [matMenuTriggerFor]="Category">
-        {{ selectedCategory }}<span class="material-symbols-outlined">arrow_drop_down</span>
+        {{ selectedCategory | translate }}<span class="material-symbols-outlined">arrow_drop_down</span>
       </button>
       <mat-menu #Category="matMenu">
-        <button mat-menu-item (click)="clearCategoryFilter()">All Categories</button>
+        <button mat-menu-item (click)="clearCategoryFilter()">{{ 'All Categories' | translate }}</button>
         @for (category of activeCategories$ | async; track category.id) {
-          <button mat-menu-item (click)="setCategory(category)">{{ category.name }}</button>
+          <button mat-menu-item (click)="setCategory(category)">{{ category.name | translate }}</button>
         }
       </mat-menu>
     </div>
@@ -36,7 +34,7 @@
   @if (recipesLoading$ | async) {
     <div class="loading-container">
       <mat-spinner></mat-spinner>
-      <p>Loading your recipes...</p>
+      <p>{{ 'Loading your recipes...' | translate }}</p>
     </div>
   }
 
@@ -44,10 +42,10 @@
   @if (isEmpty$ | async) {
     <div class="empty-state">
       <mat-icon>restaurant_menu</mat-icon>
-      <h3>No recipes found</h3>
-      <p>You haven't created any recipes yet. Start sharing your culinary creations!</p>
+      <h3>{{ 'No recipes found' | translate }}</h3>
+      <p>{{ "You haven't created any recipes yet. Start sharing your culinary creations!" | translate }}</p>
       <button mat-raised-button color="primary" (click)="router.navigate(['/add-recipe'])">
-        Create Your First Recipe
+        {{ 'Create Your First Recipe' | translate }}
       </button>
     </div>
   }
@@ -67,7 +65,7 @@
               <div class="recipe-header">
                 <div class="name-and-author">
                   <h3 class="recipe-title">{{ recipe.title }}</h3>
-                  <p class="recipe-author">by {{ recipe.user?.username || 'Unknown' }}</p>
+                  <p class="recipe-author">{{ 'by' | translate }} {{ recipe.user?.username || ('Unknown' | translate) }}</p>
                 </div>
                 <div class="example-button-row">
                   <div class="example-flex-container">
@@ -77,11 +75,11 @@
                     <mat-menu #menu="matMenu">
                       <button mat-menu-item (click)="onEditRecipe(recipe)">
                         <mat-icon>edit</mat-icon>
-                        <span>Edit</span>
+                        <span>{{ 'Edit' | translate }}</span>
                       </button>
                       <button mat-menu-item class="delete-menu-item" (click)="onDeleteRecipe(recipe)">
                         <mat-icon class="delete-icon">delete</mat-icon>
-                        <span class="delete-text">Delete</span>
+                        <span class="delete-text">{{ 'Delete' | translate }}</span>
                       </button>
                     </mat-menu>
                   </div>
@@ -93,8 +91,8 @@
 
               <!-- Additional info -->
               <div class="recipe-meta">
-                <span class="recipe-time">{{ recipe.total_cooking_time }} min</span>
-                <span class="recipe-difficulty" [class]="'recipe-difficulty ' + (recipe.difficulty?.toLowerCase() || '')">{{ recipe.difficulty }}</span>
+                <span class="recipe-time">{{ recipe.total_cooking_time }} {{ 'min' | translate }}</span>
+                <span class="recipe-difficulty" [class]="'recipe-difficulty ' + (recipe.difficulty?.toLowerCase() || '')">{{ recipe.difficulty | translate }}</span>
               </div>
 
               <!-- Creation date -->
@@ -118,7 +116,7 @@
               <div class="recipe-header">
                 <div class="name-and-author">
                   <h3 class="recipe-title">{{ recipe.title }}</h3>
-                  <p class="recipe-author">by {{ recipe.user?.username || 'Unknown' }}</p>
+                  <p class="recipe-author">{{ 'by' | translate }} {{ recipe.user?.username || ('Unknown' | translate) }}</p>
                 </div>
                 <div class="example-button-row">
                   <div class="example-flex-container">
@@ -128,15 +126,15 @@
                     <mat-menu #menu="matMenu">
                       <button mat-menu-item (click)="viewRecipe(recipe.id)">
                         <mat-icon>visibility</mat-icon>
-                        <span>View</span>
+                        <span>{{ 'View' | translate }}</span>
                       </button>
                       <button mat-menu-item (click)="editRecipe(recipe.id)">
                         <mat-icon>edit</mat-icon>
-                        <span>Edit</span>
+                        <span>{{ 'Edit' | translate }}</span>
                       </button>
                       <button mat-menu-item (click)="deleteRecipe(recipe.id)" class="delete-action">
                         <mat-icon>delete</mat-icon>
-                        <span>Delete</span>
+                        <span>{{ 'Delete' | translate }}</span>
                       </button>
                     </mat-menu>
                   </div>
@@ -148,8 +146,8 @@
 
               <!-- Additional info -->
               <div class="recipe-meta">
-                <span class="recipe-time">{{ recipe.total_cooking_time }} min</span>
-                <span class="recipe-difficulty" [class]="'recipe-difficulty ' + (recipe.difficulty?.toLowerCase() || '')">{{ recipe.difficulty }}</span>
+                <span class="recipe-time">{{ recipe.total_cooking_time }} {{ 'min' | translate }}</span>
+                <span class="recipe-difficulty" [class]="'recipe-difficulty ' + (recipe.difficulty?.toLowerCase() || '')">{{ recipe.difficulty | translate }}</span>
               </div>
 
               <!-- Creation date -->

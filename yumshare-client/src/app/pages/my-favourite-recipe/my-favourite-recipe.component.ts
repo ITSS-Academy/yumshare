@@ -18,6 +18,7 @@ import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // NgRx imports
 import * as FavoriteActions from '../../ngrx/favorite/favorite.actions';
@@ -37,6 +38,7 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule,
     FormsModule,
+    TranslatePipe,
     MatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,
@@ -60,6 +62,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private snackBar = inject(MatSnackBar);
   private actions$ = inject(Actions);
+  private translate = inject(TranslateService);
   private subscriptions: Subscription[] = [];
   private filterTrigger$ = new Subject<void>();
 
@@ -198,7 +201,7 @@ export class MyFavouriteRecipeComponent implements OnInit, OnDestroy {
         .pipe(filter(error => !!error))
         .subscribe(error => {
           console.error('Favorites error:', error);
-          this.snackBar.open(`Lỗi: ${error}`, 'Đóng', { duration: 5000 });
+          this.snackBar.open(`${this.translate.instant('Error:')} ${error}`, this.translate.instant('Close'), { duration: 5000 });
         })
     );
 

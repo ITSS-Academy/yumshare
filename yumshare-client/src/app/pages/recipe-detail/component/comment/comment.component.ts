@@ -14,7 +14,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Comment } from '../../../../models/comment.model';
 import { User } from '../../../../models/user.model';
 import { CreateCommentDto, UpdateCommentDto } from '../../../../../app/services/comment/comment.service';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 // NGRX imports
 import * as CommentActions from '../../../../ngrx/comment/comment.actions';
 import * as AuthActions from '../../../../ngrx/auth/auth.actions';
@@ -33,7 +33,8 @@ import { selectCurrentUser, selectMineProfile } from '../../../../ngrx/auth/auth
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    ScrollingModule
+    ScrollingModule,
+    TranslatePipe
   ],
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.scss']
@@ -69,7 +70,8 @@ export class CommentComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService
   ) {
     // Initialize observables
     this.comments$ = this.store.select(selectCommentsByRecipe);
@@ -86,7 +88,7 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.commentsError$.subscribe(error => {
         if (error) {
-          this.snackBar.open(`Error loading comments: ${error}`, 'Close', { duration: 3000 });
+          this.snackBar.open(`${this.translate.instant('Error loading comments')}: ${error}`, this.translate.instant('Close'), { duration: 3000 });
         }
       })
     );
@@ -121,7 +123,7 @@ export class CommentComponent implements OnInit, OnDestroy {
       this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
         if (!mineProfile || !mineProfile.id) {
           // Chưa Login - chỉ hiển thị thông báo
-          this.snackBar.open('Please login to comment!', 'Login', {
+          this.snackBar.open(this.translate.instant('Please login to comment!'), this.translate.instant('Close'), {
             duration: 4000,
             panelClass: ['warning-snackbar']
           });
@@ -155,7 +157,7 @@ export class CommentComponent implements OnInit, OnDestroy {
     // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Please login to edit comment!', 'Login', { 
+        this.snackBar.open(this.translate.instant('Please login to edit comment!'), this.translate.instant('Close'), { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
@@ -165,7 +167,7 @@ export class CommentComponent implements OnInit, OnDestroy {
       // Kiểm tra xem user có phải là người tạo comment không
       const commentUserId = comment.user_id || comment.user?.id;
       if (mineProfile.id !== commentUserId) {
-        this.snackBar.open('You do not have permission to edit this comment!', 'Close', { 
+        this.snackBar.open(this.translate.instant('You do not have permission to edit this comment!'), this.translate.instant('Close'), { 
           duration: 3000,
           panelClass: ['warning-snackbar']
         });
@@ -184,7 +186,7 @@ export class CommentComponent implements OnInit, OnDestroy {
     // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Please login to edit comment!', 'Login', { 
+        this.snackBar.open(this.translate.instant('Please login to edit comment!'), this.translate.instant('Close'), { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
@@ -223,7 +225,7 @@ export class CommentComponent implements OnInit, OnDestroy {
     // Kiểm tra Login trước
     this.mineProfile$.pipe(take(1)).subscribe((mineProfile: User | null) => {
       if (!mineProfile || !mineProfile.id) {
-        this.snackBar.open('Please login to delete comment!', 'Login', { 
+        this.snackBar.open(this.translate.instant('Please login to delete comment!'), this.translate.instant('Close'), { 
           duration: 4000,
           panelClass: ['warning-snackbar']
         });
@@ -241,7 +243,7 @@ export class CommentComponent implements OnInit, OnDestroy {
         // Kiểm tra xem user có phải là người tạo comment không
         const commentUserId = comment.user_id || comment.user?.id;
         if (mineProfile.id !== commentUserId) {
-          this.snackBar.open('You do not have permission to delete this comment!', 'Close', { 
+          this.snackBar.open(this.translate.instant('You do not have permission to delete this comment!'), this.translate.instant('Close'), { 
             duration: 3000,
             panelClass: ['warning-snackbar']
           });

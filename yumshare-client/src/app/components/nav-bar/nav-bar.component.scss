@@ -4,176 +4,115 @@
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: var(--spacing-sm);
+  justify-content: space-between;
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-sm);
-  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-variant) 100%);
-  border: 1px solid var(--border);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  box-shadow: var(--shadow-light);
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
-.search {
+// Three-section layout
+.left-section {
   display: flex;
   align-items: center;
-  flex: 1 1 520px;
-  max-width: 640px;
-  min-width: 240px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 28px;
-  box-shadow: inset 0 1px 2px var(--shadow-light);
-  padding: var(--spacing-sm) var(--spacing-sm);
-  position: relative;
+  flex: 0 0 auto;
 }
 
-.search-icon {
-  color: var(--text-muted);
-  margin-right: var(--spacing-sm);
+.center-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
 }
 
-.search input {
-  @include input-base;
-  border: none;
-  outline: none;
-  width: 100%;
-  font: var(--mat-sys-body-small);
-  background: transparent;
-  padding: 0;
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 0 0 auto;
 }
+.custom-lang-toggle {
+  display: flex;
+  width: 70px;
+  height: 32px;
+  background: var(--surface-variant);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 
-.search:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(141, 198, 63, 0.1), inset 0 1px 2px var(--shadow-light);
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .toggle-option {
+    flex: 1 1 0;
+    text-align: center;
+    line-height: 30px;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    
+    &.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+  }
 }
-
-// Search buttons
-.clear-btn, .search-btn {
+// Search icon button
+.search-icon-btn {
   @include button-base;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  padding: 0;
-  margin-left: var(--spacing-xs);
   border-radius: var(--radius-round);
   background: transparent;
-  
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--text-muted);
-  }
+  transition: all 0.2s ease;
   
   &:hover {
     background: var(--primary-lighter);
-    
-    mat-icon {
-      color: var(--primary);
-    }
-  }
-}
-
-.search-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  
-  &:hover {
-    background: transparent;
-    
-    mat-icon {
-      color: var(--text-muted);
-    }
-  }
-}
-
-// Search suggestions
-.search-suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-medium);
-  z-index: 1000;
-  margin-top: var(--spacing-xs);
-  max-height: 300px;
-  overflow-y: auto;
-  
-  .suggestion-header {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font: var(--mat-sys-body-small);
-    font-weight: var(--mat-sys-medium-font-weight);
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-variant);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
   
-  .suggestion-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    
-    &:hover {
-      background: var(--primary-lighter);
-    }
-    
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--text-muted);
-    }
-    
-    span {
-      font: var(--mat-sys-body-small);
-      color: var(--text-primary);
-    }
-    
-    &:hover mat-icon {
-      color: var(--primary);
-    }
+  &:hover mat-icon {
+    color: var(--primary) !important;
+    transform: scale(1.1);
   }
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-left: auto;
-}
-
-.actions button[mat-icon-button] {
+// Right section action buttons
+.right-section button[mat-icon-button] {
   @include button-base;
   border-radius: var(--radius-round);
   background: transparent;
   position: relative;
+  transition: all 0.2s ease;
 }
 
-.actions button[mat-icon-button]:hover,
-.actions button[mat-icon-button]:focus {
+.right-section button[mat-icon-button]:hover,
+.right-section button[mat-icon-button]:focus {
   background: var(--primary-lighter);
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   border: none;
   outline: none;
   border-radius: var(--radius-round);
-  transform: scale(1.08);
+  transform: translateY(-1px);
 }
 
-.actions button[mat-icon-button]:hover mat-icon,
-.actions button[mat-icon-button]:focus mat-icon {
+.right-section button[mat-icon-button]:hover mat-icon,
+.right-section button[mat-icon-button]:focus mat-icon {
   color: var(--primary) !important;
   transform: scale(1.1);
 }
 
-.actions button[mat-icon-button]:active {
+.right-section button[mat-icon-button]:active {
   border-radius: var(--radius-round);
   transform: scale(0.97);
 }
@@ -214,32 +153,15 @@
 
 // ===== RESPONSIVE DESIGN =====
 
-@media (max-width: 1199.98px) {
-  .search {
-    flex: 1 1 420px;
-    max-width: 520px;
-  }
-}
-
 @media (max-width: 991.98px) {
   .navbar {
     padding: var(--spacing-xs) var(--spacing-sm);
     gap: var(--spacing-sm);
   }
-  .search {
-    flex: 1 1 320px;
-    max-width: 420px;
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
 }
 
 @media (max-width: 767.98px) {
-  .search {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-  }
-  .actions {
+  .right-section {
     gap: var(--spacing-xs);
   }
   .avatar-btn { 
@@ -264,5 +186,18 @@
 @media (max-width: 767.98px) {
   .menu-btn {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 470px) {
+  .custom-lang-toggle {
+    width: 5rem;
+    height: 22px;
+    border-radius: 10px;
+    .toggle-option {
+      font-size: 7px;
+      line-height: 28px;
+      padding: 0 2px;
+    }
   }
 }

@@ -43,6 +43,7 @@ import {MatSnackBarContainer} from '@angular/material/snack-bar';
 import {MatStepperModule} from '@angular/material/stepper';
 import { ReactiveFormsModule, FormsModule} from '@angular/forms';
 import { IdToNamePipe} from '../pipes/id-to-name.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -93,7 +94,8 @@ const materialModules = [
   ReactiveFormsModule,
   FormsModule,
   CommonModule,
-IdToNamePipe,
+  IdToNamePipe,
+  TranslateModule,
 
 
 
@@ -106,7 +108,7 @@ IdToNamePipe,
 @NgModule({
   declarations: [],
   imports: [CommonModule, ...materialModules],
-  exports: [...materialModules,ReactiveFormsModule,FormsModule],
+  exports: [...materialModules,ReactiveFormsModule,FormsModule,TranslateModule],
 })
 
 

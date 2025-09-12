@@ -1,85 +1,37 @@
 <div class="navbar">
-  <button mat-icon-button class="menu-btn" (click)="onToggleSidebar()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <div class="search">
-    <mat-icon class="search-icon">search</mat-icon>
-    <input
-      matInput
-      type="text"
-      [(ngModel)]="searchQuery"
-      (keyup.enter)="onSearch()"
-      (input)="onSearchInput()"
-      (focus)="onSearchFocus()"
-      (blur)="onSearchBlur()"
-      placeholder="Search recipes, users, categories..."
-      class="search-input"
-    />
-    @if (searchQuery) {
-      <button 
-        mat-icon-button 
-        (click)="clearSearch()"
-        class="clear-btn"
-        matTooltip="Clear search">
-        <mat-icon>close</mat-icon>
-      </button>
-    }
+  <!-- Left side: Menu button -->
+  <div class="left-section">
+    <button mat-icon-button class="menu-btn" (click)="onToggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+
+  <!-- Center: Empty space -->
+  <div class="center-section">
+    <!-- Empty center for balance -->
+  </div>
+
+  <!-- Right side: Action icons and language toggle -->
+  <div class="right-section">
     <button 
       mat-icon-button 
-      (click)="onSearch()"
-      [disabled]="!searchQuery?.trim()"
-      class="search-btn"
-      matTooltip="Search">
+      (click)="openSearchModal()" 
+      [matTooltip]="'Search' | translate"
+      class="search-icon-btn">
       <mat-icon>search</mat-icon>
     </button>
     
-    <!-- Search Suggestions -->
-    @if (showSuggestions) {
-      <div class="search-suggestions">
-        @if (!searchQuery) {
-          <div class="suggestion-header">Quick Search</div>
-        }
-        @if (!searchQuery) {
-          <div class="suggestion-item" (click)="quickSearch('Popular recipes')">
-            <mat-icon>trending_up</mat-icon>
-            <span>Popular recipes</span>
-          </div>
-        }
-        @if (!searchQuery) {
-          <div class="suggestion-item" (click)="quickSearch('Easy recipes')">
-            <mat-icon>star</mat-icon>
-            <span>Easy recipes</span>
-          </div>
-        }
-        @if (!searchQuery) {
-          <div class="suggestion-item" (click)="quickSearch('Vietnamese cuisine')">
-            <mat-icon>restaurant</mat-icon>
-            <span>Vietnamese cuisine</span>
-          </div>
-        }
-        @if (searchQuery) {
-          <div class="suggestion-item" (click)="onSearch()">
-            <mat-icon>search</mat-icon>
-            <span>Search for "{{ searchQuery }}"</span>
-          </div>
-        }
-      </div>
-    }
-  </div>
-
-  <div class="actions">
     @if (isLoggedIn) {
-      <button mat-icon-button matTooltip="Add Recipe" aria-label="Add Recipe" (click)="onAddRecipe()">
+      <button mat-icon-button [matTooltip]="'Add Recipe' | translate" aria-label="Add Recipe" (click)="onAddRecipe()">
         <mat-icon>add</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Messages" aria-label="Messages" [matBadgeHidden]="(messageCount$ | async) === 0" (click)="onMessage()" [matBadge]="messageCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button [matTooltip]="'Messages' | translate" aria-label="Messages" [matBadgeHidden]="(messageCount$ | async) === 0" (click)="onMessage()" [matBadge]="messageCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>mail</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="(notificationCount$ | async) === 0" [matBadge]="notificationCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
+      <button mat-icon-button [matTooltip]="'Notifications' | translate" aria-label="Notifications" (click)="onNotification()" [matBadgeHidden]="(notificationCount$ | async) === 0" [matBadge]="notificationCount$ | async" matBadgeColor="warn" matBadgeOverlap="false">
         <mat-icon>notifications</mat-icon>
       </button>
-      <!-- <app-dark-mode-toggle></app-dark-mode-toggle> -->
-      <button class="avatar-btn" mat-icon-button matTooltip="Profile" aria-label="Profile" (click)="onProfile()">
+      <button class="avatar-btn" mat-icon-button [matTooltip]="'Profile' | translate" aria-label="Profile" (click)="onProfile()">
         @if (userAvatar) {
           <img class="avatar" [src]="userAvatar" alt="avatar" />
         } @else {
@@ -87,14 +39,18 @@
         }
       </button>
     } @else {
-      <button mat-icon-button matTooltip="Post Recipe" aria-label="Add Recipe" (click)="openLogin()">
+      <button mat-icon-button [matTooltip]="'Post Recipe' | translate" aria-label="Add Recipe" (click)="openLogin()">
         <mat-icon>add</mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Login" aria-label="Login" (click)="openLogin()">
+      <button mat-icon-button [matTooltip]="'Login' | translate" aria-label="Login" (click)="openLogin()">
         <mat-icon>login</mat-icon>
       </button>
     }
+    
+    <!-- Language toggle at the end -->
+    <div class="custom-lang-toggle" (click)="switchLang(currentLang === 'en' ? 'vi' : 'en')">
+      <span class="toggle-option" [class.active]="currentLang === 'en'">ENG</span>
+      <span class="toggle-option" [class.active]="currentLang === 'vi'">VIE</span>
+    </div>
   </div>
 </div>
-
-

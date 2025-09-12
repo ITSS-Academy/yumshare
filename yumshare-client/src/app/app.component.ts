@@ -22,18 +22,17 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { SocketService } from './services/socket/socket.service';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SideBarComponent, NavBarComponent, LoadingComponent, CommonModule, MatIconModule, FooterComponent],
+  imports: [RouterOutlet, SideBarComponent, NavBarComponent, LoadingComponent, CommonModule, MatIconModule, FooterComponent, TranslateModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title(title: any) {
-      throw new Error('Method not implemented.');
-  }
+  // Removed unused title method
   @HostBinding('class.sidebar-mini') isMini = false;
   @HostBinding('class.sidebar-closed') isClosed = false;
 
@@ -51,7 +50,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private router: Router,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private translate: TranslateService
   ) {
     this.updateSidebarMode();
     // this.darkModeService.initSystemThemeListener();
@@ -79,7 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
             duration: 3000,
             panelClass: ['success-snackbar'],
             data: {
-              message: 'Login successful!',
+              message: this.translate.instant('Login successful!'),
               icon: 'check_circle'
             }
           });

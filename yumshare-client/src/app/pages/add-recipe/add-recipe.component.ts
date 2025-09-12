@@ -22,7 +22,7 @@ import { User } from '../../models/user.model';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
 import * as CategoryActions from '../../ngrx/category/category.actions';
 import * as CategorySelectors from '../../ngrx/category/category.selectors';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-recipe',
   templateUrl: './add-recipe.component.html',
@@ -39,7 +39,8 @@ import * as CategorySelectors from '../../ngrx/category/category.selectors';
     MatCardModule,
     MatDividerModule,
     MatStepperModule,
-    SafePipe
+    SafePipe,
+    TranslatePipe
   ],
   styleUrls: ['./add-recipe.component.scss']
 })
@@ -71,7 +72,8 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     private recipeService: RecipeService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private store: Store<{auth: AuthState, category: any}>
+    private store: Store<{auth: AuthState, category: any}>,
+    private translate: TranslateService
   ) {
     this.recipeForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -207,21 +209,21 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     // Check file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      this.snackBar.open('Please select a valid image file (JPG, PNG, or WebP)', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Please select a valid image file (JPG, PNG, or WebP)'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
     // Check file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      this.snackBar.open('Image file size must be less than 5MB', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Image file size must be less than 5MB'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
     // Check minimum file size (1KB)
     const minSize = 1024; // 1KB
     if (file.size < minSize) {
-      this.snackBar.open('Image file is too small', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Image file is too small'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
@@ -246,26 +248,30 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     // Check file type
     const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm'];
     if (!allowedTypes.includes(file.type)) {
-      this.snackBar.open('Please select a valid video file (MP4, AVI, MOV, WMV, or WebM)', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Please select a valid video file (MP4, AVI, MOV, WMV, or WebM)'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
     // Check file size (100MB limit)
     const maxSize = 100 * 1024 * 1024; // 100MB in bytes
     if (file.size > maxSize) {
-      this.snackBar.open('Video file size must be less than 100MB', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Video file size must be less than 100MB'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
     // Check minimum file size (1MB)
     const minSize = 1024 * 1024; // 1MB
     if (file.size < minSize) {
-      this.snackBar.open('Video file is too small (minimum 1MB)', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Video file is too small (minimum 1MB)'), this.translate.instant('Close'), { duration: 3000 });
       return false;
     }
 
     return true;
   }
+  
+  getStepPlaceholder(i: number): string {
+  return `${this.translate.instant('Describe step')} ${i + 1}...`;
+}
 
   onVideoDragOver(event: DragEvent) {
     event.preventDefault();
@@ -285,7 +291,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
           this.videoPreview = url;
         }
       } else {
-        this.snackBar.open('Please drop a valid video file', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('Please drop a valid video file'), this.translate.instant('Close'), { duration: 3000 });
       }
     }
   }
@@ -322,7 +328,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     } else {
       this.videoPreview = null;
       if (url.length > 10) { // Only show error if user has typed something substantial
-        this.snackBar.open('Please enter a valid YouTube URL', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('Please enter a valid YouTube URL'), this.translate.instant('Close'), { duration: 3000 });
       }
     }
   }
@@ -366,7 +372,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
         
         if (error) {
           console.error('❌ Error loading categories:', error);
-          this.snackBar.open('Error loading categories - Using fallback', 'Close', { duration: 3000 });
+          this.snackBar.open(this.translate.instant('Error loading categories - Using fallback'), this.translate.instant('Close'), { duration: 3000 });
           this.categories = [
             { id: 'fallback-1', name: 'Vietnamese Cuisine', image_url: '', is_active: true, sort_order: 1, created_at: new Date(), updated_at: new Date() },
             { id: 'fallback-2', name: 'Asian Cuisine', image_url: '', is_active: true, sort_order: 2, created_at: new Date(), updated_at: new Date() },
@@ -403,17 +409,17 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     if (hours > 0 && mins > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins > 1 ? 's' : ''}`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''}`;
-    } else {
-      return `${mins} minute${mins > 1 ? 's' : ''}`;
-    }
+    return `${hours} ${this.translate.instant('hours')} ${mins} ${this.translate.instant('minutes')}`;
+  } else if (hours > 0) {
+    return `${hours} ${this.translate.instant('hours')}`;
+  } else {
+    return `${mins} ${this.translate.instant('minutes')}`;
   }
+}
 
   async onSubmit() {
     if (!this.mineProfile) {
-      this.snackBar.open('Please login to create a recipe', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Please login to create a recipe'), this.translate.instant('Close'), { duration: 3000 });
       return;
     }
     if (this.recipeForm.valid) {
@@ -442,16 +448,16 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
           formData.append('video_url', this.youtubeUrl);
         }
         await this.recipeService.createRecipeWithFiles(formData).toPromise();
-        this.snackBar.open('Recipe created successfully!', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('Recipe created successfully!'), this.translate.instant('Close'), { duration: 3000 });
         this.resetForm();
       } catch (error) {
-        this.snackBar.open('Error creating recipe. Please try again.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('Error creating recipe. Please try again.'), this.translate.instant('Close'), { duration: 3000 });
       } finally {
         this.uploading = false;
       }
     } else {
       this.markFormGroupTouched();
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('Please fill in all required fields'), this.translate.instant('Close'), { duration: 3000 });
     }
   }
 
@@ -527,7 +533,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     }
 
     if (!isValid) {
-      this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+      this.snackBar.open(errorMessage, this.translate.instant('Close'), { duration: 3000 });
     }
 
     return isValid;
@@ -597,7 +603,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     }
 
     if (!isValid) {
-      this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+      this.snackBar.open(errorMessage, this.translate.instant('Close'), { duration: 3000 });
       this.markFormGroupTouched();
     }
 
@@ -631,7 +637,7 @@ export class AddRecipeComponent implements OnInit, OnDestroy {
     }
 
     if (!isValid) {
-      this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+      this.snackBar.open(errorMessage, this.translate.instant('Close'), { duration: 3000 });
     }
 
     return isValid;

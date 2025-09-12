@@ -13,6 +13,7 @@ import { RecipeService } from '../../services/recipe/recipe.service';
 import * as RecipeActions from '../../ngrx/recipe/recipe.actions';
 import { selectSearchResults, selectSearchLoading, selectSearchError, selectRecipeState, selectSearchQuery, selectAllRecipes, selectRecipesLoading, selectRecipesError, selectPaginatedRecipes, selectPaginatedRecipesLoading, selectPaginatedRecipesError } from '../../ngrx/recipe/recipe.selectors';
 import { AsyncPipe, CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CardComponent } from '../../components/card/card.component';
 
 @Component({
@@ -26,6 +27,7 @@ import { CardComponent } from '../../components/card/card.component';
     CommonModule,
     MatProgressSpinnerModule,
     AsyncPipe,
+    TranslatePipe,
     CardComponent,
   ],
   templateUrl: './search.component.html',
@@ -69,7 +71,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private router: Router,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private translate: TranslateService
   ) {
     this.searchResults$ = this.store.select(selectSearchResults);
     this.searchLoading$ = this.store.select(selectSearchLoading);
@@ -250,16 +253,16 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   getSelectedCategoryName(): string {
     if (!this.selectedCategory) {
-      return 'All Categories';
+      return this.translate.instant('All Categories');
     }
     const category = this.categories.find(c => c.id === this.selectedCategory);
-    return category ? category.name : 'All Categories';
+    return category ? category.name : this.translate.instant('All Categories');
   }
 
   getSearchPlaceholder(): string {
-    return this.searchType === 'author' 
-      ? 'Enter author username...' 
-      : 'Search recipes by name, ingredients...';
+      return this.searchType === 'author' 
+        ? this.translate.instant('Enter author username...') 
+        : this.translate.instant('Search recipes by name, ingredients...');
   }
 
   private performSearch(resetPage: boolean = true) {
@@ -387,7 +390,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   shareRecipe(recipe: Recipe) {
     const url = `${window.location.origin}/recipe-detail/${recipe.id}`;
-    const title = recipe.title || 'YumShare Recipe';
+    const title = recipe.title || this.translate.instant('YumShare Recipe');
     const text = `Check out this recipe: ${title}`;
     if (navigator.share) {
       navigator.share({ title, text, url })
@@ -397,7 +400,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else {
       // Fallback: copy link to clipboard
       navigator.clipboard.writeText(url).then(() => {
-        alert('Link copied to clipboard!');
+        alert(this.translate.instant('Link copied to clipboard!'));
       });
     }
   }
@@ -408,10 +411,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   getDifficultyLabel(difficulty: any): string {
-    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return 'Easy';
-    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return 'Medium';
-    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return 'Hard';
-    return difficulty || 'Unknown';
+    if (difficulty === 1 || difficulty === '1' || difficulty?.toLowerCase?.() === 'easy') return this.translate.instant('Easy');
+    if (difficulty === 2 || difficulty === '2' || difficulty?.toLowerCase?.() === 'medium') return this.translate.instant('Medium');
+    if (difficulty === 3 || difficulty === '3' || difficulty?.toLowerCase?.() === 'hard') return this.translate.instant('Hard');
+    return difficulty || this.translate.instant('Unknown');
   }
 
   getDifficultyClass(difficulty: any): string {

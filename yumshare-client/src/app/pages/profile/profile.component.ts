@@ -8,6 +8,7 @@ import { DeleteConfirmDialogComponent } from '../../components/delete-confirm-di
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AuthService } from '../../services/auth/auth.service';
@@ -18,14 +19,15 @@ import { FollowState } from '../../ngrx/follow/follow.state';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as FollowActions from '../../ngrx/follow/follow.actions';
 import * as FollowSelectors from '../../ngrx/follow/follow.selectors';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   imports: [
     ShareModule,
     LoadingComponent,
-    ScrollingModule
+    ScrollingModule,
+    TranslatePipe
   ],
   styleUrls: ['./profile.component.scss']
 })
@@ -34,6 +36,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);
   private store = inject(Store<{ auth: AuthState; follow: FollowState }>);
   private snackBar = inject(MatSnackBar);
+  private translate = inject(TranslateService);
 
   // Virtual scrolling properties
   followItemSize = 60; // Height of each follow item
@@ -408,14 +411,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private showSuccess(message: string) {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.open(message, this.translate.instant('Close'), {
       duration: 3000,
       panelClass: ['success-snackbar']
     });
   }
 
   private showError(message: string) {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.open(message, this.translate.instant('Close'), {
       duration: 3000,
       panelClass: ['error-snackbar']
     });

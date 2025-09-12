@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -17,7 +16,7 @@ import { LocalTimePipe } from '../../pipes/local-time.pipe';
 import * as NotificationActions from '../../ngrx/notification/notification.actions';
 import * as NotificationSelectors from '../../ngrx/notification/notification.selectors';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-notification-list',
   standalone: true,
@@ -27,6 +26,7 @@ import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
     MatButtonModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    TranslatePipe,
     LocalTimePipe,
   ],
   templateUrl: './notification-list.component.html',
@@ -37,8 +37,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private socketService = inject(SocketService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<NotificationListComponent>);
+  private translate = inject(TranslateService);
   private subscriptions: Subscription[] = [];
 
   // NgRx Observables
@@ -175,6 +175,39 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     }
   }
 
+  getTranslatedNotificationContent(notification: Notification): string {
+    const content = notification.content;
+    
+    // Translate common notification patterns
+    if (content.includes('liked your recipe')) {
+      return content.replace('liked your recipe', this.translate.instant('liked your recipe'));
+    }
+    if (content.includes('commented on your recipe')) {
+      return content.replace('commented on your recipe', this.translate.instant('commented on your recipe'));
+    }
+    if (content.includes('started following you')) {
+      return content.replace('started following you', this.translate.instant('started following you'));
+    }
+    if (content.includes('approved your recipe')) {
+      return content.replace('approved your recipe', this.translate.instant('approved your recipe'));
+    }
+    if (content.includes('rejected your recipe')) {
+      return content.replace('rejected your recipe', this.translate.instant('rejected your recipe'));
+    }
+    if (content.includes('shared your recipe')) {
+      return content.replace('shared your recipe', this.translate.instant('shared your recipe'));
+    }
+    if (content.includes('sent you a message')) {
+      return content.replace('sent you a message', this.translate.instant('sent you a message'));
+    }
+    if (content.includes('added your recipe') && content.includes('to favorites')) {
+      return content.replace('added your recipe', this.translate.instant('added your recipe'))
+                   .replace('to favorites', this.translate.instant('to favorites'));
+    }
+    
+    return content;
+  }
+
   onNotificationClick(notification: Notification): void {
     // Mark as read first
     this.markAsRead(notification);
@@ -203,18 +236,6 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   }
 
   private showToastNotification(notification: Notification): void {
-    const icon = this.getNotificationIcon(notification.type);
-    const message = notification.content;
-    
-    this.subscriptions.push(
-      this.snackBar.open(message, 'View', {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-        panelClass: ['notification-toast', 'unread-notification']
-      }).onAction().subscribe(() => {
-        this.onNotificationClick(notification);
-      })
-    );
+    // SnackBar removed as requested
   }
 }

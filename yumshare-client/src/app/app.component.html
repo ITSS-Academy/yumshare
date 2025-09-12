@@ -30,7 +30,7 @@
       <!-- Route loading indicator -->
       @if (routeLoadingService.isLoading()) {
         <app-loading
-          [message]="'Loading page'"
+          [message]="'Loading page' | translate"
           [showProgress]="true"
           [progressValue]="routeLoadingService.loadingProgress()">
         </app-loading>

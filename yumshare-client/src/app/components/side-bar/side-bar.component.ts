@@ -8,13 +8,19 @@ import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as FollowActions from '../../ngrx/follow/follow.actions';
 import { Subscription } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
-
+// NGX-TRANSLATE
+import { TranslateService } from '@ngx-translate/core';
+// import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-side-bar',
   standalone: true,
   imports: [
    ShareModule,
-   RouterModule
+   RouterModule,
+    TranslatePipe,
+   
+  
   ],
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.scss']
@@ -27,8 +33,11 @@ export class SideBarComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private store: Store<{auth: AuthState}>,
-    private auth: Auth
-  ) {}
+    private auth: Auth,
+    private translate: TranslateService
+  ) {
+    translate.addLangs(['en', 'vi']);
+  }
   
   ngOnInit() {
     this.authSubscription = this.store.select(state => state.auth).subscribe(authState => {
@@ -46,7 +55,10 @@ export class SideBarComponent implements OnInit, OnDestroy {
   navigateTo(path: string): void {
     this.router.navigate([path]);
   }
-
+  
+ switchLang(lang: string) {
+    this.translate.use(lang);
+  }
   async onLogout() {
     try {
       // Đăng xuất khỏi Firebase trước

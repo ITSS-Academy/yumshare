@@ -1,38 +1,38 @@
-<div class="container-right">
-  <div class="top">
-    <h1 class="t1">About Us</h1>
-    <p class="headtext1">Our mission is to inspire food lovers by sharing easy-to-follow recipes, useful cooking tips, and creative ideas, bringing joy to every meal for everyone</p>
+<div class="container-right" #containerRight>
+  <div class="top" >
+    <h1 class="t1">{{ 'About Us' | translate }}</h1>
+    <p class="headtext1">{{ 'Our mission is to inspire food lovers by sharing easy-to-follow recipes, useful cooking tips, and creative ideas, bringing joy to every meal for everyone' | translate }}</p>
   </div>
 
   <div class="middle">
     <div class="box">
-      <h1 class="t2">Benifits of choosing YumShare</h1>
+      <h1 class="t2">{{ 'Benifits of choosing YumShare' | translate }}</h1>
       <div class="big-group">
         <div class="group1">
           <img class="pic" src="assets/photo-1.jpg">
           <div class="chat1">
-            <p>A diverse recipe collection</p>
+            <p>{{ 'A diverse recipe collection' | translate }}</p>
           </div>
         </div>
 
         <div class="group2">
           <img class="pic" src="assets/photo-2.jpg">
           <div class="chat2">
-            <p>Step-by-step instructions</p>
+            <p>{{ 'Step-by-step instructions' | translate }}</p>
           </div>
         </div>
 
         <div class="group3">
           <img class="pic" src="assets/photo-3.jpg">
           <div class="chat3">
-            <p>Smart search</p>
+            <p>{{ 'Smart search' | translate }}</p>
           </div>
         </div>
 
         <div class="group4">
           <img class="pic" src="assets/photo-4.jpg">
           <div class="chat4">
-            <p>Sharing community</p>
+            <p>{{ 'Sharing community' | translate }}</p>
           </div>
         </div>
       </div>
@@ -41,20 +41,27 @@
 
   <div class="bottom">
     <div class="bottum-pic">
-    <img class="contact-pic" src="assets/photo-5.jpg">
+      <img class="contact-pic" src="assets/photo-5.jpg">
     </div>
     <div class="contact">
       <div class="above">
-        <h1>Contact Us</h1>
-        <p>Please leave your information if you have any questions, We will contact and answer all of your inquiries</p>
+        <h1>{{ 'Contact Us' | translate }}</h1>
+        <p>{{ 'Please leave your information if you have any questions, We will contact and answer all of your inquiries' | translate }}</p>
       </div>
       <div class="under">
-        <input class="type-in" matInput placeholder="Name" value="">
-        <input class="type-in" matInput placeholder="Email" value="">
-        <input class="type-in" matInput placeholder="Phone" value="">
-        <input class="type-in" matInput placeholder="Message" value="">
-        <button class="submit-button" mat-flat-button>Submit</button>
+        <input #nameInput class="type-in" matInput [placeholder]="'Name' | translate" [(ngModel)]="name" (keydown.enter)="emailInput.focus()" />
+        <input #emailInput class="type-in" matInput [placeholder]="'Email' | translate" [(ngModel)]="email" (keydown.enter)="phoneInput.focus()" />
+        <input #phoneInput class="type-in" matInput [placeholder]="'Phone' | translate" [(ngModel)]="phone" (keydown.enter)="messageInput.focus()" />
+        <input #messageInput class="type-in" matInput [placeholder]="'Message' | translate" [(ngModel)]="message" (keydown.enter)="submitButton.focus()" />
+        <button #submitButton class="submit-button" mat-flat-button (click)="onSubmit()" [disabled]="!isFormValid">{{ 'Submit' | translate }}</button>
       </div>
     </div>
   </div>
 </div>
+@if (showSuccess) {
+  <div class="center-toast" (click)="showSuccess = false">
+    <div class="toast-content" (click)="$event.stopPropagation()">
+      <span>{{ 'Your feedback has been received!' | translate }}</span>
+    </div>
+  </div>
+}
