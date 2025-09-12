@@ -77,16 +77,16 @@
               <div class="avatar" [style.background-image]="'url(' + (recipe.user?.avatar_url || 'assets/default-avatar.png') + ')'"></div>
               <span class="username">{{ recipe.user?.username || 'Unknown User' }}</span>
             </div>
-            @if (recipe.user?.id !== (currentUser$ | async)?.uid && (currentUser$ | async)) {
+            @if ((currentUser$ | async) && recipe.user?.id !== (currentUser$ | async)?.uid) {
               <mat-checkbox
                 class="follow-toggle"
-                [(ngModel)]="isFollowed"
+                [checked]="isFollowing$ | async"
                 (change)="onFollowToggle($event)"
                 [disabled]="followLoading$ | async">
-                {{ isFollowed ? 'Followed' : 'Follow' }}
+                {{ (isFollowing$ | async) ? 'Followed' : 'Follow' }}
               </mat-checkbox>
             }
-            @if (recipe.user?.id !== (currentUser$ | async)?.uid && !(currentUser$ | async)) {
+            @if (!(currentUser$ | async) && recipe.user?.id) {
               <button
                 class="login-required-btn"
                 (click)="onLoginRequired()">
@@ -166,25 +166,35 @@
             
             @if (recipe.video_url) {
               @if (getVideoElementType(recipe.video_url) === 'iframe') {
-                <iframe
-                  class="clip"
-                  width="650"
-                  height="400"
-                  [src]="getVideoEmbedUrl(recipe.video_url) | safe"
-                  title="Recipe Video Tutorial"
-                  [attr.frameborder]="getVideoAttributes(recipe.video_url).frameborder"
-                  [attr.allow]="getVideoAttributes(recipe.video_url).allow"
-                  [attr.allowfullscreen]="getVideoAttributes(recipe.video_url).allowfullscreen">
-                </iframe>
+                <div class="video-container">
+                  <iframe
+                    class="clip"
+                    [src]="getVideoEmbedUrl(recipe.video_url) | safe"
+                    title="Recipe Video Tutorial"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    (load)="onIframeLoad()"
+                    (error)="onIframeError()">
+                  </iframe>
+                  
+                  <!-- Fallback link if iframe doesn't work -->
+                  <div class="video-fallback" style="margin-top: 10px; text-align: center;">
+                    <p style="font-size: 14px; color: #666; margin: 5px 0;">
+                      Video not loading? 
+                      <a [href]="recipe.video_url" target="_blank" style="color: var(--primary); text-decoration: none;">
+                        Watch on YouTube ↗
+                      </a>
+                    </p>
+                  </div>
+                </div>
               } @else {
                 <video
                   class="clip"
-                  width="650"
-                  height="400"
                   [src]="getVideoEmbedUrl(recipe.video_url)"
-                  [controls]="getVideoAttributes(recipe.video_url).controls"
-                  [preload]="getVideoAttributes(recipe.video_url).preload"
-                  [playsinline]="getVideoAttributes(recipe.video_url).playsinline"
+                  controls
+                  preload="metadata"
+                  playsinline
                   title="Recipe Video Tutorial">
                 </video>
               }
@@ -194,23 +204,19 @@
               @if (getVideoElementType(recipe.video) === 'iframe') {
                 <iframe
                   class="clip"
-                  width="650"
-                  height="400"
                   [src]="getVideoEmbedUrl(recipe.video) | safe"
                   title="Recipe Video Tutorial"
-                  [attr.frameborder]="getVideoAttributes(recipe.video).frameborder"
-                  [attr.allow]="getVideoAttributes(recipe.video).allow"
-                  [attr.allowfullscreen]="getVideoAttributes(recipe.video).allowfullscreen">
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen>
                 </iframe>
               } @else {
                 <video
                   class="clip"
-                  width="650"
-                  height="400"
                   [src]="getVideoEmbedUrl(recipe.video)"
-                  [controls]="getVideoAttributes(recipe.video).controls"
-                  [preload]="getVideoAttributes(recipe.video).preload"
-                  [playsinline]="getVideoAttributes(recipe.video).playsinline"
+                  controls
+                  preload="metadata"
+                  playsinline
                   title="Recipe Video Tutorial">
                 </video>
               }

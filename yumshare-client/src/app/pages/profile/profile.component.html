@@ -3,7 +3,10 @@
   <div class="profile-header">
     <h2>Edit Profile</h2>
     <div class="header-actions">
-      <button class="delete-account" (click)="showDialog = true">Delete account</button>
+      <button mat-raised-button color="warn" style="background-color: red; color: white;" (click)="showDialog = true">
+        <mat-icon>delete</mat-icon>
+        Delete account
+      </button>
     </div>
 
     @if (showDialog) {
@@ -12,8 +15,14 @@
           <h3>Delete Account</h3>
           <p>Are you sure you want to delete your account?</p>
           <div class="dialog-actions">
-            <button (click)="showDialog = false" class="cancel">Cancel</button>
-            <button (click)="deleteAccount()" class="confirm">Delete</button>
+            <button mat-button (click)="showDialog = false">
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+            <button mat-raised-button color="warn" (click)="deleteAccount()">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
           </div>
         </div>
       </div>
@@ -58,18 +67,18 @@
             (change)="onAvatarChange($event)" 
             class="avatar-input"
             style="display: none;">
-          <button 
-            mat-stroked-button 
-            color="primary" 
-            (click)="onSelectAvatar()"
-            [disabled]="isUploadingAvatar"
-            class="change-avatar-btn">
-            @if (isUploadingAvatar) {
-              <mat-spinner diameter="16"></mat-spinner>
-            } @else {
-              <mat-icon>photo_camera</mat-icon>
-            }
-          </button>
+           <button 
+             mat-fab 
+             color="primary" 
+             (click)="onSelectAvatar()"
+             [disabled]="isUploadingAvatar"
+             class="change-avatar-btn">
+             @if (isUploadingAvatar) {
+               <mat-spinner diameter="16"></mat-spinner>
+             } @else {
+               <mat-icon>photo_camera</mat-icon>
+             }
+           </button>
         </div>
         <div>
           <h3>{{ profileForm.value.name }}</h3>
@@ -130,11 +139,17 @@
         </i></a>
       </div>
 
-      <!-- Buttons -->
-      <div class="form-actions">
-        <button type="submit" class="btn save" [disabled]="profileForm.invalid || (isLoading$ | async)">Save</button>
-        <button type="button" class="btn cancel" (click)="onCancel()" [disabled]="isLoading$ | async">Cancel</button>
-      </div>
+       <!-- Buttons -->
+       <div class="form-actions">
+         <button mat-raised-button color="primary" type="submit" (click)="onSubmit()" [disabled]="profileForm.invalid || (isLoading$ | async)">
+           <mat-icon>save</mat-icon>
+           Save
+         </button>
+         <button mat-button type="button" (click)="onCancel()" style="background-color: #ffffff;" [disabled]="isLoading$ | async">
+           <mat-icon>cancel</mat-icon>
+           Cancel
+         </button>
+       </div>
     </form>
 
                    <!-- Followers/Following Tabs -->
@@ -186,17 +201,18 @@
                       <span class="user-bio">{{ follow.follower?.bio || 'No bio available' }}</span>
                     </div>
                     <div class="user-actions">
-                      <button 
-                        class="follow-btn"
-                        (click)="followUser(follow.follower?.id || '')"
-                        [disabled]="followIsLoading$ | async">
-                        @if (followIsLoading$ | async) {
-                          <span class="loading-spinner"></span>
-                          Following...
-                        } @else {
-                          Follow
-                        }
-                      </button>
+                       <button 
+                         mat-raised-button 
+                         color="primary"
+                         (click)="followUser(follow.follower?.id || '')"
+                         [disabled]="followIsLoading$ | async">
+                         @if (followIsLoading$ | async) {
+                           <mat-spinner diameter="16"></mat-spinner>
+                           Following...
+                         } @else {
+                           Follow
+                         }
+                       </button>
                     </div>
                   </div>
                   }
@@ -218,17 +234,18 @@
                       <span class="user-bio">{{ follow.follower?.bio || 'No bio available' }}</span>
                     </div>
                     <div class="user-actions">
-                      <button 
-                        class="follow-btn"
-                        (click)="followUser(follow.follower?.id || '')"
-                        [disabled]="followIsLoading$ | async">
-                        @if (followIsLoading$ | async) {
-                          <span class="loading-spinner"></span>
-                          Following...
-                        } @else {
-                          Follow
-                        }
-                      </button>
+                       <button 
+                         mat-raised-button 
+                         color="primary"
+                         (click)="followUser(follow.follower?.id || '')"
+                         [disabled]="followIsLoading$ | async">
+                         @if (followIsLoading$ | async) {
+                           <mat-spinner diameter="16"></mat-spinner>
+                           Following...
+                         } @else {
+                           Follow
+                         }
+                       </button>
                     </div>
                   </div>
                 }
@@ -257,17 +274,18 @@
                       <span class="user-bio">{{ follow.following?.bio || 'No bio available' }}</span>
                     </div>
                     <div class="user-actions">
-                      <button 
-                        class="unfollow-btn"
-                        (click)="unfollowUser(follow.following?.id || '')"
-                        [disabled]="followIsLoading$ | async">
-                        @if (followIsLoading$ | async) {
-                          <span class="loading-spinner"></span>
-                          Unfollowing...
-                        } @else {
-                          Unfollow
-                        }
-                      </button>
+                       <button 
+                         mat-stroked-button 
+                         color="warn"
+                         (click)="unfollowUser(follow.following?.id || '')"
+                         [disabled]="followIsLoading$ | async">
+                         @if (followIsLoading$ | async) {
+                           <mat-spinner diameter="16"></mat-spinner>
+                           Unfollowing...
+                         } @else {
+                           Unfollow
+                         }
+                       </button>
                     </div>
                   </div>
                 }
@@ -289,17 +307,18 @@
                       <span class="user-bio">{{ follow.following?.bio || 'No bio available' }}</span>
                     </div>
                     <div class="user-actions">
-                      <button 
-                        class="unfollow-btn"
-                        (click)="unfollowUser(follow.following?.id || '')"
-                        [disabled]="followIsLoading$ | async">
-                        @if (followIsLoading$ | async) {
-                          <span class="loading-spinner"></span>
-                          Unfollowing...
-                        } @else {
-                          Unfollow
-                        }
-                      </button>
+                       <button 
+                         mat-stroked-button 
+                         color="warn"
+                         (click)="unfollowUser(follow.following?.id || '')"
+                         [disabled]="followIsLoading$ | async">
+                         @if (followIsLoading$ | async) {
+                           <mat-spinner diameter="16"></mat-spinner>
+                           Unfollowing...
+                         } @else {
+                           Unfollow
+                         }
+                       </button>
                     </div>
                   </div>
                 }
@@ -315,4 +334,3 @@
     </div>
   }
 </div>
-x

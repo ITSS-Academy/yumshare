@@ -17,7 +17,6 @@ export class NotificationsController {
   }
 
   @Get()
-  @RateLimit(RateLimits.STANDARD)
   findAll() {
     return this.notificationsService.findAll();
   }
@@ -28,7 +27,6 @@ export class NotificationsController {
   }
 
   @Get('user/:userId')
-  @RateLimit(RateLimits.STANDARD)
   getUserNotifications(@Param('userId') userId: string) {
     return this.notificationsService.getUserNotifications(userId);
   }

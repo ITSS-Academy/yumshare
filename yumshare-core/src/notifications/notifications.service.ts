@@ -28,15 +28,15 @@ export class NotificationsService {
       throw new Error('User not found');
     }
     
-    // Check for duplicate notification based on content and metadata
-    const existingNotification = await this.notificationRepository.findOne({
-      where: {
-        user: { id: createDto.user_id },
-        type: createDto.type,
-        content: createDto.content,
-        metadata: createDto.metadata
-      }
-    });
+    // Check for duplicate notification within last 5 minutes
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const existingNotification = await this.notificationRepository
+      .createQueryBuilder('notification')
+      .where('notification.user.id = :userId', { userId: createDto.user_id })
+      .andWhere('notification.type = :type', { type: createDto.type })
+      .andWhere('notification.content = :content', { content: createDto.content })
+      .andWhere('notification.created_at >= :fiveMinutesAgo', { fiveMinutesAgo })
+      .getOne();
 
     if (existingNotification) {
       return existingNotification;

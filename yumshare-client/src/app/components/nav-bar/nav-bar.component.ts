@@ -15,6 +15,7 @@ import { AuthModel } from '../../models/auth.model';
 import { User } from '../../models';
 import * as AuthActions from '../../ngrx/auth/auth.actions';
 import * as AuthSelectors from '../../ngrx/auth/auth.selectors';
+import * as FollowActions from '../../ngrx/follow/follow.actions';
 import { Subscription, Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { NotificationService } from '../../services/notification/notification.service';
@@ -183,12 +184,14 @@ export class NavBarComponent implements OnInit, OnDestroy {
     try {
       // Đăng xuất khỏi Firebase trước
       await this.auth.signOut();
-      // Sau đó clear auth state
+      // Sau đó clear auth state và follow state
       this.store.dispatch(AuthActions.clearAuthState());
+      this.store.dispatch(FollowActions.clearFollowState());
     } catch (error) {
       console.error('Logout error:', error);
-      // Nếu có lỗi, vẫn clear auth state
+      // Nếu có lỗi, vẫn clear auth state và follow state
       this.store.dispatch(AuthActions.clearAuthState());
+      this.store.dispatch(FollowActions.clearFollowState());
     }
   }
 
@@ -201,9 +204,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  onLogin() {
-    // Open login dialog or navigate to login page
-  }
+
 
   onProfile() {
     this.router.navigate(['/profile'], { queryParams: { userName: this.userName } });

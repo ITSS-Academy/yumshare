@@ -64,12 +64,19 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Load notifications using NgRx
+    // Only load notifications if we don't have any yet
     this.subscriptions.push(
       this.currentUserId$.subscribe(userId => {
         if (userId) {
-          this.store.dispatch(NotificationActions.loadUserNotifications({ userId }));
-          this.store.dispatch(NotificationActions.loadNotificationCounts({ userId }));
+          // Check if we already have notifications loaded
+          this.subscriptions.push(
+            this.notifications$.subscribe(notifications => {
+              if (!notifications || notifications.length === 0) {
+                this.store.dispatch(NotificationActions.loadUserNotifications({ userId }));
+                this.store.dispatch(NotificationActions.loadNotificationCounts({ userId }));
+              }
+            })
+          );
         }
       })
     );
@@ -94,7 +101,9 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.currentUserId$.subscribe(userId => {
         if (userId) {
+          // Force reload notifications
           this.store.dispatch(NotificationActions.loadUserNotifications({ userId }));
+          this.store.dispatch(NotificationActions.loadNotificationCounts({ userId }));
         }
       })
     );

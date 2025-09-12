@@ -90,7 +90,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
   // Local state
   recipeId: string = '';
-  isFollowed = false;
 
   constructor(
     private store: Store,
@@ -153,11 +152,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(routeSub);
 
-    // Subscribe to follow state
-    const followSub = this.isFollowing$.subscribe(isFollowing => {
-      this.isFollowed = isFollowing;
-    });
-    this.subscriptions.push(followSub);
+    // No need to subscribe to follow state since we're using it directly in template
     
     // Subscribe to current user changes and reload likes when user changes
     const userChangeSub = this.currentUser$.subscribe(user => {
@@ -418,17 +413,25 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   private getYouTubeEmbedUrl(url: string): string {
     let videoId = '';
 
+    // Handle different YouTube URL formats
     if (url.includes('youtube.com/watch?v=')) {
       videoId = url.split('v=')[1]?.split('&')[0] || '';
     } else if (url.includes('youtu.be/')) {
       videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
     } else if (url.includes('youtube.com/embed/')) {
       videoId = url.split('embed/')[1]?.split('?')[0] || '';
+    } else if (url.includes('youtube.com/v/')) {
+      videoId = url.split('v/')[1]?.split('?')[0] || '';
+    }
+
+    // Clean video ID (remove any extra characters)
+    if (videoId) {
+      videoId = videoId.replace(/[^a-zA-Z0-9_-]/g, '');
     }
 
     if (videoId) {
-      // YouTube - no autoplay, with controls
-      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1&controls=1&loop=0&mute=0`;
+      // YouTube embed URL with proper parameters
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1&controls=1&loop=0&mute=0&showinfo=0&iv_load_policy=3`;
     }
 
     return url;
@@ -452,23 +455,17 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     return 'video';
   }
 
-  /**
-   * Get video attributes based on video type
-   */
-  getVideoAttributes(url: string): any {
-    if (this.isYouTubeUrl(url)) {
-      return {
-        frameborder: '0',
-        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-        allowfullscreen: true
-      };
-    }
-    
-    return {
-      controls: true,
-      preload: 'metadata',
-      playsinline: true
-    };
+
+  // Iframe event handlers
+  onIframeLoad(): void {
+    // YouTube iframe loaded successfully
+  }
+
+  onIframeError(): void {
+    this.snackBar.open('Failed to load video. Please check the URL.', 'Close', {
+      duration: 3000,
+      panelClass: ['error-snackbar']
+    });
   }
 
   // TrackBy functions for virtual scrolling performance

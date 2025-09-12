@@ -36,6 +36,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectedCategory: string = '';
   searchType: 'recipe' | 'author' = 'recipe';
   categories: Category[] = [];
+  isDropdownOpen: boolean = false;
   
   // NgRx observables
   searchResults$: Observable<Recipe[]>;
@@ -230,6 +231,29 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (this.searchType === 'author') {
       this.selectedCategory = '';
     }
+    // Clear search results when switching search type
+    this.store.dispatch(RecipeActions.clearSearchResults());
+    // Close dropdown when switching search type
+    this.isDropdownOpen = false;
+  }
+
+  toggleDropdown() {
+    if (this.searchType !== 'author') {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    }
+  }
+
+  selectCategory(categoryId: string) {
+    this.selectedCategory = categoryId;
+    this.isDropdownOpen = false;
+  }
+
+  getSelectedCategoryName(): string {
+    if (!this.selectedCategory) {
+      return 'All Categories';
+    }
+    const category = this.categories.find(c => c.id === this.selectedCategory);
+    return category ? category.name : 'All Categories';
   }
 
   getSearchPlaceholder(): string {

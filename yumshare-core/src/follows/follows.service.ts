@@ -1,9 +1,11 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Follow } from './entities/follow.entity';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { User } from '../auth/entities/user.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Injectable()
 export class FollowsService {
@@ -12,6 +14,8 @@ export class FollowsService {
     private readonly followRepository: Repository<Follow>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async followUser(createFollowDto: CreateFollowDto) {
@@ -40,6 +44,23 @@ export class FollowsService {
     // Create follow
     const follow = this.followRepository.create(createFollowDto);
     const savedFollow = await this.followRepository.save(follow);
+    
+    // Create notification for the user being followed
+    try {
+      await this.notificationsService.create({
+        user_id: createFollowDto.following_id,
+        type: NotificationType.FOLLOW,
+        content: `${follower.username || follower.email} started following you`,
+        metadata: {
+          follower_id: createFollowDto.follower_id,
+          follower_name: follower.username || follower.email,
+          notification_type: 'follow'
+        }
+      });
+    } catch (notificationError) {
+      // Log error but don't fail the follow operation
+      console.error('Failed to create follow notification:', notificationError);
+    }
     
     return {
       ...savedFollow,

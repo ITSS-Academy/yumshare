@@ -8,10 +8,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
 import { Notification, NotificationType } from '../../models/notification.model';
 import { NotificationService } from '../../services/notification/notification.service';
 import { SocketService } from '../../services/socket/socket.service';
 import { LocalTimePipe } from '../../pipes/local-time.pipe';
+import { AuthState } from '../../ngrx/auth/auth.state';
+import { selectCurrentUser } from '../../ngrx/auth/auth.selectors';
 
 @Component({
   selector: 'app-message-list',
@@ -38,7 +41,8 @@ export class MessageListComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialogRef: MatDialogRef<MessageListComponent>
+    private dialogRef: MatDialogRef<MessageListComponent>,
+    private store: Store<{ auth: AuthState }>
   ) {}
 
   ngOnInit(): void {
@@ -98,15 +102,22 @@ export class MessageListComponent implements OnInit, OnDestroy {
   }
 
   markAllAsRead(): void {
+    // Get current user ID from auth state
     this.subscription.add(
-      this.notificationService.markAllAsRead().subscribe({
-        next: () => {
-          this.notifications.forEach(n => n.is_read = true);
-          // Reload notification count to update nav-bar badge
-          this.notificationService.refreshNotificationCount();
-        },
-        error: (err) => {
-          console.error('Error marking all messages as read:', err);
+      this.store.select(selectCurrentUser).subscribe(user => {
+        if (user?.uid) {
+          this.subscription.add(
+            this.notificationService.markAllAsRead(user.uid).subscribe({
+              next: () => {
+                this.notifications.forEach(n => n.is_read = true);
+                // Reload notification count to update nav-bar badge
+                this.notificationService.refreshNotificationCount();
+              },
+              error: (err) => {
+                console.error('Error marking all messages as read:', err);
+              }
+            })
+          );
         }
       })
     );

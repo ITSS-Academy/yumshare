@@ -91,11 +91,7 @@
   font-size: 14px;
 }
 
-.delete-account {
-  @include button-danger;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-}
+// Material buttons will use their own styling
 
 .dialog-backdrop {
   position: fixed;
@@ -142,23 +138,7 @@
   gap: var(--spacing-sm);
 }
 
-.dialog-actions button {
-  flex: 1;
-  padding: var(--spacing-sm) 0;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background var(--animation-duration-fast) var(--animation-easing);
-}
-
-.dialog-actions .confirm {
-  @include button-danger;
-}
-
-.dialog-actions .cancel {
-  @include button-outline;
-}
+// Material buttons will use their own styling
 
 /* Bio Section Styles */
 .bio-section {
@@ -363,6 +343,7 @@
   display: flex;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .btn {
@@ -518,39 +499,67 @@
 .user-actions {
   margin-left: auto;
   flex-shrink: 0;
+  
+  button {
+    min-width: 80px;
+  }
 }
 
-.follow-btn,
-.unfollow-btn {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border: none;
-  border-radius: var(--radius-xl);
-  font-size: 13px;
-  font-weight: var(--mat-sys-medium-font-weight);
-  cursor: pointer;
-  transition: all var(--animation-duration-fast) var(--animation-easing);
-  min-width: 80px;
-}
-
-.follow-btn {
-  @include button-primary;
+// Custom styling for Material buttons
+.mat-mdc-raised-button {
   box-shadow: var(--shadow-light);
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  
+  &:hover:not(:disabled) {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+  }
 }
 
-.follow-btn:hover {
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-1px);
+.mat-mdc-fab {
+  box-shadow: var(--shadow-light);
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  
+  &:hover:not(:disabled) {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+  }
 }
 
-.unfollow-btn {
-  @include button-outline;
+.mat-mdc-stroked-button {
+  border-width: 2px;
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-light);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 }
 
-.follow-btn:disabled,
-.unfollow-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+.mat-mdc-button {
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 }
 
 .no-data {

@@ -353,7 +353,8 @@ export class CommentComponent implements OnInit, OnDestroy {
           month: 'short',
           day: 'numeric',
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          timeZone: 'UTC'
         });
       }
 
@@ -366,7 +367,8 @@ export class CommentComponent implements OnInit, OnDestroy {
       return commentDate.toLocaleDateString('vi-VN', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC'
       });
     } catch (error) {
       return 'Unknown time';

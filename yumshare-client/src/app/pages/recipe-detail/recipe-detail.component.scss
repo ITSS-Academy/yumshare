@@ -621,10 +621,17 @@ p {
 }
 
 /* Video container styles - responsive for both iframe and video */
+.video-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .video iframe.clip,
 .video video.clip {
   width: 100%;
-  max-width: 700px;
+  max-width: 720px;
   aspect-ratio: 16 / 9;
   height: auto;
   border-radius: 1rem;
@@ -632,6 +639,15 @@ p {
   margin: 0 auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  // Larger on desktop
+  @media (min-width: 1200px) {
+    max-width: 750px;
+  }
+  
+  @media (min-width: 1400px) {
+    max-width: 800px;
+  }
 }
 
 .video iframe.clip:hover,

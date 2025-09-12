@@ -8,7 +8,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-sm);
     padding: var(--spacing-lg);
   }
 
@@ -32,8 +32,8 @@
   // Grid layout styles
   &.layout-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(auto-fill, minmax(335px, 1fr));
+    gap: var(--spacing-sm);
     padding: var(--spacing-lg);
     overflow-x: visible;
     scroll-snap-type: none;

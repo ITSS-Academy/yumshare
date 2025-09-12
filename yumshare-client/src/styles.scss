@@ -377,35 +377,96 @@ body {
   padding: 0;
   min-width: unset !important;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: none !important;
+}
+
+// Bỏ tất cả shadow của snackbar
+.mat-mdc-snack-bar-container {
+  box-shadow: none !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  box-shadow: none !important;
 }
 
 // CSS cho thông báo thành công
 .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
   background-color: var(--success);
   color: var(--success-on);
-  border-radius: 8px;
+  border-radius: 20px;
+}
+
+// CSS cho button trong success snackbar
+.mat-mdc-snack-bar-container.success-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  border-radius: 15px !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-snack-bar-container.success-snackbar .mat-mdc-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 // CSS cho thông báo lỗi
 .mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
   background-color: var(--error);
   color: var(--error-on);
-  border-radius: 8px;
+  border-radius: 20px;
+}
+
+// CSS cho button trong error snackbar
+.mat-mdc-snack-bar-container.error-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  border-radius: 15px !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-snack-bar-container.error-snackbar .mat-mdc-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 // CSS cho thông báo cảnh báo
 .mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
   background-color: var(--warning);
   color: var(--warning-on);
-  border-radius: 8px;
+  border-radius: 20px;
+}
+
+// CSS cho button trong warning snackbar
+.mat-mdc-snack-bar-container.warning-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  border-radius: 15px !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-snack-bar-container.warning-snackbar .mat-mdc-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 // CSS cho thông báo thông tin
 .mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__surface {
   background-color: var(--info);
   color: var(--info-on);
-  border-radius: 8px;
+  border-radius: 20px;
+}
+
+// CSS cho button trong info snackbar
+.mat-mdc-snack-bar-container.info-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  border-radius: 15px !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-snack-bar-container.info-snackbar .mat-mdc-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 // Định nghĩa style cho icon và text bên trong component

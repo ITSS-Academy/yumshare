@@ -1,44 +1,142 @@
 <div class="search-container" id="search-container">
-  <h2 id="search-title">Discover Your Favorites</h2>
+  <h2 id="search-title">Discover Cooking Recipes</h2>
 
-  <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
-    <select 
-      id="search-type-select" 
-      [(ngModel)]="searchType" 
-      name="searchType"
-      class="search-type-select"
-      (ngModelChange)="onSearchTypeChange()"
-    >
-      <option value="recipe">Search Recipes</option>
-      <option value="author">Search by Author</option>
-    </select>
-    <input
-      type="text"
-      id="search-input"
-      [placeholder]="getSearchPlaceholder()"
-      [(ngModel)]="keyword"
-      name="keyword"
-    />
-    <select 
-      id="category-select" 
-      [(ngModel)]="selectedCategory" 
-      name="category"
-      [disabled]="searchType === 'author'"
-    >
-      <option value="">All Categories</option>
-      @for (c of categories; track c.id) {
-        <option [value]="c.id">{{ c.name }}</option>
-      }
-    </select>
-    <button mat-raised-button color="primary" id="search-button" type="submit">
-      <mat-icon>search</mat-icon>
-      Search
-    </button>
-    <button mat-stroked-button color="warn" id="clear-button" type="button" (click)="clearSearch()">
-      <mat-icon>clear</mat-icon>
-      Clear
-    </button>
-  </form>
+  <div class="search-form-container">
+    <form class="search-bar" id="search-bar" (ngSubmit)="onSearch()">
+      <!-- Search Type Toggle -->
+      <div class="search-type-toggle">
+        <button 
+          type="button"
+          class="toggle-btn"
+          [class.active]="searchType === 'recipe'"
+          (click)="searchType = 'recipe'; onSearchTypeChange()"
+        >
+          <mat-icon>restaurant</mat-icon>
+          <span>Recipes</span>
+        </button>
+        <button 
+          type="button"
+          class="toggle-btn"
+          [class.active]="searchType === 'author'"
+          (click)="searchType = 'author'; onSearchTypeChange()"
+        >
+          <mat-icon>person</mat-icon>
+          <span>Authors</span>
+        </button>
+      </div>
+
+      <!-- Main Search Input -->
+      <div class="search-input-group">
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">search</mat-icon>
+          <input
+            type="text"
+            id="search-input"
+            [placeholder]="getSearchPlaceholder()"
+            [(ngModel)]="keyword"
+            name="keyword"
+            class="search-input"
+            (keydown.enter)="onSearch()"
+            autocomplete="off"
+          />
+          @if (keyword) {
+            <button 
+              type="button" 
+              class="clear-input-btn"
+              (click)="keyword = ''"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="category-filter" [class.disabled]="searchType === 'author'">
+          <mat-icon class="filter-icon">restaurant_menu</mat-icon>
+          <div class="custom-dropdown" (click)="toggleDropdown()" [class.open]="isDropdownOpen">
+            <span class="dropdown-text">
+              {{ getSelectedCategoryName() }}
+            </span>
+            <mat-icon class="dropdown-arrow">{{ isDropdownOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+          
+          <!-- Dropdown Options -->
+          <div class="dropdown-options" [class.show]="isDropdownOpen" *ngIf="isDropdownOpen">
+            <div 
+              class="dropdown-option" 
+              [class.selected]="selectedCategory === ''"
+              (click)="selectCategory('')"
+            >
+              <mat-icon>apps</mat-icon>
+              <span>All Categories</span>
+            </div>
+            @for (category of categories; track category.id) {
+              <div 
+                class="dropdown-option" 
+                [class.selected]="selectedCategory === category.id"
+                (click)="selectCategory(category.id)"
+              >
+                <span>{{ category.name }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          id="search-button" 
+          type="submit"
+          class="search-btn"
+          [disabled]="!keyword.trim()"
+        >
+          <mat-icon>search</mat-icon>
+          <span>Search</span>
+        </button>
+        <button 
+          mat-stroked-button 
+          color="warn" 
+          id="clear-button" 
+          type="button" 
+          (click)="clearSearch()"
+          class="clear-btn"
+        >
+          <mat-icon>refresh</mat-icon>
+          <span>Reset</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Quick Filters -->
+    <div class="quick-filters" *ngIf="searchType === 'recipe' && categories.length > 0">
+      <span class="filter-label">
+        <mat-icon>tune</mat-icon>
+        Quick filters:
+      </span>
+      <div class="filter-chips">
+        <button 
+          class="filter-chip"
+          [class.active]="selectedCategory === ''"
+          (click)="selectedCategory = ''"
+        >
+          <mat-icon>apps</mat-icon>
+          All
+        </button>
+        @for (category of categories; track category.id) {
+          <button 
+            class="filter-chip"
+            [class.active]="selectedCategory === category.id"
+            (click)="selectedCategory = category.id"
+          >
+            {{ category.name }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
 
   <!-- @if (getLoadingState() | async) {
     <div class="loading">

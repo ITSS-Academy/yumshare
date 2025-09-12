@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.yumshare.vn' // Custom domain for API
+  apiUrl: 'https://yumshare-core-production.up.railway.app' // Railway backend API URL
 };
